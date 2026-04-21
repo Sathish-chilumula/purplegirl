@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Sparkles, Heart, Briefcase, Pill, Shirt, Brain, Salad, ArrowRight, Loader2, Bath, ShoppingBag, Coffee, Baby } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import LiveSearch from '@/components/search/LiveSearch';
+import MeTooButton from '@/components/question/MeTooButton';
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   'beauty-skincare': <Sparkles className="w-5 h-5" />,
@@ -160,18 +161,19 @@ export default function Home() {
               
               <div className="flex overflow-x-auto pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-3 gap-6 snap-x snap-mandatory hide-scrollbar">
                 {trending.map((q) => (
-                  <Link 
+                  <div 
                     key={q.id} 
-                    href={`/q/${q.slug}`}
                     className="min-w-[280px] md:min-w-0 bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 snap-start border border-purple-50 flex flex-col h-full"
                   >
                     <div className="text-xs font-semibold text-purple-primary mb-3 uppercase tracking-wider">{q.categories?.name}</div>
-                    <h3 className="font-bold text-lg text-text-primary mb-4 flex-1 line-clamp-3">{q.title}</h3>
-                    <div className="flex items-center text-sm font-medium text-text-secondary mt-auto">
-                      <Heart className="w-4 h-4 text-pink-accent mr-1.5 fill-pink-accent/20" />
-                      {q.metoo_count} girls asked this
+                    <Link href={`/q/${q.slug}`} className="flex-1">
+                      <h3 className="font-bold text-lg text-text-primary mb-4 line-clamp-3 hover:text-purple-primary transition-colors">{q.title}</h3>
+                    </Link>
+                    <div className="flex items-center justify-between text-sm font-medium text-text-secondary mt-auto pt-2 border-t border-purple-50/50">
+                      <span className="text-xs">Trending</span>
+                      <MeTooButton questionId={q.id} initialCount={q.metoo_count} variant="compact" />
                     </div>
-                  </Link>
+                  </div>
                 ))}
               </div>
             </section>

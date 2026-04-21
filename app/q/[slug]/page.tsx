@@ -1,10 +1,12 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Clock, Eye, Heart, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { Clock, Eye, CheckCircle2, ArrowLeft } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import QuestionClient from '@/components/question/QuestionClient';
 import FollowUpChat from '@/components/question/FollowUpChat';
+import MeTooButton from '@/components/question/MeTooButton';
+import AnswerWaiter from '@/components/question/AnswerWaiter';
 import { SITE_NAME } from '@/lib/constants';
 
 interface QuestionPageProps {
@@ -81,14 +83,17 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
         {question.title}
       </h1>
 
-      {/* Meta */}
-      <div className="flex flex-wrap items-center gap-4 text-sm text-text-secondary mb-8 pb-8 border-b border-purple-50">
-        <span className="font-semibold text-purple-primary bg-purple-100 px-3 py-1 rounded-full uppercase tracking-wider text-xs">
-          {question.categories?.name}
-        </span>
-        <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> {timeAgo}</span>
-        <span className="flex items-center gap-1.5"><Eye className="w-4 h-4" /> {(question.view_count || 0).toLocaleString()}</span>
-        <span className="flex items-center gap-1.5"><Heart className="w-4 h-4 text-pink-accent" /> {(question.metoo_count || 0).toLocaleString()}</span>
+      {/* Meta + Action */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 pb-8 border-b border-purple-50">
+        <div className="flex flex-wrap items-center gap-4 text-sm text-text-secondary">
+          <span className="font-semibold text-purple-primary bg-purple-100 px-3 py-1 rounded-full uppercase tracking-wider text-xs">
+            {question.categories?.name}
+          </span>
+          <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> {timeAgo}</span>
+          <span className="flex items-center gap-1.5"><Eye className="w-4 h-4" /> {(question.view_count || 0).toLocaleString()}</span>
+        </div>
+        
+        <MeTooButton questionId={question.id} initialCount={question.metoo_count || 0} variant="prominent" />
       </div>
 
       {question.answers ? (
@@ -208,9 +213,7 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
           />
         </>
       ) : (
-        <div className="bg-yellow-50 border border-yellow-100 rounded-2xl p-8 text-center mb-12">
-          <p className="text-yellow-800 font-medium italic">Our sisters are currently writing an answer for this question. Please check back in a few minutes! 💜</p>
-        </div>
+        <AnswerWaiter questionId={question.id} />
       )}
 
       {/* Related Questions */}

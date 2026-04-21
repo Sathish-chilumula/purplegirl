@@ -77,21 +77,6 @@ export default function QuestionClient({
           Share as Image
         </button>
       </div>
-      
-      <div className="pt-8 border-t border-purple-100/50">
-        <button 
-          onClick={handleMeToo}
-          disabled={hasMeToo}
-          className={`flex items-center justify-center w-full gap-3 px-8 py-4 rounded-2xl font-bold text-lg transition-all ${
-            hasMeToo 
-              ? 'bg-pink-100 text-pink-600 border border-pink-200' 
-              : 'bg-white text-text-primary border border-purple-200 shadow-sm hover:border-pink-300 hover:shadow-md'
-          }`}
-        >
-          <Heart className={`w-6 h-6 ${hasMeToo ? 'fill-current text-pink-500' : 'text-pink-accent'}`} />
-          {hasMeToo ? `You and ${metooCount} girls asked this` : `${metooCount} girls have this question too`}
-        </button>
-      </div>
     </div>
   );
 }
