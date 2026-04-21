@@ -1,10 +1,12 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Clock, Eye, Heart, ArrowLeft, ArrowRight, Sparkles } from 'lucide-react';
+import { Clock, Eye, Heart, ArrowLeft, ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import QuestionClient from '@/components/question/QuestionClient';
 import FollowUpChat from '@/components/question/FollowUpChat';
+import MeTooButton from '@/components/question/MeTooButton';
+import AnswerWaiter from '@/components/question/AnswerWaiter';
 import { SITE_NAME } from '@/lib/constants';
 
 export const runtime = 'edge';
@@ -87,6 +89,10 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
         <h1 className="font-playfair font-bold text-3xl md:text-5xl text-[#1F1235] tracking-tight leading-tight mb-8 animate-slide-up">
           {question.title}
         </h1>
+        
+        <MeTooButton questionId={question.id} initialCount={question.metoo_count || 0} variant="prominent" />
+      </div>
+>>>>>>> b5ef35a4fbc7f5a2d1ff3a29b93a15a52be0c706
 
         {/* Category + Meta glass bar */}
         <div className="glass rounded-2xl px-5 py-3.5 flex flex-wrap items-center gap-3 mb-12 shadow-sm animate-slide-up stagger-1">
@@ -207,7 +213,88 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
             </div>
           </section>
         )}
-      </div>
+
+        {/* Practical Tips (Integrated from remote) */}
+        {question.answers?.bullet_points && question.answers.bullet_points.length > 0 && (
+          <section className="mt-12 glass rounded-[2rem] p-8 border border-purple-100 shadow-sm animate-slide-up">
+            <h2 className="font-playfair font-bold text-2xl text-[#1F1235] mb-6 flex items-center gap-2">
+              <Sparkles className="w-6 h-6 text-purple-500" /> Practical Tips
+            </h2>
+            <ul className="space-y-4">
+              {question.answers.bullet_points.map((tip: string, i: number) => (
+                <li key={i} className="flex items-start gap-4 bg-white/50 p-4 rounded-2xl border border-purple-50 transition-all hover:border-purple-200">
+                  <CheckCircle2 className="w-5 h-5 text-purple-600 shrink-0 mt-0.5" />
+                  <span className="text-[#1F1235] font-medium leading-relaxed">{tip}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {/* FAQs (Integrated from remote) */}
+        {question.answers?.faqs && question.answers.faqs.length > 0 && (
+          <section className="mt-12 animate-slide-up">
+            <h2 className="font-playfair font-bold text-2xl text-[#1F1235] mb-6">Common Questions</h2>
+            <div className="space-y-3">
+              {question.answers.faqs.map((faq: any, i: number) => (
+                <details key={i} className="group glass rounded-2xl border border-purple-100 overflow-hidden transition-all duration-300">
+                  <summary className="flex items-center justify-between p-5 font-bold text-[#1F1235] cursor-pointer hover:bg-purple-50/50 transition-colors list-none">
+                    {faq.q}
+                    <span className="transition-transform group-open:rotate-180">
+                      <svg fill="none" height="20" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="20"><path d="M6 9l6 6 6-6"></path></svg>
+                    </span>
+                  </summary>
+                  <div className="p-5 pt-0 text-gray-600 leading-relaxed text-sm bg-white/30">
+                    {faq.a}
+                  </div>
+                </details>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Disclaimer */}
+        {question.answers?.disclaimer && (
+          <div className="mt-12 text-center">
+            <p className="text-xs text-gray-400 italic bg-gray-50/50 px-4 py-3 rounded-xl inline-block max-w-md">
+              {question.answers.disclaimer}
+          />
+
+          {/* Client Side Interaction Block */}
+          <QuestionClient 
+            questionId={question.id}
+            initialMeToo={question.metoo_count}
+            questionTitle={question.title}
+            questionSlug={question.slug}
+            bulletPoints={question.answers.bullet_points}
+            summary={question.answers.summary}
+          />
+        </>
+      ) : (
+        <AnswerWaiter questionId={question.id} />
+      )}
+
+      {/* Related Questions */}
+      {related && related.length > 0 && (
+        <section>
+          <h2 className="font-bold text-2xl text-text-primary mb-6">Girls also asked…</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {related.map((q: any, i: number) => (
+              <Link 
+                key={i}
+                href={`/q/${q.slug}`}
+                className="bg-white p-5 rounded-2xl border border-purple-50 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all"
+              >
+                <h3 className="font-bold text-text-primary line-clamp-2">{q.title}</h3>
+                <div className="text-purple-primary text-sm font-medium mt-3 flex items-center gap-1 group-hover:gap-2 transition-all">
+                  Read answer <ArrowLeft className="w-4 h-4 rotate-180" />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+>>>>>>> b5ef35a4fbc7f5a2d1ff3a29b93a15a52be0c706
     </div>
   );
 }

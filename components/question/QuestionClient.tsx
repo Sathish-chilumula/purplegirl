@@ -109,7 +109,6 @@ export default function QuestionClient({
           Share as Image
         </button>
       </div>
-
       <ShareImageGenerator 
         ref={shareCardRef}
         questionTitle={questionTitle}

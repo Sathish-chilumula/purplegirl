@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Sparkles, Heart, Briefcase, Pill, Shirt, Brain, Salad, Bath, ShoppingBag, Coffee, Baby, ArrowRight, Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import LiveSearch from '@/components/search/LiveSearch';
+import MeTooButton from '@/components/question/MeTooButton';
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   'beauty-skincare': <Sparkles className="w-5 h-5" />,
@@ -170,16 +171,47 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── TRENDING QUESTIONS ──────────────────────── */}
-      <section className="relative w-full bg-[#FAF5FF] py-16 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center gap-3 mb-10">
-            <span className="text-3xl">🔥</span>
-            <div>
-              <h2 className="font-playfair font-bold text-3xl text-[#1F1235]">Girls are asking…</h2>
-              <p className="text-gray-500 text-sm mt-1">Real questions from the sisterhood, answered with empathy</p>
-            </div>
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-32 gap-6">
+          <div className="relative">
+            <div className="w-16 h-16 rounded-full border-4 border-purple-100 border-t-purple-600 animate-spin" />
+            <Heart className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 text-pink-400 animate-pulse" />
           </div>
+          <p className="text-purple-900/60 font-bold tracking-tight animate-pulse">Entering the sisterhood...</p>
+        </div>
+      ) : (
+        <>
+          {/* ─── TRENDING QUESTIONS ──────────────────────── */}
+          <section className="relative w-full bg-[#FAF5FF] py-16 px-4">
+            <div className="max-w-7xl mx-auto">
+              <div className="flex items-center gap-3 mb-10">
+                <span className="text-3xl">🔥</span>
+                <div>
+                  <h2 className="font-playfair font-bold text-3xl text-[#1F1235]">Girls are asking…</h2>
+                  <p className="text-gray-500 text-sm mt-1">Real questions from the sisterhood, answered with empathy</p>
+                </div>
+              </div>
+
+              <div className="flex overflow-x-auto pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-3 gap-6 snap-x snap-mandatory hide-scrollbar">
+                {trending.map((q) => (
+                  <div 
+                    key={q.id} 
+                    className="min-w-[280px] md:min-w-0 bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 snap-start border border-purple-50 flex flex-col h-full"
+                  >
+                    <div className="text-xs font-semibold text-purple-primary mb-3 uppercase tracking-wider">{q.categories?.name}</div>
+                    <Link href={`/q/${q.slug}`} className="flex-1">
+                      <h3 className="font-bold text-lg text-text-primary mb-4 line-clamp-3 hover:text-purple-primary transition-colors">{q.title}</h3>
+                    </Link>
+                    <div className="flex items-center justify-between text-sm font-medium text-text-secondary mt-auto pt-2 border-t border-purple-50/50">
+                      <span className="text-xs">Trending</span>
+                      <MeTooButton questionId={q.id} initialCount={q.metoo_count} variant="compact" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+>>>>>>> b5ef35a4fbc7f5a2d1ff3a29b93a15a52be0c706
 
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
