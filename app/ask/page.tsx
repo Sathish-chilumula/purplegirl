@@ -199,6 +199,4 @@ export default function AskPage() {
     </div>
   );
 }
-  );
-}
 

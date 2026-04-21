@@ -83,10 +83,10 @@ export async function POST(req: Request) {
     let affiliatedProducts = [];
     if (answerData.product_keywords && answerData.product_keywords.length > 0) {
       affiliatedProducts = answerData.product_keywords.map((kw: string) => ({
-        title: \`Top Rated \${kw.charAt(0).toUpperCase() + kw.slice(1)}\`,
-        link: \`https://amazon.in/s?k=\${encodeURIComponent(kw)}\`,
+        title: `Top Rated ${kw.charAt(0).toUpperCase() + kw.slice(1)}`,
+        link: `https://amazon.in/s?k=${encodeURIComponent(kw)}`,
         price: 'Featured',
-        image: \`https://picsum.photos/seed/\${encodeURIComponent(kw)}/200/200\`
+        image: `https://picsum.photos/seed/${encodeURIComponent(kw)}/200/200`
       }));
     }
 

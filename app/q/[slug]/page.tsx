@@ -91,8 +91,6 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
         </h1>
         
         <MeTooButton questionId={question.id} initialCount={question.metoo_count || 0} variant="prominent" />
-      </div>
->>>>>>> b5ef35a4fbc7f5a2d1ff3a29b93a15a52be0c706
 
         {/* Category + Meta glass bar */}
         <div className="glass rounded-2xl px-5 py-3.5 flex flex-wrap items-center gap-3 mb-12 shadow-sm animate-slide-up stagger-1">

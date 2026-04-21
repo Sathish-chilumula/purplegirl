@@ -203,44 +203,16 @@ export default function Home() {
                       <h3 className="font-bold text-lg text-text-primary mb-4 line-clamp-3 hover:text-purple-primary transition-colors">{q.title}</h3>
                     </Link>
                     <div className="flex items-center justify-between text-sm font-medium text-text-secondary mt-auto pt-2 border-t border-purple-50/50">
-                      <span className="text-xs">Trending</span>
+                      <span className="text-xs font-bold text-pink-500">Trending</span>
                       <MeTooButton questionId={q.id} initialCount={q.metoo_count} variant="compact" />
                     </div>
                   </div>
                 ))}
               </div>
-            </section>
-          )}
->>>>>>> b5ef35a4fbc7f5a2d1ff3a29b93a15a52be0c706
-
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[1,2,3].map(i => <div key={i} className="shimmer h-48 rounded-3xl" />)}
             </div>
-          ) : (
-            <div className="flex overflow-x-auto pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-3 gap-6 snap-x snap-mandatory hide-scrollbar">
-              {trending.map((q, i) => (
-                <Link
-                  key={q.id}
-                  href={`/q/${q.slug}`}
-                  className="card-premium min-w-[280px] md:min-w-0 p-6 flex flex-col snap-start group animate-slide-up"
-                  style={{ animationDelay: `${i * 0.1}s` }}
-                >
-                  <div className="text-xs font-bold text-purple-600 mb-3 uppercase tracking-widest bg-purple-50 px-3 py-1 rounded-full w-fit">{q.categories?.name}</div>
-                  <h3 className="font-bold text-lg text-[#1F1235] mb-4 flex-1 line-clamp-3 group-hover:text-purple-600 transition-colors">{q.title}</h3>
-                  <div className="flex items-center justify-between text-sm text-gray-400 mt-auto pt-4 border-t border-purple-50">
-                    <span className="flex items-center gap-1.5">
-                      <Heart className="w-4 h-4 text-pink-400 fill-pink-100" />
-                      {q.metoo_count} girls asked this
-                    </span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform text-purple-400" />
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+          </section>
+        </>
+      )}
 
       {/* ─── CATEGORIES SECTION ─────────────────────── */}
       <section className="relative py-16 px-4 overflow-hidden">
