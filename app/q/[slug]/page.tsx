@@ -109,7 +109,7 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
         </div>
 
         {question.answers ? (
-          <div className="flex flex-col gap-5 mb-16 animate-slide-up stagger-2">
+          <div className="flex flex-col gap-8 animate-slide-up stagger-2">
             {/* User Bubble (The Question) */}
             <div className="flex justify-end">
               <div className="bubble-user text-white rounded-[2rem] rounded-tr-md px-6 py-4 max-w-[85%]">
@@ -137,12 +137,12 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
                 </div>
               ))
             ) : (
-              <p className="text-center text-gray-400 italic">No response found.</p>
+              <p className="text-center text-gray-400 italic">Asking our elders for the best advice...</p>
             )}
 
             {/* Affiliated Products */}
             {question.answers.products && question.answers.products.length > 0 && (
-              <div className="flex justify-start w-full mt-4" style={{ animationDelay: '1000ms', animationFillMode: 'both' }}>
+              <div className="flex justify-start w-full mt-4 animate-slide-up" style={{ animationDelay: '1000ms', animationFillMode: 'both' }}>
                 <div className="ml-12 w-full">
                   <div className="glass rounded-3xl p-6 border border-pink-100 shadow-sm relative overflow-hidden">
                     <div className="orb orb-pink w-40 h-40 top-0 right-0 opacity-20" />
@@ -152,7 +152,7 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
                     <div className="flex overflow-x-auto gap-4 pb-2 hide-scrollbar relative z-10">
                       {question.answers.products.map((p: any, i: number) => (
                         <a key={i} href={p.link} target="_blank" rel="noopener noreferrer"
-                          className="card-premium min-w-[150px] p-3">
+                          className="card-premium min-w-[200px] p-3 hover:translate-y-[-4px] transition-transform">
                           <img src={p.image} alt={p.title} className="w-full aspect-square object-cover rounded-xl mb-3 bg-purple-50" />
                           <p className="font-bold text-sm text-[#1F1235] line-clamp-2">{p.title}</p>
                           <p className="text-xs font-bold text-pink-500 mt-1">{p.price}</p>
@@ -164,18 +164,68 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
               </div>
             )}
 
-            {/* Me Too / Share */}
-            <div className="ml-12 animate-slide-up mt-4" style={{ animationDelay: '1200ms', animationFillMode: 'both' }}>
+            {/* Practical Tips */}
+            {question.answers?.bullet_points && question.answers.bullet_points.length > 0 && (
+              <section className="ml-12 glass rounded-[2rem] p-8 border border-purple-100 shadow-sm animate-slide-up" style={{ animationDelay: '1200ms', animationFillMode: 'both' }}>
+                <h2 className="font-playfair font-bold text-2xl text-[#1F1235] mb-6 flex items-center gap-2">
+                  <Sparkles className="w-6 h-6 text-purple-500" /> Practical Tips
+                </h2>
+                <ul className="space-y-4">
+                  {question.answers.bullet_points.map((tip: string, i: number) => (
+                    <li key={i} className="flex items-start gap-4 bg-white/50 p-4 rounded-2xl border border-purple-50 transition-all hover:border-purple-200">
+                      <CheckCircle2 className="w-5 h-5 text-purple-600 shrink-0 mt-0.5" />
+                      <span className="text-[#1F1235] font-medium leading-relaxed">{tip}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            {/* FAQs */}
+            {question.answers?.faqs && question.answers.faqs.length > 0 && (
+              <section className="ml-12 animate-slide-up" style={{ animationDelay: '1400ms', animationFillMode: 'both' }}>
+                <h2 className="font-playfair font-bold text-2xl text-[#1F1235] mb-6">Common Questions</h2>
+                <div className="space-y-3">
+                  {question.answers.faqs.map((faq: any, i: number) => (
+                    <details key={i} className="group glass rounded-2xl border border-purple-100 overflow-hidden transition-all duration-300">
+                      <summary className="flex items-center justify-between p-5 font-bold text-[#1F1235] cursor-pointer hover:bg-purple-50/50 transition-colors list-none">
+                        {faq.q}
+                        <span className="transition-transform group-open:rotate-180">
+                          <svg fill="none" height="20" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="20"><path d="M6 9l6 6 6-6"></path></svg>
+                        </span>
+                      </summary>
+                      <div className="p-5 pt-0 text-gray-600 leading-relaxed text-sm bg-white/30">
+                        {faq.a}
+                      </div>
+                    </details>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Disclaimer */}
+            {question.answers?.disclaimer && (
+              <div className="ml-12 mt-8 text-center animate-slide-up">
+                <p className="text-xs text-gray-400 italic bg-gray-50/50 px-4 py-3 rounded-xl inline-block max-w-md">
+                  {question.answers.disclaimer}
+                </p>
+              </div>
+            )}
+
+            {/* Me Too / Share / Interaction Block */}
+            <div className="ml-12 animate-slide-up mt-8">
               <QuestionClient
                 questionId={question.id}
                 initialMeToo={question.metoo_count}
                 questionTitle={question.title}
                 questionSlug={question.slug}
+                bulletPoints={question.answers?.bullet_points}
+                summary={question.answers?.summary}
               />
             </div>
 
             {/* Follow-up Chat */}
-            <div className="mt-12 pt-12 border-t border-purple-100/60">
+            <div className="mt-12 pt-12 border-t border-purple-100/60 ml-12 animate-slide-up">
               <div className="flex items-center gap-2 mb-6">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-200 to-pink-200 flex items-center justify-center text-sm border-2 border-white shadow">💜</div>
                 <p className="font-bold text-[#1F1235] text-sm">Continue the conversation…</p>
@@ -184,120 +234,44 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
             </div>
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-4 py-24 animate-slide-up">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-200 to-pink-200 flex items-center justify-center text-3xl border-4 border-white shadow-lg">💜</div>
-            <p className="text-[#1F1235] font-bold text-lg">PurpleGirl is typing a response…</p>
-            <div className="flex gap-2">
-              <div className="w-2.5 h-2.5 rounded-full bg-purple-400 animate-typing" style={{ animationDelay: '0ms' }} />
-              <div className="w-2.5 h-2.5 rounded-full bg-purple-400 animate-typing" style={{ animationDelay: '200ms' }} />
-              <div className="w-2.5 h-2.5 rounded-full bg-purple-400 animate-typing" style={{ animationDelay: '400ms' }} />
+          <div className="flex flex-col items-center gap-6 py-32 animate-slide-up">
+            <div className="relative">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-200 to-pink-200 flex items-center justify-center text-4xl border-4 border-white shadow-xl animate-pulse">💜</div>
+              <div className="absolute -top-1 -right-1 w-6 h-6 bg-pink-500 rounded-full border-2 border-white flex items-center justify-center">
+                <Sparkles className="w-3.5 h-3.5 text-white animate-spin-slow" />
+              </div>
             </div>
+            <div className="text-center">
+              <p className="text-[#1F1235] font-bold text-xl mb-2">PurpleGirl is thinking…</p>
+              <p className="text-gray-500 text-sm max-w-xs mx-auto">We're gathering the best guidance just for you. This usually takes less than 30 seconds.</p>
+            </div>
+            <div className="flex gap-2">
+              <div className="w-3 h-3 rounded-full bg-purple-400 animate-typing" style={{ animationDelay: '0ms' }} />
+              <div className="w-3 h-3 rounded-full bg-purple-400 animate-typing" style={{ animationDelay: '200ms' }} />
+              <div className="w-3 h-3 rounded-full bg-purple-400 animate-typing" style={{ animationDelay: '400ms' }} />
+            </div>
+            <AnswerWaiter questionId={question.id} />
           </div>
         )}
 
         {/* Related Questions */}
         {related && related.length > 0 && (
-          <section className="mt-12 animate-slide-up">
-            <h2 className="font-playfair font-bold text-2xl text-[#1F1235] mb-6">Girls also asked…</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <section className="mt-24 pt-12 border-t border-purple-100 animate-slide-up">
+            <h2 className="font-playfair font-bold text-2xl text-[#1F1235] mb-8">More conversations you might like…</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {related.map((q: any, i: number) => (
-                <Link key={i} href={`/q/${q.slug}`} className="card-premium p-5 group">
-                  <h3 className="font-bold text-[#1F1235] line-clamp-2 group-hover:text-purple-600 transition-colors">{q.title}</h3>
-                  <div className="text-purple-600 text-sm font-bold mt-3 flex items-center gap-1 group-hover:gap-2 transition-all">
-                    Read answer <ArrowRight className="w-3.5 h-3.5" />
+                <Link key={i} href={`/q/${q.slug}`} className="card-premium p-6 group hover:translate-y-[-4px] transition-all">
+                  <h3 className="font-bold text-[#1F1235] text-lg line-clamp-2 group-hover:text-purple-600 transition-colors leading-tight">{q.title}</h3>
+                  <div className="text-purple-600 text-sm font-bold mt-4 flex items-center gap-1 group-hover:gap-2 transition-all">
+                    Read answer <ArrowRight className="w-4 h-4" />
                   </div>
                 </Link>
               ))}
             </div>
           </section>
         )}
-
-        {/* Practical Tips (Integrated from remote) */}
-        {question.answers?.bullet_points && question.answers.bullet_points.length > 0 && (
-          <section className="mt-12 glass rounded-[2rem] p-8 border border-purple-100 shadow-sm animate-slide-up">
-            <h2 className="font-playfair font-bold text-2xl text-[#1F1235] mb-6 flex items-center gap-2">
-              <Sparkles className="w-6 h-6 text-purple-500" /> Practical Tips
-            </h2>
-            <ul className="space-y-4">
-              {question.answers.bullet_points.map((tip: string, i: number) => (
-                <li key={i} className="flex items-start gap-4 bg-white/50 p-4 rounded-2xl border border-purple-50 transition-all hover:border-purple-200">
-                  <CheckCircle2 className="w-5 h-5 text-purple-600 shrink-0 mt-0.5" />
-                  <span className="text-[#1F1235] font-medium leading-relaxed">{tip}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-
-        {/* FAQs (Integrated from remote) */}
-        {question.answers?.faqs && question.answers.faqs.length > 0 && (
-          <section className="mt-12 animate-slide-up">
-            <h2 className="font-playfair font-bold text-2xl text-[#1F1235] mb-6">Common Questions</h2>
-            <div className="space-y-3">
-              {question.answers.faqs.map((faq: any, i: number) => (
-                <details key={i} className="group glass rounded-2xl border border-purple-100 overflow-hidden transition-all duration-300">
-                  <summary className="flex items-center justify-between p-5 font-bold text-[#1F1235] cursor-pointer hover:bg-purple-50/50 transition-colors list-none">
-                    {faq.q}
-                    <span className="transition-transform group-open:rotate-180">
-                      <svg fill="none" height="20" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="20"><path d="M6 9l6 6 6-6"></path></svg>
-                    </span>
-                  </summary>
-                  <div className="p-5 pt-0 text-gray-600 leading-relaxed text-sm bg-white/30">
-                    {faq.a}
-                  </div>
-                </details>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Disclaimer */}
-        {question.answers?.disclaimer && (
-          <div className="mt-12 text-center">
-            <p className="text-xs text-gray-400 italic bg-gray-50/50 px-4 py-3 rounded-xl inline-block max-w-md">
-              {question.answers.disclaimer}
-            </p>
-          </div>
-        )}
-
-        {/* Client Side Interaction Block */}
-        <QuestionClient 
-          questionId={question.id}
-          initialMeToo={question.metoo_count}
-          questionTitle={question.title}
-          questionSlug={question.slug}
-          bulletPoints={question.answers.bullet_points}
-          summary={question.answers.summary}
-        />
       </div>
-    ) : (
-      <div className="max-w-2xl mx-auto px-4 py-32">
-        <AnswerWaiter questionId={question.id} />
-      </div>
-    )}
-
-    {/* Related Questions */}
-    {related && related.length > 0 && (
-      <section className="max-w-2xl mx-auto px-4 pb-32">
-        <h2 className="font-playfair font-bold text-2xl text-[#1F1235] mb-6">Girls also asked…</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {related.map((q: any, i: number) => (
-            <Link 
-              key={i}
-              href={`/q/${q.slug}`}
-              className="bg-white p-5 rounded-2xl border border-purple-50 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all group"
-            >
-              <h3 className="font-bold text-[#1F1235] line-clamp-2 group-hover:text-purple-600 transition-colors">{q.title}</h3>
-              <div className="text-purple-600 text-sm font-medium mt-3 flex items-center gap-1">
-                Read answer <ArrowRight className="w-4 h-4" />
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-    )}
     </div>
-  </div>
-);
+  );
 }
 
