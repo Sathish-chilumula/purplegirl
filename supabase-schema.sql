@@ -59,13 +59,17 @@ CREATE TABLE IF NOT EXISTS subscribers (
 -- 5. Seed categories
 INSERT INTO categories (name, slug, icon, color) 
 VALUES
-('Beauty & Skincare',   'beauty-skincare',  '✨', '#E91E8C'),
-('Relationships',       'relationships',    '💜', '#9C27B0'),
-('Career & Money',      'career-money',     '💼', '#673AB7'),
-('Health Basics',       'health-basics',    '🌿', '#4CAF50'),
-('Fashion',             'fashion',          '👗', '#FF4081'),
-('Mental Wellness',     'mental-wellness',  '🧘', '#7C4DFF'),
-('Food & Nutrition',    'food-nutrition',   '🥗', '#FF9800')
+('Beauty & Skincare',           'beauty-skincare',           '✨', '#E91E8C'),
+('Fashion & Style',             'fashion-style',             '👗', '#FF4081'),
+('Haircare',                    'haircare',                  '💇‍♀️', '#F48FB1'),
+('Relationships & Love',        'relationships-love',        '💜', '#9C27B0'),
+('Mental Wellness',             'mental-wellness',           '🧘‍♀️', '#7C4DFF'),
+('Health Basics',               'health-basics',             '🌿', '#4CAF50'),
+('Lifestyle',                   'lifestyle',                 '☕', '#8D6E63'),
+('Self-Care & Glow Up',         'self-care-glow-up',         '🛁', '#00BCD4'),
+('Food & Nutrition',            'food-nutrition',            '🥗', '#FF9800'),
+('Shopping & Product Advice',   'shopping-product-advice',   '🛍️', '#FFC107'),
+('Pregnancy & Baby Care',       'pregnancy-baby-care',       '🍼', '#009688')
 ON CONFLICT (slug) DO NOTHING;
 
 -- 6. Basic RLS (Row Level Security)

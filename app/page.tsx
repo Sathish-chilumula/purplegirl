@@ -2,18 +2,22 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Sparkles, Heart, Briefcase, Pill, Shirt, Brain, Salad, ArrowRight, Loader2 } from 'lucide-react';
+import { Sparkles, Heart, Briefcase, Pill, Shirt, Brain, Salad, ArrowRight, Loader2, Bath, ShoppingBag, Coffee, Baby } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import LiveSearch from '@/components/search/LiveSearch';
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   'beauty-skincare': <Sparkles className="w-5 h-5" />,
-  'relationships': <Heart className="w-5 h-5" />,
-  'career-money': <Briefcase className="w-5 h-5" />,
-  'health-basics': <Pill className="w-5 h-5" />,
-  'fashion': <Shirt className="w-5 h-5" />,
+  'fashion-style': <Shirt className="w-5 h-5" />,
+  'haircare': <Bath className="w-5 h-5" />,
+  'relationships-love': <Heart className="w-5 h-5" />,
   'mental-wellness': <Brain className="w-5 h-5" />,
+  'health-basics': <Pill className="w-5 h-5" />,
+  'lifestyle': <Coffee className="w-5 h-5" />,
+  'self-care-glow-up': <Bath className="w-5 h-5" />,
   'food-nutrition': <Salad className="w-5 h-5" />,
+  'shopping-product-advice': <ShoppingBag className="w-5 h-5" />,
+  'pregnancy-baby-care': <Baby className="w-5 h-5" />,
 };
 
 interface TrendingQuestion {

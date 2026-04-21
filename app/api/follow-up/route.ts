@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
+import { createClient } from '@/utils/supabase/server';
 
 const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 
@@ -11,11 +12,30 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Query is required' }, { status: 400 });
     }
 
+    // Try to get authenticated user and their metadata for hyper-personalization
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    let personalizedContext = '';
+    if (user && user.user_metadata) {
+      const meta = user.user_metadata;
+      personalizedContext = `
+      The user asking this question has the following profile traits:
+      - Skin Type: ${meta.skinType || 'Unknown'}
+      - Hair Type: ${meta.hairType || 'Unknown'}
+      - Current Life Goal: ${meta.primaryGoal || 'Unknown'}
+      
+      CRITICAL: Keep this context in mind if it applies to their question. If their skin type is dry and they ask about cleansers, recommend hydrating ones.
+      `;
+    }
+
     const prompt = `
       You are "PurpleGirl", a wise, supportive, and non-judgmental older sister/mentor helping girls and young women in India.
       Context Topic: ${topic}
       Original Question Being Discussed: ${questionTopic}
       
+      ${personalizedContext}
+
       User's new follow-up question: ${query}
 
       Previous Chat History:
