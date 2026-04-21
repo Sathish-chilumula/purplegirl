@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Sparkles, Heart, Briefcase, Pill, Shirt, Brain, Salad, ArrowRight, Loader2, Bath, ShoppingBag, Coffee, Baby } from 'lucide-react';
+import Image from 'next/image';
+import { Sparkles, Heart, Briefcase, Pill, Shirt, Brain, Salad, Bath, ShoppingBag, Coffee, Baby, ArrowRight, Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import LiveSearch from '@/components/search/LiveSearch';
 
@@ -20,28 +21,16 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   'pregnancy-baby-care': <Baby className="w-5 h-5" />,
 };
 
-interface TrendingQuestion {
-  id: string;
-  title: string;
-  slug: string;
-  metoo_count: number;
-  categories: { name: string };
-}
+interface TrendingQuestion { id: string; title: string; slug: string; metoo_count: number; categories: { name: string }; }
+interface RecentQuestion { id: string; title: string; slug: string; created_at: string; answers: { chat_log: string[] } | null; }
+interface Category { id: string; name: string; slug: string; color: string; }
 
-interface RecentQuestion {
-  id: string;
-  title: string;
-  slug: string;
-  created_at: string;
-  answers: { summary: string };
-}
-
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  color: string;
-}
+const TRUST_STATS = [
+  { value: '8K+', label: 'Questions Answered' },
+  { value: '100%', label: 'Anonymous' },
+  { value: '0', label: 'Judgment' },
+  { value: '24/7', label: 'Available' },
+];
 
 export default function Home() {
   const [trending, setTrending] = useState<TrendingQuestion[]>([]);
@@ -49,43 +38,25 @@ export default function Home() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [subEmail, setSubEmail] = useState('');
-  const [subStatus, setSubStatus] = useState<{ type: 'idle' | 'loading' | 'success' | 'error', message?: string }>({ type: 'idle' });
+  const [subStatus, setSubStatus] = useState<{ type: 'idle' | 'loading' | 'success' | 'error'; message?: string }>({ type: 'idle' });
 
   useEffect(() => {
     async function fetchHomeData() {
       setLoading(true);
       try {
-        // 1. Fetch categories
-        const { data: catData } = await supabase
-          .from('categories')
-          .select('*')
-          .order('name');
+        const { data: catData } = await supabase.from('categories').select('*').order('name');
         setCategories(catData || []);
 
-        // 2. Fetch trending (by metoo_count)
         const { data: trendData } = await supabase
-          .from('questions')
-          .select('id, title, slug, metoo_count, categories(name)')
-          .eq('status', 'approved')
-          .order('metoo_count', { ascending: false })
-          .limit(6);
+          .from('questions').select('id, title, slug, metoo_count, categories(name)')
+          .eq('status', 'approved').order('metoo_count', { ascending: false }).limit(6);
         setTrending((trendData as any) || []);
 
-        // 3. Fetch recent with answers
         const { data: recentData } = await supabase
-          .from('questions')
-          .select('id, title, slug, created_at, answers(summary)')
-          .eq('status', 'approved')
-          .order('created_at', { ascending: false })
-          .limit(4);
-        
-        // Format to handle the array from the join
-        const formattedRecent = (recentData as any)?.map((q: any) => ({
-          ...q,
-          answers: q.answers?.[0] || null
-        })) || [];
-        
-        setRecent(formattedRecent);
+          .from('questions').select('id, title, slug, created_at, answers(chat_log)')
+          .eq('status', 'approved').order('created_at', { ascending: false }).limit(4);
+
+        setRecent(((recentData as any) || []).map((q: any) => ({ ...q, answers: q.answers?.[0] || null })));
       } catch (err) {
         console.error('Error loading home data:', err);
       } finally {
@@ -98,182 +69,278 @@ export default function Home() {
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!subEmail) return;
-    
     setSubStatus({ type: 'loading' });
     try {
-      const res = await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: subEmail }),
-      });
+      const res = await fetch('/api/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: subEmail }) });
       const data = await res.json();
-      
-      if (res.ok) {
-        setSubStatus({ type: 'success', message: data.message });
-        setSubEmail('');
-      } else {
-        setSubStatus({ type: 'error', message: data.error });
-      }
-    } catch (err) {
-      setSubStatus({ type: 'error', message: 'Something went wrong. Please try again.' });
-    }
+      if (res.ok) { setSubStatus({ type: 'success', message: data.message }); setSubEmail(''); }
+      else setSubStatus({ type: 'error', message: data.error });
+    } catch { setSubStatus({ type: 'error', message: 'Something went wrong. Please try again.' }); }
   };
 
   return (
-    <div className="flex flex-col gap-12 md:gap-20 pb-20">
-      {/* 1. Hero Section */}
-      <section className="w-full bg-gradient-to-br from-[#7C3AED] to-[#EC4899] py-12 md:py-20 px-4 mt-[-1px]">
-        <div className="max-w-3xl mx-auto text-center space-y-8">
-          <h1 className="font-playfair font-bold text-4xl md:text-6xl text-white tracking-tight drop-shadow-md">
-            Ask anything you can&apos;t ask anyone 💜
-          </h1>
-          <p className="text-lg text-white/90 font-medium">
-            1000+ real questions answered for girls like you
-          </p>
-          
-          <LiveSearch variant="hero" placeholder="Type your question… (it's anonymous)" />
-          
-          <p className="text-sm text-white/80 mt-4 font-medium flex items-center justify-center gap-4">
-            <span><span className="opacity-70">🔒</span> Anonymous</span>
-            <span className="hidden sm:inline">·</span>
-            <span><span className="opacity-70">💜</span> No Judgment</span>
-            <span className="hidden sm:inline">·</span>
-            <span><span className="opacity-70">⚡</span> Instant Answer</span>
-          </p>
+    <div className="flex flex-col gap-0 pb-20 overflow-x-hidden">
+
+      {/* ─── HERO SECTION ─────────────────────────────── */}
+      <section className="relative w-full min-h-[calc(100vh-72px)] flex items-center overflow-hidden bg-[#FAF5FF]">
+        {/* Animated orb backgrounds */}
+        <div className="orb orb-purple w-[600px] h-[600px] top-[-100px] right-[-80px]" style={{ animationDelay: '0s' }} />
+        <div className="orb orb-pink w-[500px] h-[500px] bottom-[-80px] left-[-60px]" style={{ animationDelay: '2s' }} />
+        <div className="orb orb-violet w-[300px] h-[300px] top-[40%] left-[30%]" style={{ animationDelay: '4s' }} />
+
+        <div className="max-w-7xl mx-auto w-full px-6 md:px-12 grid grid-cols-1 md:grid-cols-2 gap-12 items-center py-16 relative z-10">
+          {/* Left — Copy */}
+          <div className="space-y-7 text-center md:text-left animate-slide-up">
+            <div className="inline-flex items-center gap-2 glass border border-purple-200/60 px-5 py-2.5 rounded-full text-sm font-bold text-purple-700 shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+              Join 10,000+ girls already asking
+            </div>
+
+            <h1 className="font-playfair font-bold text-5xl md:text-6xl lg:text-7xl text-[#1F1235] tracking-tight leading-[1.08]">
+              Ask{' '}
+              <span className="gradient-text-animate">anything</span>
+              <br />you can&apos;t ask anyone.
+            </h1>
+
+            <p className="text-xl text-gray-500 leading-relaxed max-w-lg mx-auto md:mx-0">
+              Your private AI elder sister — for honest, judgment-free guidance on life, career, love, and everything in between.
+            </p>
+
+            <div className="max-w-lg mx-auto md:mx-0 pt-2">
+              <LiveSearch variant="hero" placeholder="E.g. How do I deal with a toxic manager?" />
+              <div className="flex items-center justify-center md:justify-start gap-6 mt-5 text-sm font-semibold text-gray-500">
+                <span className="flex items-center gap-1.5"><span>🔒</span> Anonymous</span>
+                <span className="text-gray-300">|</span>
+                <span className="flex items-center gap-1.5"><span>💜</span> No login</span>
+                <span className="text-gray-300">|</span>
+                <span className="flex items-center gap-1.5"><span>⚡</span> Instant</span>
+              </div>
+            </div>
+
+            {/* Trust stats */}
+            <div className="grid grid-cols-4 gap-3 pt-4 max-w-sm mx-auto md:mx-0">
+              {TRUST_STATS.map(s => (
+                <div key={s.value} className="text-center glass rounded-2xl p-3 shadow-sm">
+                  <div className="font-playfair font-bold text-lg gradient-text">{s.value}</div>
+                  <div className="text-xs text-gray-500 leading-tight mt-0.5">{s.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right — Image */}
+          <div className="relative flex items-center justify-center animate-slide-up stagger-2">
+            {/* Glow ring behind image */}
+            <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-br from-purple-400/30 to-pink-400/30 blur-3xl scale-110 animate-glow-pulse" />
+
+            <div className="relative w-full max-w-md aspect-[4/5] rounded-[2.5rem] overflow-hidden shadow-2xl border-[6px] border-white/80 group animate-float">
+              <Image
+                src="/hero_women.png"
+                alt="Women laughing and supporting each other"
+                fill
+                priority
+                className="object-cover group-hover:scale-105 transition-transform duration-700"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+              {/* Gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-purple-900/30 via-transparent to-pink-200/10" />
+
+              {/* Floating badge */}
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 glass px-5 py-3 rounded-2xl text-center shadow-lg border border-white/60 w-[80%]">
+                <p className="font-bold text-[#1F1235] text-sm">💜 &ldquo;You are not alone in this&rdquo;</p>
+                <p className="text-xs text-gray-500 mt-0.5">PurpleGirl AI answers you with empathy</p>
+              </div>
+            </div>
+
+            {/* Floating sparkles */}
+            <div className="absolute top-8 right-4 glass w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg animate-float" style={{ animationDelay: '1s' }}>
+              <span className="text-2xl">✨</span>
+            </div>
+            <div className="absolute bottom-24 left-0 glass w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg animate-float" style={{ animationDelay: '2s' }}>
+              <span className="text-2xl">💬</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Wave divider */}
+        <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
+          <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" className="w-full h-12">
+            <path d="M0 60L48 50C96 40 192 20 288 16.7C384 13.3 480 26.7 576 33.3C672 40 768 40 864 33.3C960 26.7 1056 13.3 1152 10C1248 6.7 1344 13.3 1392 16.7L1440 20V60H1392C1344 60 1248 60 1152 60C1056 60 960 60 864 60C768 60 672 60 576 60C480 60 384 60 288 60C192 60 96 60 48 60H0Z" fill="#FAF5FF" />
+          </svg>
         </div>
       </section>
 
-      {loading ? (
-        <div className="flex flex-col items-center justify-center py-20 gap-4">
-          <Loader2 className="w-10 h-10 text-purple-primary animate-spin" />
-          <p className="text-text-secondary font-medium animate-pulse">Loading the sisterhood...</p>
-        </div>
-      ) : (
-        <>
-          {/* 2. Trending Questions */}
-          {trending.length > 0 && (
-            <section className="max-w-7xl mx-auto w-full px-4">
-              <div className="flex items-center gap-2 mb-6">
-                <span className="text-2xl">🔥</span>
-                <h2 className="font-bold text-2xl text-text-primary">Girls are asking…</h2>
-              </div>
-              
-              <div className="flex overflow-x-auto pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-3 gap-6 snap-x snap-mandatory hide-scrollbar">
-                {trending.map((q) => (
-                  <Link 
-                    key={q.id} 
-                    href={`/q/${q.slug}`}
-                    className="min-w-[280px] md:min-w-0 bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 snap-start border border-purple-50 flex flex-col h-full"
-                  >
-                    <div className="text-xs font-semibold text-purple-primary mb-3 uppercase tracking-wider">{q.categories?.name}</div>
-                    <h3 className="font-bold text-lg text-text-primary mb-4 flex-1 line-clamp-3">{q.title}</h3>
-                    <div className="flex items-center text-sm font-medium text-text-secondary mt-auto">
-                      <Heart className="w-4 h-4 text-pink-accent mr-1.5 fill-pink-accent/20" />
-                      {q.metoo_count} girls asked this
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </section>
-          )}
+      {/* ─── TRENDING QUESTIONS ──────────────────────── */}
+      <section className="relative w-full bg-[#FAF5FF] py-16 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center gap-3 mb-10">
+            <span className="text-3xl">🔥</span>
+            <div>
+              <h2 className="font-playfair font-bold text-3xl text-[#1F1235]">Girls are asking…</h2>
+              <p className="text-gray-500 text-sm mt-1">Real questions from the sisterhood, answered with empathy</p>
+            </div>
+          </div>
 
-          {/* 3. Categories */}
-          <section className="max-w-7xl mx-auto w-full px-4">
-            <h2 className="font-bold text-2xl text-text-primary mb-6">Browse by topic</h2>
-            
-            <div className="grid grid-cols-2 lg:flex lg:flex-wrap gap-4">
-              {categories.map((cat) => (
-                <Link 
-                  key={cat.id} 
-                  href={`/category/${cat.slug}`}
-                  className={`flex items-center gap-3 bg-white p-4 rounded-2xl shadow-sm hover:shadow-md transition-all lg:flex-1 lg:min-w-[200px] border border-purple-50 hover:-translate-y-1 group`}
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[1,2,3].map(i => <div key={i} className="shimmer h-48 rounded-3xl" />)}
+            </div>
+          ) : (
+            <div className="flex overflow-x-auto pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-3 gap-6 snap-x snap-mandatory hide-scrollbar">
+              {trending.map((q, i) => (
+                <Link
+                  key={q.id}
+                  href={`/q/${q.slug}`}
+                  className="card-premium min-w-[280px] md:min-w-0 p-6 flex flex-col snap-start group animate-slide-up"
+                  style={{ animationDelay: `${i * 0.1}s` }}
                 >
-                  <div className={`p-2.5 rounded-xl bg-purple-50 text-purple-primary group-hover:bg-purple-primary group-hover:text-white transition-colors`}>
-                    {CATEGORY_ICONS[cat.slug] || <Heart className="w-5 h-5" />}
+                  <div className="text-xs font-bold text-purple-600 mb-3 uppercase tracking-widest bg-purple-50 px-3 py-1 rounded-full w-fit">{q.categories?.name}</div>
+                  <h3 className="font-bold text-lg text-[#1F1235] mb-4 flex-1 line-clamp-3 group-hover:text-purple-600 transition-colors">{q.title}</h3>
+                  <div className="flex items-center justify-between text-sm text-gray-400 mt-auto pt-4 border-t border-purple-50">
+                    <span className="flex items-center gap-1.5">
+                      <Heart className="w-4 h-4 text-pink-400 fill-pink-100" />
+                      {q.metoo_count} girls asked this
+                    </span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform text-purple-400" />
                   </div>
-                  <span className="font-semibold text-text-primary text-sm md:text-base leading-tight">
-                    {cat.name}
-                  </span>
                 </Link>
               ))}
             </div>
-          </section>
-
-          {/* 4. Recent Questions */}
-          {recent.length > 0 && (
-            <section className="max-w-4xl mx-auto w-full px-4">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="font-bold text-2xl text-text-primary">Recently answered</h2>
-                <Link href="/search?sort=recent" className="text-sm font-bold text-purple-primary hover:underline">View all</Link>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {recent.map((q) => (
-                  <Link 
-                    key={q.id}
-                    href={`/q/${q.slug}`}
-                    className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 border border-purple-50"
-                  >
-                    <h3 className="font-bold text-lg text-text-primary mb-2 line-clamp-2">{q.title}</h3>
-                    <p className="text-text-secondary text-sm mb-4 line-clamp-2 leading-relaxed h-[40px]">
-                      {q.answers?.summary || 'Our sisters are currently writing an answer...'}
-                    </p>
-                    <div className="text-xs text-text-secondary font-medium mt-2">
-                      {new Date(q.created_at).toLocaleDateString()}
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </section>
           )}
-        </>
-      )}
+        </div>
+      </section>
 
-      {/* 5. Newsletter CTA */}
-      <section className="max-w-3xl mx-auto w-full px-4 md:px-0">
-        <div className="bg-[#FDF2F8] rounded-3xl p-8 md:p-12 text-center border border-pink-100 shadow-sm relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-pink-300 via-purple-300 to-pink-300"></div>
-          <span className="text-4xl mb-4 block">💌</span>
-          <h2 className="font-bold text-2xl md:text-3xl text-text-primary mb-3">Get our best answers weekly</h2>
-          <p className="text-text-secondary mb-8 max-w-md mx-auto">
-            Join 10,000+ girls getting practical advice on beauty, career, and relationships straight to their inbox. It&apos;s free!
-          </p>
-          
-          {subStatus.type === 'success' ? (
-            <div className="bg-green-50 border border-green-100 text-green-700 p-4 rounded-2xl font-medium animate-in fade-in zoom-in">
-              {subStatus.message}
+      {/* ─── CATEGORIES SECTION ─────────────────────── */}
+      <section className="relative py-16 px-4 overflow-hidden">
+        {/* Subtle background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white to-[#FAF5FF]" />
+        <div className="orb orb-pink w-[400px] h-[400px] top-0 right-0 opacity-20" />
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="text-center mb-12">
+            <h2 className="font-playfair font-bold text-3xl text-[#1F1235] mb-3">What&apos;s on your mind?</h2>
+            <p className="text-gray-500">Browse by topic and find your answer instantly</p>
+          </div>
+
+          {loading ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[1,2,3,4,5,6,7,8].map(i => <div key={i} className="shimmer h-20 rounded-2xl" />)}
             </div>
           ) : (
-            <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto" onSubmit={handleSubscribe}>
-              <input 
-                type="email" 
-                placeholder="Your email address" 
-                className="flex-1 rounded-full px-6 py-3 border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-accent/50 text-text-primary"
-                value={subEmail}
-                onChange={(e) => setSubEmail(e.target.value)}
-                required
-                disabled={subStatus.type === 'loading'}
-              />
-              <button 
-                type="submit"
-                disabled={subStatus.type === 'loading'}
-                className="bg-text-primary text-white px-8 py-3 rounded-full font-bold hover:bg-black transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {subStatus.type === 'loading' && <Loader2 className="w-4 h-4 animate-spin" />}
-                {subStatus.type === 'loading' ? 'Joining...' : 'Subscribe'}
-              </button>
-            </form>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {categories.map((cat, i) => (
+                <Link
+                  key={cat.id}
+                  href={`/category/${cat.slug}`}
+                  className="card-premium p-4 flex items-center gap-3 group animate-slide-up"
+                  style={{ animationDelay: `${i * 0.05}s` }}
+                >
+                  <div className="p-3 rounded-2xl bg-gradient-to-br from-purple-100 to-pink-50 text-purple-600 group-hover:from-purple-600 group-hover:to-pink-500 group-hover:text-white transition-all duration-300 shrink-0">
+                    {CATEGORY_ICONS[cat.slug] || <Heart className="w-5 h-5" />}
+                  </div>
+                  <span className="font-semibold text-[#1F1235] text-sm leading-tight group-hover:text-purple-600 transition-colors">{cat.name}</span>
+                </Link>
+              ))}
+            </div>
           )}
-          
-          {subStatus.type === 'error' && (
-            <p className="text-red-500 text-sm mt-3 font-medium">{subStatus.message}</p>
-          )}
-          
-          <div className="text-xs text-text-secondary mt-4">We respect your privacy. Unsubscribe anytime.</div>
+        </div>
+      </section>
+
+      {/* ─── HOW IT WORKS ───────────────────────────── */}
+      <section className="py-16 px-4 bg-[#FAF5FF]">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="font-playfair font-bold text-3xl text-[#1F1235] mb-4">How PurpleGirl works</h2>
+          <p className="text-gray-500 mb-12">Three steps to get the answers you deserve</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { emoji: '💬', step: '01', title: 'Ask anonymously', desc: 'Type anything — no login, no name, no judgment. Your question is completely private.' },
+              { emoji: '🧠', step: '02', title: 'AI elder sister responds', desc: 'Our empathetic AI understands the emotion behind your question and replies like a caring older sister.' },
+              { emoji: '✨', step: '03', title: 'Continue the conversation', desc: 'Ask follow-up questions, get tailored advice, and explore product recommendations.' },
+            ].map((item, i) => (
+              <div key={i} className="card-premium p-8 text-center group animate-slide-up" style={{ animationDelay: `${i * 0.15}s` }}>
+                <div className="text-4xl mb-4 animate-float" style={{ animationDelay: `${i}s` }}>{item.emoji}</div>
+                <div className="text-xs font-bold text-purple-400 tracking-widest mb-3 uppercase">{item.step}</div>
+                <h3 className="font-bold text-lg text-[#1F1235] mb-3 group-hover:text-purple-600 transition-colors">{item.title}</h3>
+                <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── RECENT ANSWERS ─────────────────────────── */}
+      {!loading && recent.length > 0 && (
+        <section className="py-16 px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex items-center justify-between mb-10">
+              <div>
+                <h2 className="font-playfair font-bold text-3xl text-[#1F1235]">Recently answered</h2>
+                <p className="text-gray-500 text-sm mt-1">Fresh answers from the sisterhood</p>
+              </div>
+              <Link href="/search?sort=recent" className="text-sm font-bold text-purple-600 hover:text-purple-700 flex items-center gap-1 transition-colors">
+                View all <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {recent.map((q, i) => (
+                <Link
+                  key={q.id}
+                  href={`/q/${q.slug}`}
+                  className="card-premium p-6 group animate-slide-up"
+                  style={{ animationDelay: `${i * 0.1}s` }}
+                >
+                  <h3 className="font-bold text-lg text-[#1F1235] mb-3 line-clamp-2 group-hover:text-purple-600 transition-colors">{q.title}</h3>
+                  {q.answers?.chat_log?.[0] && (
+                    <p className="text-gray-500 text-sm mb-4 line-clamp-2 leading-relaxed italic">
+                      &ldquo;{q.answers.chat_log[0]}&rdquo;
+                    </p>
+                  )}
+                  <div className="flex items-center justify-between mt-auto pt-4 border-t border-purple-50">
+                    <span className="text-xs text-gray-400 font-medium">{new Date(q.created_at).toLocaleDateString()}</span>
+                    <span className="text-xs font-bold text-purple-600 flex items-center gap-1 group-hover:gap-2 transition-all">Read conversation <ArrowRight className="w-3 h-3" /></span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ─── NEWSLETTER CTA ─────────────────────────── */}
+      <section className="py-16 px-4">
+        <div className="max-w-2xl mx-auto relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-pink-500 rounded-[2.5rem]" />
+          <div className="orb orb-pink w-72 h-72 top-0 right-0 opacity-25" />
+          <div className="relative z-10 p-10 md:p-14 text-center">
+            <span className="text-5xl mb-5 block animate-float">💌</span>
+            <h2 className="font-playfair font-bold text-3xl text-white mb-3">Get answers in your inbox</h2>
+            <p className="text-white/80 mb-8 max-w-sm mx-auto">Weekly answers on beauty, career, relationships and life. It&apos;s completely free.</p>
+
+            {subStatus.type === 'success' ? (
+              <div className="bg-white/20 backdrop-blur-sm text-white border border-white/30 p-4 rounded-2xl font-medium">
+                {subStatus.message} 🎉
+              </div>
+            ) : (
+              <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto" onSubmit={handleSubscribe}>
+                <input
+                  type="email" placeholder="Your email address"
+                  className="flex-1 rounded-full px-6 py-3.5 bg-white/20 backdrop-blur-sm text-white placeholder-white/60 border border-white/30 focus:outline-none focus:border-white/60 focus:bg-white/30 transition-all"
+                  value={subEmail} onChange={e => setSubEmail(e.target.value)} required
+                  disabled={subStatus.type === 'loading'}
+                />
+                <button type="submit" disabled={subStatus.type === 'loading'}
+                  className="bg-white text-purple-700 px-8 py-3.5 rounded-full font-bold hover:bg-purple-50 transition-all shadow-lg disabled:opacity-60 flex items-center gap-2 justify-center whitespace-nowrap">
+                  {subStatus.type === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                  {subStatus.type === 'loading' ? 'Joining…' : 'Subscribe'}
+                </button>
+              </form>
+            )}
+            {subStatus.type === 'error' && <p className="text-red-200 text-sm mt-3">{subStatus.message}</p>}
+            <p className="text-white/50 text-xs mt-5">We respect your privacy. Unsubscribe anytime.</p>
+          </div>
         </div>
       </section>
     </div>
   );
 }
-
-

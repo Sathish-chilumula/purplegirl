@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Heart, MessageCircle, Copy, Check, Instagram } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Heart, MessageCircle, Copy, Check, Instagram, Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import html2canvas from 'html2canvas';
+import { ShareImageGenerator } from '../share/ShareImageGenerator';
 
 interface QuestionClientProps {
   questionId: string;
@@ -11,6 +13,7 @@ interface QuestionClientProps {
   questionSlug: string;
   bulletPoints: string[];
   summary: string;
+  categoryName?: string;
 }
 
 export default function QuestionClient({ 
@@ -19,11 +22,14 @@ export default function QuestionClient({
   questionTitle, 
   questionSlug, 
   bulletPoints, 
-  summary 
+  summary,
+  categoryName = 'PurpleGirl'
 }: QuestionClientProps) {
   const [metooCount, setMetooCount] = useState(initialMeToo);
   const [hasMeToo, setHasMeToo] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const shareCardRef = useRef<HTMLDivElement>(null);
 
   const handleMeToo = async () => {
     if (hasMeToo) return;
@@ -53,6 +59,28 @@ export default function QuestionClient({
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 
+  const shareInstagram = async () => {
+    if (!shareCardRef.current || isGeneratingImage) return;
+    try {
+      setIsGeneratingImage(true);
+      const canvas = await html2canvas(shareCardRef.current, {
+        scale: 2,
+        backgroundColor: null,
+        logging: false,
+        useCORS: true,
+      });
+      const dataUrl = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.download = `purplegirl-${questionSlug}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error('Failed to generate image:', err);
+    } finally {
+      setIsGeneratingImage(false);
+    }
+  };
+
   return (
     <div className="bg-gradient-to-br from-[#FAF5FF] to-[#FDF2F8] border border-purple-100 rounded-3xl p-6 md:p-10 text-center mb-16 shadow-sm">
       <h3 className="font-bold text-xl text-text-primary mb-6">Found this helpful? Share it 💜</h3>
@@ -72,11 +100,22 @@ export default function QuestionClient({
           {copied ? <><Check className="w-5 h-5 text-green-500" /> Copied!</> : <><Copy className="w-5 h-5" /> Copy Text</>}
         </button>
         
-        <button className="flex items-center gap-2 bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F56040] text-white px-6 py-3 rounded-full font-bold hover:opacity-90 transition-opacity shadow-sm">
-          <Instagram className="w-5 h-5" />
+        <button 
+          onClick={shareInstagram}
+          disabled={isGeneratingImage}
+          className="flex items-center gap-2 bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F56040] text-white px-6 py-3 rounded-full font-bold hover:opacity-90 transition-opacity shadow-sm disabled:opacity-75"
+        >
+          {isGeneratingImage ? <Loader2 className="w-5 h-5 animate-spin" /> : <Instagram className="w-5 h-5" />}
           Share as Image
         </button>
       </div>
+
+      <ShareImageGenerator 
+        ref={shareCardRef}
+        questionTitle={questionTitle}
+        categoryName={categoryName}
+        tips={bulletPoints || []}
+      />
       
       <div className="pt-8 border-t border-purple-100/50">
         <button 

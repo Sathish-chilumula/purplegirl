@@ -5,6 +5,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import MobileBottomNav from '@/components/layout/MobileBottomNav';
 import { SEO_CONFIG } from '@/lib/constants';
+import Script from 'next/script';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' });
@@ -19,6 +20,15 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <body className="font-sans bg-[#FAF5FF] text-[#1F1235] antialiased flex flex-col min-h-screen" suppressHydrationWarning>
+        {process.env.NEXT_PUBLIC_ADSENSE_ID && (
+          <Script 
+            id="adsense"
+            async 
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_ID}`} 
+            crossOrigin="anonymous" 
+            strategy="afterInteractive"
+          />
+        )}
         <Header />
         <main className="flex-grow">
           {children}

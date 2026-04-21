@@ -60,30 +60,30 @@ export default function AskPage() {
       const selectedCat = categories.find(c => c.slug === categorySlug);
       if (!selectedCat) throw new Error('Category not found');
 
+      const questionId = crypto.randomUUID();
       const slug = `${slugify(title)}-${Math.random().toString(36).substring(2, 7)}`;
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('questions')
         .insert([
           {
+            id: questionId,
             title,
             description,
             slug,
             category_id: selectedCat.id,
             status: 'pending',
           },
-        ])
-        .select()
-        .single();
+        ]);
 
       if (error) throw error;
 
-      // Trigger AI generation (non-blocking if possible, but for this demo we can wait or just fire and forget)
+      // Trigger AI generation (non-blocking)
       try {
         fetch('/api/generate-answer', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ questionId: data.id }),
+          body: JSON.stringify({ questionId: questionId }),
         });
       } catch (err) {
         console.error('Error triggering AI generation:', err);
@@ -100,90 +100,105 @@ export default function AskPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8 pb-24 md:py-12">
-      <Link href="/" className="inline-flex items-center text-text-secondary hover:text-purple-primary mb-6 transition-colors">
-        <ArrowLeft className="w-4 h-4 mr-2" /> Back to home
-      </Link>
-      
-      <div className="bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-purple-100">
-        <div className="text-center mb-8">
-          <span className="text-4xl mb-4 block">💜</span>
-          <h1 className="font-playfair font-bold text-3xl text-text-primary tracking-tight">Ask anything you want</h1>
-          <p className="text-text-secondary mt-2">100% anonymous. No judgments. Get a helpful answer.</p>
-        </div>
+    <div className="relative min-h-screen overflow-hidden bg-white">
+      {/* Page-level orb backgrounds */}
+      <div className="orb orb-purple w-[600px] h-[600px] top-[-100px] left-[-100px] opacity-20" />
+      <div className="orb orb-pink w-[500px] h-[500px] bottom-[-80px] right-[-60px] opacity-15" />
+
+      <div className="max-w-3xl mx-auto px-4 py-12 md:py-16 relative z-10">
+        <Link href="/" className="inline-flex items-center text-gray-500 hover:text-purple-600 mb-8 transition-colors font-medium group animate-slide-up">
+          <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" /> Back to home
+        </Link>
         
-        <form onSubmit={handleSubmit} className="space-y-8">
-          <div>
-            <label className="block font-bold text-text-primary mb-2 text-lg">What&apos;s your question?</label>
-            <textarea
-              className="w-full bg-[#FAF5FF] border border-purple-200 rounded-2xl p-4 min-h-[120px] text-lg focus:outline-none focus:ring-2 focus:ring-purple-400 placeholder:text-purple-300 resize-none"
-              placeholder="E.g. How do I ask for a salary hike as a fresher..."
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-              maxLength={150}
-            />
-            <div className="text-right text-xs text-text-secondary mt-1">{title.length}/150</div>
+        <div className="glass rounded-[2rem] p-8 md:p-12 shadow-xl border border-purple-100/60 animate-slide-up stagger-1">
+          <div className="text-center mb-12">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-200 to-pink-200 flex items-center justify-center text-4xl mx-auto mb-6 shadow-md animate-float">💜</div>
+            <h1 className="font-playfair font-bold text-4xl text-[#1F1235] tracking-tight mb-4">
+              Ask <span className="gradient-text-animate">anything</span> you want
+            </h1>
+            <p className="text-gray-500 text-lg">100% anonymous. No judgments. Get a helpful answer from your AI elder sister.</p>
           </div>
           
-          <div>
-            <label className="block font-bold text-text-primary mb-2">More details (optional)</label>
-            <textarea
-              className="w-full bg-[#FAF5FF] border border-purple-200 rounded-2xl p-4 min-h-[120px] focus:outline-none focus:ring-2 focus:ring-purple-400 placeholder:text-purple-300 resize-none"
-              placeholder="Give some context so we can give you a better answer..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              maxLength={500}
-            />
-            <div className="text-right text-xs text-text-secondary mt-1">{description.length}/500</div>
-          </div>
-          
-          <div>
-            <label className="block font-bold text-text-primary mb-3">Choose a category</label>
-            {isLoadingCats ? (
-              <div className="flex items-center gap-2 text-purple-primary animate-pulse">
-                <Loader2 className="w-5 h-5 animate-spin" />
-                <span>Loading categories...</span>
+          <form onSubmit={handleSubmit} className="space-y-10">
+            <div className="animate-slide-up stagger-2">
+              <label className="block font-playfair font-bold text-[#1F1235] mb-3 text-xl">What&apos;s on your mind?</label>
+              <div className="relative">
+                <textarea
+                  className="w-full bg-[#FAF5FF]/50 border border-purple-100 rounded-3xl p-6 min-h-[140px] text-lg focus:outline-none focus:ring-4 focus:ring-purple-200/50 placeholder:text-purple-300 resize-none transition-all"
+                  placeholder="E.g. How do I deal with a toxic manager?"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  required
+                  maxLength={150}
+                />
+                <div className="absolute bottom-4 right-6 text-xs text-purple-400 font-bold">{title.length}/150</div>
               </div>
-            ) : (
-              <div className="flex flex-wrap gap-3">
-                {categories.map((cat) => (
-                  <button
-                    type="button"
-                    key={cat.id}
-                    onClick={() => setCategorySlug(cat.slug)}
-                    className={`flex items-center gap-2 px-4 py-3 rounded-xl border transition-all ${
-                      categorySlug === cat.slug 
-                        ? 'bg-purple-100 border-purple-500 text-purple-primary font-medium shadow-sm' 
-                        : 'bg-white border-gray-200 text-text-secondary hover:border-purple-300 hover:bg-purple-50'
-                    }`}
-                  >
-                    <span className={`${categorySlug === cat.slug ? 'text-purple-primary' : 'text-gray-400'}`}>
-                      {CATEGORY_ICONS[cat.slug] || <Heart className="w-5 h-5" />}
-                    </span>
-                    <span>{cat.name}</span>
-                  </button>
-                ))}
+            </div>
+            
+            <div className="animate-slide-up stagger-3">
+              <label className="block font-playfair font-bold text-[#1F1235] mb-3 text-lg">More details (optional)</label>
+              <div className="relative">
+                <textarea
+                  className="w-full bg-[#FAF5FF]/50 border border-purple-100 rounded-3xl p-6 min-h-[140px] focus:outline-none focus:ring-4 focus:ring-purple-200/50 placeholder:text-purple-300 resize-none transition-all"
+                  placeholder="Give some context so we can give you a better answer..."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  maxLength={500}
+                />
+                <div className="absolute bottom-4 right-6 text-xs text-purple-400 font-bold">{description.length}/500</div>
               </div>
-            )}
-          </div>
-          
-          <div className="pt-4 border-t border-purple-50">
-            <button
-              type="submit"
-              disabled={isSubmitting || !title || !categorySlug}
-              className="w-full bg-gradient-to-r from-[#7C3AED] to-[#EC4899] text-white py-4 rounded-full font-bold text-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shadow-md flex items-center justify-center gap-2"
-            >
-              {isSubmitting && <Loader2 className="w-5 h-5 animate-spin" />}
-              {isSubmitting ? 'Submitting securely...' : 'Submit Question Anonymously'}
-            </button>
-            <p className="text-center text-xs text-text-secondary mt-4 flex items-center justify-center gap-1">
-              <span className="opacity-70">🔒</span> We don&apos;t track who asks what. Your identity is safe.
-            </p>
-          </div>
-        </form>
+            </div>
+            
+            <div className="animate-slide-up stagger-4">
+              <label className="block font-playfair font-bold text-[#1F1235] mb-4 text-lg">Choose a category</label>
+              {isLoadingCats ? (
+                <div className="flex items-center gap-2 text-purple-600 animate-pulse">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span className="font-bold">Gathering topics...</span>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {categories.map((cat) => (
+                    <button
+                      type="button"
+                      key={cat.id}
+                      onClick={() => setCategorySlug(cat.slug)}
+                      className={`flex items-center gap-3 px-4 py-4 rounded-2xl border transition-all duration-300 transform active:scale-95 ${
+                        categorySlug === cat.slug 
+                          ? 'bg-gradient-to-br from-purple-600 to-pink-500 border-transparent text-white font-bold shadow-lg shadow-purple-200' 
+                          : 'bg-white border-purple-50 text-gray-500 hover:border-purple-200 hover:bg-purple-50/50'
+                      }`}
+                    >
+                      <span className={`${categorySlug === cat.slug ? 'text-white' : 'text-purple-400'}`}>
+                        {CATEGORY_ICONS[cat.slug] || <Heart className="w-5 h-5" />}
+                      </span>
+                      <span className="text-sm">{cat.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            <div className="pt-6 border-t border-purple-50/60 animate-slide-up stagger-5">
+              <button
+                type="submit"
+                disabled={isSubmitting || !title || !categorySlug}
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white py-5 rounded-full font-bold text-xl hover:shadow-2xl hover:shadow-purple-300 transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-xl"
+              >
+                {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : <span>✨</span>}
+                {isSubmitting ? 'Sending securely...' : 'Submit Anonymously'}
+              </button>
+              <div className="mt-6 flex items-center justify-center gap-2 text-sm text-gray-400 font-medium">
+                <span className="text-green-500 text-lg">🔒</span> 
+                Your identity is 100% protected. We never track who you are.
+              </div>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
+  );
+}
   );
 }
 

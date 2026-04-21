@@ -1,31 +1,40 @@
 import Link from 'next/link';
-import { Search } from 'lucide-react';
+import { Search, Plus } from 'lucide-react';
 import LiveSearch from '../search/LiveSearch';
 import AuthButton from '../auth/AuthButton';
 
 export default function Header() {
   return (
-    <header className="sticky top-0 z-50 bg-[#FAF5FF]/80 backdrop-blur-md border-b border-purple-100">
-      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
-        <Link href="/" className="flex items-center gap-2 shrink-0">
-          <span className="font-playfair font-bold text-2xl text-purple-primary tracking-tight">PurpleGirl</span>
+    <header className="sticky top-0 z-[100] glass border-b border-purple-100/50 backdrop-blur-xl">
+      <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between gap-6">
+        <Link href="/" className="flex items-center gap-2 shrink-0 group transition-transform active:scale-95">
+          <span className="font-playfair font-black text-2xl tracking-tighter transition-colors">
+            <span className="gradient-text-animate">Purple</span>
+            <span className="text-[#1F1235]">Girl</span>
+          </span>
+          <div className="w-2 h-2 rounded-full bg-pink-500 animate-pulse" />
         </Link>
         
         {/* Desktop Search */}
-        <LiveSearch variant="header" placeholder="Search the vault..." />
+        <div className="hidden md:block flex-1 max-w-xl">
+          <LiveSearch variant="header" placeholder="Find answers in the vault..." />
+        </div>
         
-        <div className="flex items-center gap-3 sm:gap-4 shrink-0">
-          <Link href="/search" className="p-2 text-text-secondary hover:text-purple-primary transition-colors md:hidden">
+        <div className="flex items-center gap-4 shrink-0">
+          <Link href="/search" className="p-2.5 text-gray-400 hover:text-purple-600 transition-all md:hidden rounded-xl bg-purple-50/50 border border-purple-100/50">
             <Search className="w-5 h-5" />
           </Link>
           
-          <AuthButton />
+          <div className="hidden sm:block">
+            <AuthButton />
+          </div>
 
           <Link 
             href="/ask" 
-            className="hidden sm:inline-flex bg-gradient-to-r from-[#7C3AED] to-[#EC4899] text-white px-4 py-2 rounded-full font-medium text-sm hover:opacity-90 transition-opacity whitespace-nowrap"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-500 text-white px-6 py-3 rounded-full font-bold text-sm hover:shadow-lg hover:shadow-purple-200 transition-all active:scale-95 whitespace-nowrap"
           >
-            Ask a Question
+            <Plus className="w-4 h-4 hidden xs:block" />
+            <span>Ask Sister</span>
           </Link>
         </div>
       </div>

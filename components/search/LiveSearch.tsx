@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Loader2, MessageSquare } from 'lucide-react';
+import { Search, Loader2, MessageSquare, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
@@ -95,63 +95,74 @@ export default function LiveSearch({ initialValue = '', placeholder = "Type your
 
   if (variant === 'header') {
     return (
-      <div ref={searchRef} className="relative w-full max-w-md hidden md:block">
+      <div ref={searchRef} className="relative w-full max-w-md hidden md:block group">
         <form onSubmit={handleSearch} className="relative">
           <input
             type="text"
             placeholder={placeholder}
-            className="w-full bg-gray-100 border-none rounded-full py-2 pl-4 pr-10 text-sm focus:ring-2 focus:ring-purple-primary transition-all"
+            className="w-full bg-purple-50/50 border border-purple-100/50 rounded-2xl py-2.5 pl-5 pr-12 text-sm focus:ring-4 focus:ring-purple-200/50 outline-none transition-all placeholder:text-purple-300 font-medium"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => query.length >= 2 && setIsOpen(true)}
           />
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-xl bg-white border border-purple-50 flex items-center justify-center text-purple-400 group-focus-within:text-purple-600 transition-colors">
+            <Search className="w-4 h-4" />
+          </div>
         </form>
 
         <AnimatePresence>
           {isOpen && (
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              className="absolute top-full mt-2 w-full bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 p-2"
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+              className="absolute top-full mt-3 w-[120%] -left-[10%] glass rounded-[1.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-purple-100/50 overflow-hidden z-[100] p-3"
             >
               {loading ? (
-                <div className="p-4 flex items-center justify-center gap-2 text-gray-500 text-sm">
-                  <Loader2 className="w-4 h-4 animate-spin text-purple-primary" />
-                  Searching The Vault...
+                <div className="p-6 flex flex-col items-center justify-center gap-3 text-gray-500 text-sm">
+                  <Loader2 className="w-6 h-6 animate-spin text-purple-600" />
+                  <span className="font-bold italic">Consulting the vault...</span>
                 </div>
               ) : results.length > 0 ? (
                 <div className="space-y-1">
+                  <div className="px-3 py-2 text-[10px] font-black uppercase tracking-widest text-purple-400 mb-2 border-b border-purple-50 flex items-center gap-2">
+                    <MessageSquare className="w-3.5 h-3.5" />
+                    Matched Conversations
+                  </div>
                   {results.map((res) => (
                     <button
                       key={res.id}
                       onClick={() => handleResultClick(res.slug)}
-                      className="w-full text-left p-3 rounded-xl hover:bg-purple-50 transition-colors group flex flex-col gap-1"
+                      className="w-full text-left p-3.5 rounded-xl hover:bg-purple-600 hover:text-white transition-all group flex flex-col gap-1.5 shadow-sm hover:shadow-lg hover:shadow-purple-200"
                     >
-                      <span className="text-sm font-medium text-text-primary group-hover:text-purple-primary line-clamp-1">
+                      <span className="text-sm font-bold text-[#1F1235] group-hover:text-white transition-colors line-clamp-1 leading-snug">
                         {res.title}
                       </span>
-                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                      <span className="text-[9px] px-2 py-0.5 bg-purple-50 text-purple-600 rounded-full font-black uppercase tracking-tighter w-fit group-hover:bg-white/20 group-hover:text-white transition-colors">
                         {res.categories.name}
                       </span>
                     </button>
                   ))}
                   <button
                     onClick={() => handleSearch()}
-                    className="w-full p-2 mt-2 text-center text-xs font-bold text-purple-primary hover:bg-purple-100 rounded-lg transition-colors border-t border-gray-50 pt-3"
+                    className="w-full p-4 mt-2 text-center text-xs font-black text-purple-600 hover:bg-purple-50 rounded-xl transition-all border-t border-purple-50 flex items-center justify-center gap-2 group/all"
                   >
-                    See all results for &quot;{query}&quot;
+                    <span>View all results for &ldquo;{query}&rdquo;</span>
+                    <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
                   </button>
                 </div>
               ) : (
-                <div className="p-4 text-center">
-                  <p className="text-sm text-gray-500 mb-2">No results found...</p>
+                <div className="p-8 text-center bg-gray-50/50 rounded-xl">
+                  <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-4 border border-purple-50">
+                    <Search className="w-6 h-6 text-purple-300" />
+                  </div>
+                  <p className="text-[#1F1235] font-black text-sm mb-1 uppercase tracking-tight">No direct matches</p>
+                  <p className="text-xs text-gray-400 mb-6 font-medium">Try a different keyword or press enter for a deep search.</p>
                   <button 
                     onClick={() => handleSearch()}
-                    className="text-xs font-bold text-purple-primary hover:underline"
+                    className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-500 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl hover:shadow-lg transition-all"
                   >
-                    Try advanced search
+                    Deep Vault Search
                   </button>
                 </div>
               )}
@@ -163,58 +174,64 @@ export default function LiveSearch({ initialValue = '', placeholder = "Type your
   }
 
   return (
-    <div ref={searchRef} className="max-w-2xl mx-auto relative group mt-8">
+    <div ref={searchRef} className="max-w-2xl mx-auto relative group mt-10">
       <form 
         onSubmit={handleSearch} 
-        className="relative bg-white rounded-2xl p-2 md:p-3 shadow-lg flex items-center gap-2 group-hover:-translate-y-1 transition-all duration-300 ring-1 ring-black/5"
+        className="relative glass rounded-[2.5rem] p-3 md:p-4 shadow-[0_20px_50px_rgba(0,0,0,0.12)] flex items-center gap-2 md:gap-4 group-hover:-translate-y-1.5 transition-all duration-500 border border-purple-100/50 ring-1 ring-purple-100/20"
       >
+        <div className="pl-4 md:pl-6 text-purple-400">
+          <Search className="w-6 h-6 md:w-7 md:h-7" />
+        </div>
         <input 
           type="text" 
           placeholder={placeholder}
-          className="flex-1 bg-transparent py-3 px-4 md:text-lg text-text-primary placeholder:text-purple-300 outline-none"
+          className="flex-1 bg-transparent py-4 md:text-xl font-medium text-[#1F1235] placeholder:text-purple-200 outline-none"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => query.length >= 2 && setIsOpen(true)}
         />
         <button 
           type="submit"
-          className="bg-gradient-to-r from-[#7C3AED] to-[#EC4899] text-white px-6 md:px-8 py-3 md:py-4 rounded-full font-bold whitespace-nowrap hover:opacity-90 transition-opacity shadow-md hover:shadow-lg"
+          className="bg-gradient-to-r from-purple-600 to-pink-500 text-white px-8 md:px-12 py-4 md:py-5 rounded-full font-black text-sm md:text-base tracking-[0.05em] whitespace-nowrap hover:shadow-2xl hover:shadow-purple-300/50 transition-all active:scale-95 flex items-center gap-2"
         >
-          {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Get Answer \u2192'}
+          {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <span>Start Chat </span>}
+          {!loading && <span className="opacity-70">&rarr;</span>}
         </button>
       </form>
 
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            className="absolute top-full mt-3 w-full bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 p-3"
+            initial={{ opacity: 0, y: 20, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.98 }}
+            className="absolute top-full mt-5 w-full glass rounded-[2.5rem] shadow-[0_40px_80px_rgba(0,0,0,0.2)] border border-purple-100/50 overflow-hidden z-[100] p-5 md:p-6"
           >
             {loading ? (
-              <div className="p-8 flex flex-col items-center justify-center gap-3 text-gray-400">
-                <Loader2 className="w-8 h-8 animate-spin text-purple-primary" />
-                <p className="text-sm font-medium italic">Consulting the sisterhood...</p>
+              <div className="p-16 flex flex-col items-center justify-center gap-6">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center shadow-lg animate-float">
+                  <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
+                </div>
+                <p className="text-gray-500 text-lg font-bold italic animate-pulse">Checking the archives...</p>
               </div>
             ) : results.length > 0 ? (
-              <div className="space-y-1">
-                <div className="px-3 py-2 text-[10px] uppercase tracking-widest text-gray-400 font-bold border-bottom border-gray-50 flex items-center gap-2 mb-2">
-                   <MessageSquare className="w-3 h-3" />
-                   Matched Questions
+              <div className="space-y-2">
+                <div className="px-4 py-3 text-[11px] font-black uppercase tracking-[0.25em] text-purple-400 mb-4 border-b border-purple-50 flex items-center gap-3">
+                   <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
+                   Matched Conversations
                 </div>
                 {results.map((res) => (
                   <button
                     key={res.id}
                     onClick={() => handleResultClick(res.slug)}
-                    className="w-full text-left p-4 rounded-xl hover:bg-gradient-to-r hover:from-purple-50 hover:to-white transition-all group border border-transparent hover:border-purple-100"
+                    className="w-full text-left p-5 rounded-2xl hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-500 group transition-all duration-300 border border-transparent shadow-sm hover:shadow-xl hover:shadow-purple-200"
                   >
-                    <div className="flex flex-col gap-1">
-                      <span className="text-base font-bold text-text-primary group-hover:text-purple-primary transition-colors line-clamp-1">
+                    <div className="flex flex-col gap-2">
+                      <span className="text-lg font-bold text-[#1F1235] group-hover:text-white transition-colors line-clamp-1 leading-snug">
                         {res.title}
                       </span>
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full font-bold">
+                        <span className="text-[10px] px-3 py-1 bg-purple-50 text-purple-700 rounded-full font-black uppercase tracking-widest group-hover:bg-white/20 group-hover:text-white transition-colors">
                           {res.categories.name}
                         </span>
                       </div>
@@ -223,23 +240,24 @@ export default function LiveSearch({ initialValue = '', placeholder = "Type your
                 ))}
                 <button
                   onClick={() => handleSearch()}
-                  className="w-full p-4 mt-2 text-center text-sm font-extrabold text-purple-primary hover:bg-purple-50 rounded-xl transition-all border-t border-gray-50 flex items-center justify-center gap-2"
+                  className="w-full p-6 mt-4 text-center text-sm font-black text-purple-600 hover:bg-purple-50 rounded-2xl transition-all border-t border-purple-50 flex items-center justify-center gap-3 group/all border-dashed"
                 >
-                  See all results for &quot;{query}&quot; &rarr;
+                  <span className="uppercase tracking-[0.1em]">Browse all matching results</span>
+                  <span className="group-hover:translate-x-2 transition-transform">&rarr;</span>
                 </button>
               </div>
             ) : (
-              <div className="p-8 text-center bg-gray-50/50 rounded-xl">
-                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Search className="w-6 h-6 text-gray-300" />
+              <div className="p-12 md:p-20 text-center bg-gray-50/50 rounded-[2rem]">
+                <div className="w-20 h-20 glass rounded-[2rem] shadow-xl flex items-center justify-center mx-auto mb-8 animate-float">
+                  <Search className="w-10 h-10 text-purple-300" />
                 </div>
-                <p className="text-text-primary font-bold mb-1">No exact matches yet</p>
-                <p className="text-sm text-gray-500 mb-4">You might be the first to ask this! Press enter to search everywhere.</p>
+                <h3 className="text-2xl font-playfair font-black text-[#1F1235] mb-3">No exact matches yet</h3>
+                <p className="text-gray-400 text-lg mb-10 max-w-sm mx-auto font-medium">You might be the first to ask this! Press enter to search everywhere in the vault.</p>
                 <button 
                   onClick={() => handleSearch()}
-                  className="px-6 py-2 bg-purple-primary text-white text-xs font-bold rounded-full hover:bg-purple-700 transition-colors shadow-sm"
+                  className="px-12 py-5 bg-gradient-to-r from-purple-600 to-pink-500 text-white text-xs font-black uppercase tracking-[0.25em] rounded-full hover:shadow-2xl hover:shadow-purple-300 transition-all hover:scale-105 active:scale-95"
                 >
-                  Global Search
+                  Deep Vault Search
                 </button>
               </div>
             )}
@@ -247,5 +265,7 @@ export default function LiveSearch({ initialValue = '', placeholder = "Type your
         )}
       </AnimatePresence>
     </div>
+  );
+}
   );
 }

@@ -137,59 +137,63 @@ export default function SearchClient({ initialCategories }: { initialCategories:
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
-      <div className="flex flex-col gap-8">
-        <div className="space-y-6 text-center md:text-left">
-          <h1 className="text-3xl md:text-4xl font-playfair font-bold text-text-primary">
-            {query ? `Results for "${query}"` : 'Discover Answers'}
+    <div className="max-w-7xl mx-auto px-4 py-12 md:py-16">
+      <div className="flex flex-col gap-10">
+        <div className="space-y-8 text-center md:text-left relative z-10 animate-slide-up">
+          <h1 className="text-4xl md:text-6xl font-playfair font-bold text-[#1F1235] tracking-tight">
+            {query ? (
+              <span>Results for &ldquo;<span className="gradient-text-animate">{query}</span>&rdquo;</span>
+            ) : (
+              <span>Discover <span className="gradient-text-animate">Conversations</span></span>
+            )}
           </h1>
-          <p className="text-text-secondary max-w-2xl">
-            Browse through common questions asked by girls like you. Can&apos;t find what you need? <Link href="/ask" className="text-purple-primary font-bold hover:underline">Ask anonymously.</Link>
+          <p className="text-gray-500 text-lg max-w-2xl leading-relaxed">
+            Browse through the honest guidance asked by others. Can&apos;t find your specific situation? <Link href="/ask" className="text-purple-600 font-bold hover:text-purple-700 transition-colors">Ask your sisters privately.</Link>
           </p>
           
-          <form onSubmit={handleSearchSubmit} className="relative max-w-2xl mx-auto md:mx-0">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-300 w-5 h-5" />
+          <form onSubmit={handleSearchSubmit} className="relative max-w-2xl mx-auto md:mx-0 group">
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-purple-400 w-6 h-6 group-focus-within:scale-110 transition-transform" />
             <input 
               type="text"
-              placeholder="Search questions by topic..."
-              className="w-full pl-12 pr-4 py-4 rounded-2xl border border-purple-100 shadow-lg focus:ring-2 focus:ring-purple-primary/20 outline-none text-text-primary placeholder:text-purple-200 transition-all"
+              placeholder="Search conversations by topic..."
+              className="w-full pl-16 pr-6 py-5 rounded-[2rem] border border-purple-100 glass shadow-2xl focus:ring-4 focus:ring-purple-200/50 outline-none text-[#1F1235] text-lg placeholder:text-purple-200 transition-all font-medium"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </form>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          <aside className="lg:w-64 space-y-8 flex-shrink-0">
+        <div className="flex flex-col lg:flex-row gap-10">
+          <aside className="lg:w-72 space-y-8 flex-shrink-0 relative z-10 animate-slide-up stagger-1">
             <button 
               onClick={() => setShowFilters(!showFilters)}
-              className="lg:hidden flex items-center justify-between w-full p-4 bg-white rounded-xl border border-purple-50 shadow-sm font-bold text-purple-primary"
+              className="lg:hidden flex items-center justify-between w-full p-5 bg-white rounded-2xl border border-purple-100 shadow-lg font-bold text-purple-600"
             >
-              <div className="flex items-center gap-2">
-                <Filter className="w-4 h-4" />
-                <span>Filters</span>
+              <div className="flex items-center gap-2 text-lg">
+                <Filter className="w-5 h-5" />
+                <span>Refine Search</span>
               </div>
-              <ChevronDown className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${showFilters ? 'rotate-180' : ''}`} />
             </button>
 
-            <div className={`${showFilters ? 'block' : 'hidden'} lg:block space-y-8 p-6 bg-white rounded-3xl border border-purple-50 shadow-sm animate-in fade-in slide-in-from-top-4 lg:animate-none`}>
-              <div>
-                <h3 className="font-bold text-text-primary mb-4 flex items-center gap-2">
-                  <Filter className="w-4 h-4 text-purple-primary" />
-                  Categories
+            <div className={`${showFilters ? 'block' : 'hidden'} lg:block space-y-10 p-8 glass rounded-[2.5rem] border border-purple-100 shadow-xl`}>
+              <div className="animate-slide-up" style={{ animationDelay: '100ms' }}>
+                <h3 className="font-playfair font-bold text-[#1F1235] text-xl mb-6 flex items-center gap-2">
+                  <Filter className="w-5 h-5 text-purple-600" />
+                  Topics
                 </h3>
                 <div className="space-y-2">
                   <button 
                     onClick={() => updateParams({ category: '' })}
-                    className={`block w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${!categoryParam ? 'bg-purple-50 text-purple-primary font-bold' : 'text-text-secondary hover:bg-gray-50'}`}
+                    className={`block w-full text-left px-4 py-2.5 rounded-xl text-sm transition-all duration-300 ${!categoryParam ? 'bg-purple-600 text-white font-bold shadow-md' : 'text-gray-500 hover:bg-purple-50 hover:text-purple-600 font-medium'}`}
                   >
-                    All Topics
+                    All Conversations
                   </button>
                   {initialCategories.map((cat) => (
                     <button 
                       key={cat.id}
                       onClick={() => updateParams({ category: cat.slug })}
-                      className={`block w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${categoryParam === cat.slug ? 'bg-purple-50 text-purple-primary font-bold' : 'text-text-secondary hover:bg-gray-50'}`}
+                      className={`block w-full text-left px-4 py-2.5 rounded-xl text-sm transition-all duration-300 ${categoryParam === cat.slug ? 'bg-purple-600 text-white font-bold shadow-md' : 'text-gray-500 hover:bg-purple-50 hover:text-purple-600 font-medium'}`}
                     >
                       {cat.name}
                     </button>
@@ -197,21 +201,21 @@ export default function SearchClient({ initialCategories }: { initialCategories:
                 </div>
               </div>
 
-              <div>
-                <h3 className="font-bold text-text-primary mb-4 flex items-center gap-2">
-                  <ArrowRight className="w-4 h-4 text-purple-primary" />
-                  Sort by
+              <div className="animate-slide-up" style={{ animationDelay: '200ms' }}>
+                <h3 className="font-playfair font-bold text-[#1F1235] text-xl mb-6 flex items-center gap-2">
+                  <ArrowRight className="w-5 h-5 text-purple-600" />
+                  Sort By
                 </h3>
                 <div className="space-y-2">
                   {[
-                    { label: 'Most Recent', value: 'recent' },
-                    { label: 'Most Popular', value: 'metoo' },
-                    { label: 'Most Viewed', value: 'views' },
+                    { label: 'Freshness', value: 'recent' },
+                    { label: 'Popularity', value: 'metoo' },
+                    { label: 'Recency', value: 'views' },
                   ].map((s) => (
                     <button 
                       key={s.value}
                       onClick={() => updateParams({ sort: s.value })}
-                      className={`block w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${sortParam === s.value ? 'bg-purple-50 text-purple-primary font-bold' : 'text-text-secondary hover:bg-gray-50'}`}
+                      className={`block w-full text-left px-4 py-2.5 rounded-xl text-sm transition-all duration-300 ${sortParam === s.value ? 'bg-purple-600 text-white font-bold shadow-md' : 'text-gray-500 hover:bg-purple-50 hover:text-purple-600 font-medium'}`}
                     >
                       {s.label}
                     </button>
@@ -219,22 +223,22 @@ export default function SearchClient({ initialCategories }: { initialCategories:
                 </div>
               </div>
 
-              <div>
-                <h3 className="font-bold text-text-primary mb-4 flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-pink-accent" />
-                  Time period
+              <div className="animate-slide-up" style={{ animationDelay: '300ms' }}>
+                <h3 className="font-playfair font-bold text-[#1F1235] text-xl mb-6 flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-pink-500" />
+                  Timeframe
                 </h3>
                 <div className="space-y-2">
                   {[
-                    { label: 'All time', value: 'all' },
+                    { label: 'Forever', value: 'all' },
                     { label: 'Today', value: 'today' },
-                    { label: 'Last 7 days', value: 'week' },
-                    { label: 'Last 30 days', value: 'month' },
+                    { label: 'This Week', value: 'week' },
+                    { label: 'This Month', value: 'month' },
                   ].map((range) => (
                     <button 
                       key={range.value}
                       onClick={() => updateParams({ date: range.value })}
-                      className={`block w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${dateParam === range.value ? 'bg-pink-50 text-pink-accent font-bold' : 'text-text-secondary hover:bg-gray-50'}`}
+                      className={`block w-full text-left px-4 py-2.5 rounded-xl text-sm transition-all duration-300 ${dateParam === range.value ? 'bg-pink-500 text-white font-bold shadow-md' : 'text-gray-500 hover:bg-pink-50 hover:text-pink-500 font-medium'}`}
                     >
                       {range.label}
                     </button>
@@ -243,16 +247,16 @@ export default function SearchClient({ initialCategories }: { initialCategories:
               </div>
 
               {/* Popular Keywords */}
-              <div className="pt-4 border-t border-gray-100">
-                <h3 className="font-bold text-xs uppercase tracking-widest text-gray-400 mb-4">
-                  Popular Searches
+              <div className="pt-6 border-t border-purple-100 animate-slide-up" style={{ animationDelay: '400ms' }}>
+                <h3 className="font-bold text-[10px] uppercase tracking-[0.2em] text-gray-400 mb-6">
+                  Trending Keywords
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {['Period Health', 'Skin Care', 'Self Love', 'Career Advice', 'Anxiety', 'Grooming'].map((kw) => (
                     <button
                       key={kw}
                       onClick={() => updateParams({ q: kw })}
-                      className="text-xs px-3 py-1.5 bg-gray-50 text-text-secondary rounded-full hover:bg-purple-100 hover:text-purple-primary transition-all border border-gray-100"
+                      className="text-[11px] font-bold px-4 py-2 bg-white text-gray-500 rounded-full hover:bg-purple-600 hover:text-white transition-all border border-purple-50 shadow-sm hover:shadow-md"
                     >
                       {kw}
                     </button>
@@ -263,50 +267,53 @@ export default function SearchClient({ initialCategories }: { initialCategories:
               {(categoryParam || dateParam !== 'all' || query) && (
                 <button 
                   onClick={clearFilters}
-                  className="w-full text-center text-xs font-bold text-text-secondary hover:text-purple-primary transition-colors flex items-center justify-center gap-1 pt-4 border-t border-gray-100"
+                  className="w-full text-center text-xs font-bold text-gray-400 hover:text-purple-600 transition-colors flex items-center justify-center gap-1 pt-6 border-t border-purple-100 group"
                 >
-                  <X className="w-3 h-3" />
-                  Clear all filters
+                  <X className="w-3.5 h-3.5 group-hover:rotate-90 transition-transform" />
+                  Reset all filters
                 </button>
               )}
             </div>
           </aside>
 
-          <main className="flex-1">
+          <main className="flex-1 relative z-10">
             {loading ? (
-              <div className="flex flex-col items-center justify-center py-20 gap-4">
-                <Loader2 className="w-10 h-10 text-purple-primary animate-spin" />
-                <p className="text-text-secondary font-medium">Looking through the archive...</p>
+              <div className="flex flex-col items-center justify-center py-32 gap-6 animate-pulse">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-200 to-pink-200 flex items-center justify-center shadow-lg">
+                  <Loader2 className="w-8 h-8 text-purple-600 animate-spin" />
+                </div>
+                <p className="text-gray-500 text-lg font-bold">Scanning the sisterhood vault...</p>
               </div>
             ) : questions.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {questions.map((q) => (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {questions.map((q, i) => (
                   <Link 
                     key={q.id}
                     href={`/q/${q.slug}`}
-                    className="bg-white rounded-2xl p-6 shadow-sm border border-purple-50 hover:shadow-md transition-all group flex flex-col h-full"
+                    className="card-premium p-8 group flex flex-col h-full animate-slide-up"
+                    style={{ animationDelay: `${(i % 6) * 100}ms` }}
                   >
-                    <div className="text-xs font-bold text-purple-primary uppercase tracking-wider mb-2">{q.categories?.name}</div>
-                    <h3 className="font-bold text-lg text-text-primary mb-4 group-hover:text-purple-primary transition-colors flex-1 line-clamp-3 leading-snug">
+                    <div className="text-[10px] font-black text-purple-600 uppercase tracking-[0.15em] mb-4 bg-purple-50 px-3 py-1 rounded-full w-fit">{q.categories?.name}</div>
+                    <h3 className="font-bold text-xl text-[#1F1235] mb-6 group-hover:text-purple-600 transition-colors flex-1 line-clamp-3 leading-snug">
                       {q.title}
                     </h3>
-                    <div className="flex items-center justify-between text-xs text-text-secondary font-medium">
+                    <div className="flex items-center justify-between text-xs text-gray-400 font-bold mt-auto pt-6 border-t border-purple-50/60">
                       <div className="flex items-center gap-1.5">
-                        <Heart className="w-3.5 h-3.5 text-pink-accent" />
-                        {q.metoo_count} asked this
+                        <Heart className="w-4 h-4 text-pink-400 fill-pink-100" />
+                        {q.metoo_count} girls asked
                       </div>
-                      <span>{new Date(q.created_at).toLocaleDateString()}</span>
+                      <span className="opacity-60">{new Date(q.created_at).toLocaleDateString()}</span>
                     </div>
                   </Link>
                 ))}
               </div>
             ) : (
-              <div className="bg-white rounded-3xl p-12 text-center border border-purple-50 shadow-sm">
-                <div className="text-4xl mb-4">🔍</div>
-                <h2 className="text-xl font-bold text-text-primary mb-2">No matching questions found</h2>
-                <p className="text-text-secondary mb-8">Try adjusting your filters or search for something else. Our sisters are always here to help.</p>
-                <Link href="/ask" className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-primary to-pink-accent text-white px-8 py-3 rounded-full font-bold hover:shadow-lg hover:-translate-y-0.5 transition-all">
-                  Be the first to ask <ArrowRight className="w-4 h-4" />
+              <div className="glass rounded-[3rem] p-16 text-center border border-purple-100 shadow-2xl animate-slide-up">
+                <div className="text-6xl mb-8 animate-float">🍂</div>
+                <h2 className="text-2xl font-playfair font-bold text-[#1F1235] mb-4">No conversations found</h2>
+                <p className="text-gray-500 mb-10 text-lg max-w-md mx-auto">Try a different keyword or adjust your filters. Our sisters might be waiting for you to ask first!</p>
+                <Link href="/ask" className="inline-flex items-center gap-3 bg-gradient-to-r from-purple-600 to-pink-500 text-white px-10 py-4 rounded-full font-bold shadow-lg shadow-purple-200 hover:scale-105 transition-all">
+                  Be the first to ask <ArrowRight className="w-5 h-5" />
                 </Link>
               </div>
             )}
@@ -314,5 +321,7 @@ export default function SearchClient({ initialCategories }: { initialCategories:
         </div>
       </div>
     </div>
+  );
+}
   );
 }

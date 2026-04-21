@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
-import { GoogleGenAI } from '@google/genai';
 
-const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
+export const runtime = 'edge';
 
 export async function POST(req: Request) {
   try {
@@ -25,62 +24,80 @@ export async function POST(req: Request) {
     }
 
     const prompt = `
-      You are "PurpleGirl", a wise, supportive, and non-judgmental older sister/mentor helping girls and young women in India with their most pressing questions.
-      Your tone is empathetic, practical, and sisterly. Use simple English that a teenage girl or young adult can understand.
+      You are "PurpleGirl", an extremely smart, empathetic, and culturally-aware elder sister and personal AI life assistant for young women in India.
+      The user is coming to you for personal advice, NOT for a blog article.
       
       Topic: ${question.categories?.name || 'General'}
-      Question: ${question.title}
-      Details: ${question.description || ''}
+      User's Message: "${question.title}"
+      Context: ${question.description || 'None provided.'}
 
-      Please provide a response in the following JSON format:
-      {
-        "summary": "A concise 1-2 sentence quick answer.",
-        "detailed": "A deeper explanation of the 'why' and 'how'. 2-3 paragraphs. Emphasize that she isn't alone.",
-        "bullet_points": ["Step-by-step practical tip 1", "Practical tip 2", "Practical tip 3"],
-        "faqs": [
-          {"q": "A related follow-up question?", "a": "A brief helpful answer."},
-          {"q": "Another common related question?", "a": "A brief helpful answer."}
-        ],
-        "products": [
-          {
-            "title": "Name of a helpful generic product (e.g., 'Salicylic Acid Cleanser')",
-            "link": "https://amazon.in/s?k=salicylic+acid+cleanser",
-            "price": "Under ₹500",
-            "image": "https://picsum.photos/seed/skincare/200/200"
-          }
-        ],
-        "disclaimer": "A kind reassurance that this is advice and she should consult a pro/adult for serious issues."
-      }
+      Your task is to generate a conversational response exactly as if you are texting her back on a messaging app (like WhatsApp/iMessage).
+      Your response should be broken down into individual "chat bubbles" so it feels like a real-time conversation.
       
-      Return ONLY the JSON.
+      Follow this cadence:
+      1. Bubble 1: Pure emotional reassurance. Make her feel completely understood, safe, and validated.
+      2. Bubble 2: Practical, actionable, step-by-step guidance.
+      3. Bubble 3 (Optional): Ask a warm follow-up question to keep the conversation going.
+
+      If her message is related to Fashion, Beauty, or Lifestyle, you can suggest related item types in the 'product_keywords' field. Our backend will swap these with real affiliate links.
+
+      Return ONLY this exact JSON schema:
+      {
+        "chat_bubbles": [
+          "Oh honey, I am so sorry you're feeling this way right now. Take a deep breath, you are not alone in this.",
+          "Here is what I think we should do next. First...",
+          "How does that sound to you?"
+        ],
+        "product_keywords": ["cleanser", "moisturizer"] // array of strings (leave empty if not applicable)
+      }
     `;
 
-    // 2. Generate answer with Gemini
-    const result = await genAI.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-      }
+    // 2. Generate answer with Groq API
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        response_format: { type: 'json_object' },
+        messages: [{ role: 'user', content: prompt }]
+      })
     });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Groq API Error:', errorText);
+      throw new Error(`Groq API failed: ${response.status}`);
+    }
+
+    const result = await response.json();
+    const responseText = result.choices[0]?.message?.content;
     
-    const responseText = result.text;
     if (!responseText) throw new Error('No response from AI');
     
     const answerData = JSON.parse(responseText);
+
+    // Mock API for Cuelinks/Affiliate links based on keywords
+    let affiliatedProducts = [];
+    if (answerData.product_keywords && answerData.product_keywords.length > 0) {
+      affiliatedProducts = answerData.product_keywords.map((kw: string) => ({
+        title: \`Top Rated \${kw.charAt(0).toUpperCase() + kw.slice(1)}\`,
+        link: \`https://amazon.in/s?k=\${encodeURIComponent(kw)}\`,
+        price: 'Featured',
+        image: \`https://picsum.photos/seed/\${encodeURIComponent(kw)}/200/200\`
+      }));
+    }
 
     // 3. Save answer to DB
     const { data: savedAnswer, error: saveError } = await supabaseAdmin
       .from('answers')
       .insert({
         question_id: question.id,
-        summary: answerData.summary,
-        detailed: answerData.detailed,
-        bullet_points: answerData.bullet_points,
-        faqs: answerData.faqs,
-        products: answerData.products || null,
-        disclaimer: answerData.disclaimer,
-        ai_model: 'gemini-3-flash-preview'
+        chat_log: answerData.chat_bubbles,
+        products: affiliatedProducts.length > 0 ? affiliatedProducts : null,
+        ai_model: 'llama3-70b-8192'
       })
       .select()
       .single();

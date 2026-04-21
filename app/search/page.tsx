@@ -38,12 +38,23 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     .order('name');
 
   return (
-    <Suspense fallback={
-      <div className="flex flex-col items-center justify-center py-40 gap-4">
-        <Loader2 className="w-10 h-10 text-purple-primary animate-spin" />
-      </div>
-    }>
-      <SearchClient initialCategories={categories || []} />
-    </Suspense>
+    <div className="relative min-h-screen overflow-hidden bg-white">
+      {/* Page-level orb backgrounds */}
+      <div className="orb orb-purple w-[600px] h-[600px] top-[-100px] right-[-100px] opacity-20" />
+      <div className="orb orb-pink w-[500px] h-[500px] bottom-[-80px] left-[-60px] opacity-15" />
+
+      <Suspense fallback={
+        <div className="flex flex-col items-center justify-center py-40 gap-4 relative z-10">
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-200 to-pink-200 flex items-center justify-center shadow-lg animate-float">
+            <Loader2 className="w-8 h-8 text-purple-600 animate-spin" />
+          </div>
+          <p className="text-gray-500 font-bold animate-pulse">Scanning the vault...</p>
+        </div>
+      }>
+        <div className="relative z-10">
+          <SearchClient initialCategories={categories || []} />
+        </div>
+      </Suspense>
+    </div>
   );
 }
