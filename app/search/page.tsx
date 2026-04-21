@@ -1,5 +1,7 @@
 import { Metadata } from 'next';
 import { Suspense } from 'react';
+
+export const runtime = 'edge';
 import { supabase } from '@/lib/supabase';
 import SearchClient from '@/components/search/SearchClient';
 import { SITE_NAME } from '@/lib/constants';

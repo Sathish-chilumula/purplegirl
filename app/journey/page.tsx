@@ -1,5 +1,7 @@
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
+
+export const runtime = 'edge';
 import Link from 'next/link';
 import { Sparkles, Bookmark, Settings, Heart, ArrowRight } from 'lucide-react';
 import { supabase as publicSupabase } from '@/lib/supabase';
