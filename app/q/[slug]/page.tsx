@@ -256,44 +256,47 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
           <div className="mt-12 text-center">
             <p className="text-xs text-gray-400 italic bg-gray-50/50 px-4 py-3 rounded-xl inline-block max-w-md">
               {question.answers.disclaimer}
-          />
-
-          {/* Client Side Interaction Block */}
-          <QuestionClient 
-            questionId={question.id}
-            initialMeToo={question.metoo_count}
-            questionTitle={question.title}
-            questionSlug={question.slug}
-            bulletPoints={question.answers.bullet_points}
-            summary={question.answers.summary}
-          />
-        </>
-      ) : (
-        <AnswerWaiter questionId={question.id} />
-      )}
-
-      {/* Related Questions */}
-      {related && related.length > 0 && (
-        <section>
-          <h2 className="font-bold text-2xl text-text-primary mb-6">Girls also asked…</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {related.map((q: any, i: number) => (
-              <Link 
-                key={i}
-                href={`/q/${q.slug}`}
-                className="bg-white p-5 rounded-2xl border border-purple-50 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all"
-              >
-                <h3 className="font-bold text-text-primary line-clamp-2">{q.title}</h3>
-                <div className="text-purple-primary text-sm font-medium mt-3 flex items-center gap-1 group-hover:gap-2 transition-all">
-                  Read answer <ArrowLeft className="w-4 h-4 rotate-180" />
-                </div>
-              </Link>
-            ))}
+            </p>
           </div>
-        </section>
-      )}
->>>>>>> b5ef35a4fbc7f5a2d1ff3a29b93a15a52be0c706
-    </div>
-  );
+        )}
+
+        {/* Client Side Interaction Block */}
+        <QuestionClient 
+          questionId={question.id}
+          initialMeToo={question.metoo_count}
+          questionTitle={question.title}
+          questionSlug={question.slug}
+          bulletPoints={question.answers.bullet_points}
+          summary={question.answers.summary}
+        />
+      </div>
+    ) : (
+      <div className="max-w-2xl mx-auto px-4 py-32">
+        <AnswerWaiter questionId={question.id} />
+      </div>
+    )}
+
+    {/* Related Questions */}
+    {related && related.length > 0 && (
+      <section className="max-w-2xl mx-auto px-4 pb-32">
+        <h2 className="font-playfair font-bold text-2xl text-[#1F1235] mb-6">Girls also asked…</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {related.map((q: any, i: number) => (
+            <Link 
+              key={i}
+              href={`/q/${q.slug}`}
+              className="bg-white p-5 rounded-2xl border border-purple-50 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all group"
+            >
+              <h3 className="font-bold text-[#1F1235] line-clamp-2 group-hover:text-purple-600 transition-colors">{q.title}</h3>
+              <div className="text-purple-600 text-sm font-medium mt-3 flex items-center gap-1">
+                Read answer <ArrowRight className="w-4 h-4" />
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+    )}
+  </div>
+);
 }
 

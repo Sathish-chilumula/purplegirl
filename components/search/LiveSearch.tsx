@@ -267,5 +267,3 @@ export default function LiveSearch({ initialValue = '', placeholder = "Type your
     </div>
   );
 }
-  );
-}
