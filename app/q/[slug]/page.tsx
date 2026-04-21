@@ -296,6 +296,7 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
         </div>
       </section>
     )}
+    </div>
   </div>
 );
 }
