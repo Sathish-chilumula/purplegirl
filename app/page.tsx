@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Sparkles, Heart, Briefcase, Pill, Shirt, Brain, Salad, Bath, ShoppingBag, Coffee, Baby, ArrowRight, Loader2 } from 'lucide-react';
+import { Sparkles, Heart, Briefcase, Pill, Shirt, Brain, Salad, Bath, ShoppingBag, Coffee, Baby, ArrowRight, Loader2, EyeOff, Shield } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import LiveSearch from '@/components/search/LiveSearch';
 import MeTooButton from '@/components/question/MeTooButton';
@@ -253,6 +253,37 @@ export default function Home() {
             </div>
           )}
         </div>
+      </section>
+
+      {/* ─── WHISPER MODE PROMO ──────────────────────── */}
+      <section className="px-4 py-8">
+        <Link 
+          href="/whisper"
+          className="max-w-7xl mx-auto block bg-gradient-to-r from-[#1A0F1D] to-[#2D1B2E] rounded-[2rem] p-8 md:p-12 relative overflow-hidden group shadow-2xl"
+        >
+          {/* Decorative background elements */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-purple-900/20 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-pink-900/10 blur-3xl rounded-full translate-y-1/2 -translate-x-1/2" />
+          
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="text-center md:text-left space-y-4">
+              <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-1.5 rounded-full text-xs font-bold text-purple-300 uppercase tracking-widest">
+                <Shield className="w-3.5 h-3.5" /> New: Ephemeral Chat
+              </div>
+              <h2 className="font-playfair font-bold text-3xl md:text-4xl text-white">
+                Enter <span className="text-purple-400">Whisper Mode</span>
+              </h2>
+              <p className="text-gray-400 text-lg max-w-md">
+                Have a sensitive question you want 100% off the records? No logs, no history, just sisterly advice in the shadows.
+              </p>
+            </div>
+            <div className="shrink-0">
+              <div className="w-20 h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-500">
+                <EyeOff className="w-8 h-8 text-purple-400" />
+              </div>
+            </div>
+          </div>
+        </Link>
       </section>
 
       {/* ─── HOW IT WORKS ───────────────────────────── */}

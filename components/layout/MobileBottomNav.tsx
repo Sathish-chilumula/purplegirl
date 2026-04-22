@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, PlusCircle, Search, User } from 'lucide-react';
+import { Home, PlusCircle, Search, User, EyeOff } from 'lucide-react';
 
 export default function MobileBottomNav() {
   const pathname = usePathname();
@@ -11,7 +11,8 @@ export default function MobileBottomNav() {
     { name: 'Home', href: '/', icon: Home },
     { name: 'Discover', href: '/search', icon: Search },
     { name: 'Ask Now', href: '/ask', icon: PlusCircle, highlight: true },
-    { name: 'My Profile', href: '/profile', icon: User },
+    { name: 'Whisper', href: '/whisper', icon: EyeOff },
+    { name: 'My Profile', href: '/journey', icon: User },
   ];
 
   return (

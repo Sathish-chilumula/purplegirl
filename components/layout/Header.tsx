@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Search, Plus } from 'lucide-react';
+import { Search, Plus, EyeOff } from 'lucide-react';
 import LiveSearch from '../search/LiveSearch';
 import AuthButton from '../auth/AuthButton';
 
@@ -25,6 +25,14 @@ export default function Header() {
             <Search className="w-5 h-5" />
           </Link>
           
+          <Link 
+            href="/whisper" 
+            className="hidden lg:flex items-center gap-2 text-gray-500 hover:text-purple-600 transition-colors font-medium text-sm mr-4"
+          >
+            <EyeOff className="w-4 h-4" />
+            <span>Whisper</span>
+          </Link>
+
           <div className="hidden sm:block">
             <AuthButton />
           </div>
