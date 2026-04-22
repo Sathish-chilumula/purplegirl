@@ -11,20 +11,9 @@ import AnswerWaiter from '@/components/question/AnswerWaiter';
 import EmotionBar from '@/components/question/EmotionBar';
 import { SITE_NAME } from '@/lib/constants';
 
-// SSG: Fully static build
-// export const revalidate = 3600;
+export const runtime = 'edge';
+// SSR: Removed SSG generateStaticParams to fix 404 on new questions for Cloudflare
 
-// ─── Static Params (pre-render up to 500 approved questions) ─────
-export async function generateStaticParams() {
-  const { data } = await supabaseAdmin
-    .from('questions')
-    .select('slug')
-    .in('status', ['approved', 'featured'])
-    .order('created_at', { ascending: false })
-    .limit(500);
-
-  return (data || []).map((q) => ({ slug: q.slug }));
-}
 
 interface QuestionPageProps {
   params: Promise<{ slug: string }>;

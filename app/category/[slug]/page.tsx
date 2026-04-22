@@ -6,17 +6,9 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 import { buildItemListSchema } from '@/lib/schema';
 import { SITE_NAME } from '@/lib/constants';
 
-// SSG: Fully static build
-// export const revalidate = 3600; 
+export const runtime = 'edge';
+// SSR: Removed SSG generateStaticParams to fix 404 on new questions for Cloudflare
 
-// ─── Static Params ───────────────────────────────────────
-export async function generateStaticParams() {
-  const { data } = await supabaseAdmin
-    .from('categories')
-    .select('slug');
-
-  return (data || []).map((c) => ({ slug: c.slug }));
-}
 
 // ─── Types ───────────────────────────────────────────────
 interface CategoryPageProps {
