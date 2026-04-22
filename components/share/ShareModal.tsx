@@ -97,7 +97,7 @@ export default function ShareModal({
             ref={shareCardRef}
             questionTitle={questionTitle}
             categoryName={categoryName}
-            tips={bulletPoints.length > 0 ? bulletPoints : (chatLog.length > 0 ? chatLog : [questionTitle])}
+            tips={(bulletPoints?.length ?? 0) > 0 ? bulletPoints! : ((chatLog?.length ?? 0) > 0 ? chatLog! : [questionTitle])}
             template={template}
           />
         </div>

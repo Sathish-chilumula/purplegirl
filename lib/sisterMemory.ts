@@ -24,7 +24,17 @@ export function getMemory(): SisterMemory {
   const stored = localStorage.getItem(MEMORY_KEY);
   if (stored) {
     try {
-      return JSON.parse(stored);
+      const parsed = JSON.parse(stored);
+      // Merge with defaults to handle version updates
+      return {
+        visitCount: 1,
+        lastVisit: null,
+        askedQuestions: [],
+        topCategories: {},
+        nickname: null,
+        sessionId: crypto.randomUUID(),
+        ...parsed
+      };
     } catch (e) {
       console.error('Failed to parse SisterMemory', e);
     }
@@ -53,7 +63,7 @@ export function updateMemory(updates: Partial<SisterMemory>) {
 export function recordCategoryVisit(categorySlug: string) {
   if (typeof window === 'undefined') return;
   const current = getMemory();
-  const topCategories = { ...current.topCategories };
+  const topCategories = { ...(current.topCategories || {}) };
   topCategories[categorySlug] = (topCategories[categorySlug] || 0) + 1;
   updateMemory({ topCategories });
 }
