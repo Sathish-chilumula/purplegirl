@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Heart } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { motion } from 'motion/react';
@@ -15,6 +15,17 @@ export default function MeTooButton({ questionId, initialCount, variant = 'promi
   const [count, setCount] = useState(initialCount);
   const [hasVoted, setHasVoted] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const voted = localStorage.getItem(`metoo_${questionId}`);
+      if (voted) {
+        setHasVoted(true);
+      }
+      setIsLoaded(true);
+    }
+  }, [questionId]);
 
   const handleVote = async (e?: React.MouseEvent) => {
     if (e) {
@@ -25,6 +36,7 @@ export default function MeTooButton({ questionId, initialCount, variant = 'promi
     if (hasVoted) return;
     
     setHasVoted(true);
+    localStorage.setItem(`metoo_${questionId}`, 'true');
     setCount(prev => prev + 1);
     setIsAnimating(true);
     setTimeout(() => setIsAnimating(false), 1000);

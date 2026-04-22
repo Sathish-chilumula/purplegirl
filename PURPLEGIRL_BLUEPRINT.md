@@ -1,8 +1,8 @@
 # 💜 PurpleGirl.in — Complete Master Blueprint
-> Last Updated: April 2026 (Rev 2 — UI/UX + Hero + AI Prompt Refined)
+> Last Updated: April 22, 2026 (Rev 3 — PurpleGirl 2.0 AI-Native Vision)
 > Domain: purplegirl.in
-> Purpose: AI-powered anonymous Q&A platform for women/girls
-> Stack: Next.js 14 + Tailwind CSS + Supabase + OpenRouter + Cloudflare Pages
+> Purpose: AI-powered emotionally intelligent companion platform for women
+> Stack: Next.js 15 + Tailwind CSS + Supabase + OpenRouter + Cloudflare Pages
 
 > **REVISION LOG**
 > - Rev 1: Initial full blueprint (tech, DB, content, SEO, monetization)
@@ -10,6 +10,11 @@
 >          Mobile UX spec, Color palette refined (#FAF5FF bg),
 >          AI prompt improved (engagement + SEO), Copy Answer feature added,
 >          WhatsApp-first share strategy (Instagram = Phase 2)
+> - Rev 3: PurpleGirl 2.0 AI-Native Vision — 10 advanced features added,
+>          Implementation status tracker (Section 19), Priority phases defined,
+>          Features: Emotion Intelligence, Voice Sister, Skin Photo Analysis,
+>          Whisper Mode, Live Pulse, Sister Memory, Reel Script Generator,
+>          Sisterhood Circles, Personalized Answers, Collective Intelligence
 
 ---
 
@@ -1551,35 +1556,343 @@ TOTAL:             ₹2,00,000/month
 
 ---
 
-## 19. FUTURE FEATURES
+## 19. IMPLEMENTATION STATUS TRACKER
 
-### Version 2.0 (Month 6-9)
+> Track what's built, what's partial, and what's next.
+> ✅ = Done | 🔧 = Partial/In Progress | ⬜ = Not Started
+
+### Core Foundation
 ```
-□ PWA (Progressive Web App) — Add to homescreen + push notifications
-□ Expert Marketplace — Verified doctors, coaches, therapists
-□ Audio Answers — Text-to-speech for accessibility
-□ Question Upvoting — Community-driven answer improvement
-□ Collections — Curated topic bundles ("Skincare Starter Kit")
-□ Trending Alerts — Email/push when topic trends
+✅ Next.js App Router + Tailwind CSS + Supabase integration
+✅ Homepage with Hero + Categories + Trending + Recent + Newsletter
+✅ Ask question form (/ask)
+✅ Question detail page (/q/[slug]) — server component
+✅ Category page (/category/[slug]) — ⚠️ client-rendered (needs SSG fix)
+✅ Search page (/search) with LiveSearch
+✅ Admin panel with Basic Auth (/admin)
+✅ AI answer pipeline (OpenRouter + chat_log format)
+✅ Follow-up chat on question pages
+✅ Sitemap generation (dynamic)
+✅ Privacy, Terms, About, Contact pages
+✅ Mobile bottom nav
+✅ AdSense script integration
+🔧 MeToo button — works but no localStorage persistence
+🔧 Share feature — basic WhatsApp + Instagram (no modal/templates)
+⬜ Category pages SSG (currently client-rendered = SEO blocker)
+⬜ generateStaticParams on /q/[slug] pages
+⬜ FAQPage + Article schema markup (JSON-LD)
+⬜ Full ShareModal with platform/template picker
+⬜ trending_logs table + trending score cron
+⬜ Content seeding at scale (only 13 questions exist)
 ```
 
-### Version 3.0 (Month 9-12)
+---
+
+## 19A. PURPLEGIRL 2.0 — AI-NATIVE VISION
+
+> Core Shift: Stop being a Q&A site. Become the world's first
+> emotionally intelligent AI companion platform for women.
+
+### FEATURE 1: Emotion Intelligence Layer ⬜
 ```
-□ App (React Native) — iOS + Android
-□ Live Q&A Sessions — Weekly expert live sessions (paid)
-□ Community Forums — Moderated category discussion boards
-□ Personalization — Saved categories, reading history
-□ AI Chatbot — Interactive follow-up questions
-□ Video Answers — AI avatar explains answer in video
+Status: ⬜ NOT STARTED
+Priority: HIGH — Differentiator
+Depends on: AI answer pipeline (✅ exists)
+
+What it does:
+- AI detects emotion from question text BEFORE answering
+- Response tone auto-calibrates to detected emotion
+- UI color shifts to match emotional state (warm amber for worried, etc.)
+- Opening line acknowledges the feeling FIRST
+
+Emotion types: Scared | Embarrassed | Angry | Hopeful | Confused | Sad | Frustrated
+
+UI: Emotion detection bar with progress indicator
+    Background gradient shifts based on emotion
+    Opening acknowledgment bubble before main answer
+
+Implementation:
+- New API route: /api/detect-emotion
+- Emotion detection prompt runs before main answer generation
+- Returns JSON: { primary_emotion, intensity (1-10), opening_acknowledgment, tone_instruction }
+- Emotion → UI color mapping in emotionTheme config
+- EmotionBar component shows detected emotion + calibration progress
+
+Files needed:
+  lib/emotion.ts           — Detection prompt + theme mapping
+  components/question/EmotionBar.tsx  — UI component
+  app/api/detect-emotion/route.ts     — API endpoint
 ```
 
-### Future Monetization
+### FEATURE 2: Voice Sister Mode ⬜
 ```
-□ White-label API — License Q&A engine to other niche sites
-□ Data Insights Reports — Anonymized trend data for brands
-□ Certification Courses — Skincare, nutrition, career courses
-□ Job Board — Women-focused employer listings
-□ Matchmaking — Expert-to-user 1:1 sessions (commission)
+Status: ⬜ NOT STARTED
+Priority: MEDIUM — Engagement booster
+Depends on: Web Speech API (free), ElevenLabs (free tier 10K chars/month)
+
+What it does:
+- User speaks question via microphone (Web Speech API — free, built-in)
+- AI responds in warm voice (ElevenLabs multilingual_v2 — supports Hindi)
+- Full-screen voice mode with waveform visualization
+- Audio player UI with speed controls (0.75x / 1x / 1.25x)
+
+Implementation:
+- Input: window.SpeechRecognition (lang: 'en-IN' for Indian English)
+- Output: ElevenLabs /v1/text-to-speech API
+- Waveform: Canvas-based audio visualization
+- "Read instead" toggle to switch to text mode
+
+Files needed:
+  components/voice/VoiceSisterMode.tsx  — Full-screen voice UI
+  components/voice/AudioPlayer.tsx      — Playback controls
+  components/voice/Waveform.tsx         — Audio waveform visualization
+  lib/voice.ts                          — Speech recognition + ElevenLabs API
+  app/api/speak/route.ts                — TTS proxy endpoint
+
+Env vars: ELEVENLABS_API_KEY
+```
+
+### FEATURE 3: Skin Photo Analysis (Vision AI) ⬜
+```
+Status: ⬜ NOT STARTED
+Priority: HIGH — Unique differentiator, monetization driver
+Depends on: Claude Vision API or Google Gemini Vision
+
+What it does:
+- Upload photo of skin concern (dark spots, acne, pigmentation)
+- AI gives specific, personalized analysis
+- Recommends home remedies ranked by effectiveness
+- Suggests India-budget products (Nykaa/Amazon)
+- Flags when to see a doctor
+- Photo analyzed instantly, NEVER stored
+
+Implementation:
+- Camera/upload component with drag-drop
+- Base64 encoding → API route → Claude Vision API
+- Response: condition, confidence, causes, remedies, products
+- Always uses "appears to be" / "looks like" (never diagnoses)
+- Medical disclaimer auto-injected
+
+Files needed:
+  components/skin/SkinAnalyzer.tsx       — Upload + camera UI
+  components/skin/AnalysisResult.tsx     — Results display
+  app/api/analyze-skin/route.ts          — Vision AI endpoint
+  app/skin-check/page.tsx                — Dedicated page
+
+Env vars: ANTHROPIC_API_KEY (for Claude Vision)
+```
+
+### FEATURE 4: Whisper Mode ⬜
+```
+Status: ⬜ NOT STARTED
+Priority: HIGH — Trust builder, handles sensitive topics
+Depends on: Existing AI pipeline
+
+What it does:
+- For questions too sensitive even for normal feed
+- Topics: domestic abuse, sexual health, eating disorders, crisis
+- Answered and auto-deleted — ZERO database writes
+- Dark UI theme, crisis hotline numbers always visible
+- Answer shown once via API response, no storage
+
+Crisis detection:
+- Keyword matching for suicide/violence/abuse
+- Crisis response bypasses AI — hardcoded empathy + helpline resources
+- iCall: 9152987821, Vandrevala: 1860-2662-345, Women Helpline: 181
+
+Files needed:
+  app/whisper/page.tsx                   — Whisper mode page (dark UI)
+  app/api/whisper/route.ts               — Zero-storage API
+  components/whisper/WhisperChat.tsx      — Chat interface
+  components/whisper/CrisisBanner.tsx     — Helpline resources
+```
+
+### FEATURE 5: Live Sisterhood Pulse ⬜
+```
+Status: ⬜ NOT STARTED
+Priority: LOW — Engagement/virality (needs traffic volume first)
+Depends on: Supabase Realtime subscriptions
+
+What it does:
+- Real-time visualization of questions being asked across India
+- India SVG map with pulsing dots (each dot = question submitted)
+- Color = category, animation = new question arriving
+- Live trending: most asked right now, most Me Too'd today
+- Massively shareable, media-citable
+
+Implementation:
+- Supabase Realtime channel: 'questions-live'
+- Listen for INSERT events on questions table
+- India SVG map with Framer Motion animated dots
+- 24-hour rolling stats counters
+
+Files needed:
+  app/pulse/page.tsx                     — Full-screen pulse page
+  components/pulse/SisterhoodPulse.tsx   — Map + stats component
+  components/pulse/IndiaSVGMap.tsx        — Interactive India map
+  components/pulse/LiveCounter.tsx       — Animated counters
+```
+
+### FEATURE 6: Smart Sister Memory (No Login) ⬜
+```
+Status: ⬜ NOT STARTED
+Priority: MEDIUM — Retention booster
+Depends on: localStorage only (zero backend)
+
+What it does:
+- "Sister" remembers everything across sessions via localStorage
+- Personalized greeting on return visits
+- Shows new answers since last visit
+- Tracks top categories user is interested in
+- Feels like ongoing relationship without any login
+
+Memory structure:
+  { visitCount, lastVisit, askedQuestions[], topCategories[], sessionId }
+
+Files needed:
+  lib/sisterMemory.ts                    — Memory CRUD helpers
+  components/home/WelcomeBackCard.tsx     — Personalized greeting card
+  hooks/useSisterMemory.ts               — React hook for memory
+```
+
+### FEATURE 7: AI Reel Script Generator ⬜
+```
+Status: ⬜ NOT STARTED
+Priority: MEDIUM — Creator tool, virality driver
+Depends on: AI pipeline
+
+What it does:
+- Take any Q&A answer → generate 30-45 sec Reel script
+- Scene-by-scene directions with text overlays
+- Trending audio suggestions
+- Hashtag recommendations
+- Women become creators without effort
+
+Output JSON:
+  { hook, scenes: [{ duration, what_to_show, text_overlay, voiceover, transition }],
+    cta, trending_audio_suggestions, hashtags, viral_hook_reason }
+
+Files needed:
+  components/share/ReelScriptGenerator.tsx — UI component
+  app/api/generate-reel/route.ts           — AI endpoint
+  lib/reelScript.ts                        — Prompt builder
+```
+
+### FEATURE 8: Anonymous Sisterhood Circles ⬜
+```
+Status: ⬜ NOT STARTED
+Priority: LOW — Needs critical mass of users
+Depends on: Supabase Realtime (broadcast channels)
+
+What it does:
+- Real-time anonymous group chat rooms by topic
+- 5-8 women per room, AI sister moderates
+- No usernames — just "Sister 1", "Sister 2", etc.
+- AI adds facts, prevents toxicity, responds when appropriate
+- Auto-expires after 2 hours
+
+Implementation:
+- Supabase channel per circle: `circle-${circleId}`
+- Broadcast events for messages
+- AI decides whether to respond (not every message)
+- Max capacity enforcement
+
+Files needed:
+  app/circles/page.tsx                   — Circle listing
+  app/circles/[id]/page.tsx              — Active circle
+  components/circles/CircleChat.tsx      — Chat interface
+  components/circles/CircleList.tsx      — Available circles
+  app/api/circles/route.ts              — Create/join circle
+```
+
+### FEATURE 9: Hyper-Personalized Answer Mode ⬜
+```
+Status: ⬜ NOT STARTED
+Priority: HIGH — Answer quality differentiator
+Depends on: AI pipeline
+
+What it does:
+- Before answering, AI asks 5 smart clarifying questions
+- Like a doctor's intake form but friendly
+- Final answer calibrated to YOUR specific situation
+- Not generic advice — references your specific factors
+
+Intake flow:
+  1. Age group (chips: 18-22 / 23-28 / 29-35 / 35+)
+  2. When issue started (Recently / 3-6 months / Over a year)
+  3. Contributing factors (checkboxes)
+  4. Relevant type (category-specific)
+  5. Budget preference (Under ₹500 / ₹500-2000 / Any)
+
+Files needed:
+  components/question/PersonalizedIntake.tsx  — Intake form UI
+  lib/personalizedPrompt.ts                   — Profile-aware prompt builder
+```
+
+### FEATURE 10: Women's Collective Intelligence Dashboard ⬜
+```
+Status: ⬜ NOT STARTED
+Priority: LOW — PR asset, needs data volume
+Depends on: 1000+ questions in database
+
+What it does:
+- Anonymized, aggregated insights page
+- What Indian women are collectively asking about
+- Top concerns this month with percentages
+- Age breakdown of topics (if collected)
+- Weekly spikes and trends
+- Downloadable report (PDF)
+- Brand partnership inquiry CTA
+
+Files needed:
+  app/insights/page.tsx                  — Dashboard page
+  components/insights/TopConcerns.tsx    — Bar chart
+  components/insights/TrendSpikes.tsx    — Spike alerts
+  app/api/insights/route.ts             — Aggregation queries
+```
+
+### Advanced Tech Stack Addition
+```
+Current Stack              →    PurpleGirl 2.0 Stack
+─────────────────────────────────────────────────────
+OpenRouter (text)           →  + Claude Vision (photo analysis)
+html2canvas (images)        →  + ElevenLabs (voice output)
+Supabase DB                 →  + Supabase Realtime (circles/pulse)
+Static pages                →  + Emotion-aware dynamic responses
+Anonymous Q&A               →  + Whisper Mode (zero storage)
+Share cards                 →  + Reel Script Generator
+No memory                   →  + localStorage Sister Memory
+Generic answers             →  + Personalized intake flow
+
+New env vars needed:
+  ELEVENLABS_API_KEY        — Voice Sister Mode
+  ANTHROPIC_API_KEY         — Skin Photo Analysis (Claude Vision)
+```
+
+### Implementation Priority Order
+```
+Phase A — SEO Critical (NOW):
+  1. Fix Category SSG (Gap 1)
+  2. Add generateStaticParams to /q/[slug] (Gap 2)
+  3. Add FAQPage schema markup (Gap 4)
+  4. Fix MeToo localStorage persistence
+  5. Full ShareModal with templates (Gap 5)
+
+Phase B — Differentiators (Month 2-3):
+  6. Emotion Intelligence Layer (Feature 1)
+  7. Whisper Mode (Feature 4)
+  8. Sister Memory (Feature 6)
+  9. Personalized Intake (Feature 9)
+
+Phase C — Engagement (Month 3-5):
+  10. Voice Sister Mode (Feature 2)
+  11. Skin Photo Analysis (Feature 3)
+  12. Reel Script Generator (Feature 7)
+
+Phase D — Community (Month 5+):
+  13. Sisterhood Circles (Feature 8)
+  14. Live Sisterhood Pulse (Feature 5)
+  15. Collective Intelligence Dashboard (Feature 10)
 ```
 
 ---

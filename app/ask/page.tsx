@@ -6,6 +6,8 @@ import { ArrowLeft, Sparkles, Heart, Briefcase, Pill, Shirt, Brain, Salad, Loade
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { slugify } from '@/lib/slugify';
+import PersonalizedIntake from '@/components/question/PersonalizedIntake';
+import { IntakeData, buildPersonalizedContext } from '@/lib/personalizedPrompt';
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   'beauty-skincare': <Sparkles className="w-5 h-5" />,
@@ -31,6 +33,7 @@ export default function AskPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingCats, setIsLoadingCats] = useState(true);
+  const [intakeData, setIntakeData] = useState<IntakeData>({});
 
   useEffect(() => {
     async function fetchCategories() {
@@ -80,10 +83,14 @@ export default function AskPage() {
 
       // Trigger AI generation (non-blocking)
       try {
+        const customContext = buildPersonalizedContext(intakeData);
         fetch('/api/generate-answer', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ questionId: questionId }),
+          body: JSON.stringify({ 
+            questionId: questionId,
+            customContext: customContext // Pass personalized context to backend
+          }),
         });
       } catch (err) {
         console.error('Error triggering AI generation:', err);
@@ -177,6 +184,10 @@ export default function AskPage() {
                   ))}
                 </div>
               )}
+            </div>
+
+            <div className="animate-slide-up stagger-5">
+              <PersonalizedIntake onIntakeChange={setIntakeData} />
             </div>
             
             <div className="pt-6 border-t border-purple-50/60 animate-slide-up stagger-5">

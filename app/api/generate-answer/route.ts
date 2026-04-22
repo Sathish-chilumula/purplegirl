@@ -5,7 +5,7 @@ export const runtime = 'edge';
 
 export async function POST(req: Request) {
   try {
-    const { questionId } = await req.json();
+    const { questionId, customContext } = await req.json();
 
     if (!questionId) {
       return NextResponse.json({ error: 'Question ID is required' }, { status: 400 });
@@ -30,6 +30,7 @@ export async function POST(req: Request) {
       Topic: ${question.categories?.name || 'General'}
       User's Message: "${question.title}"
       Context: ${question.description || 'None provided.'}
+      ${customContext ? customContext : ''}
 
       Your task is to generate a conversational response exactly as if you are texting her back on a messaging app (like WhatsApp/iMessage).
       Your response should be broken down into individual "chat bubbles" so it feels like a real-time conversation.

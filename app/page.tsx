@@ -7,6 +7,7 @@ import { Sparkles, Heart, Briefcase, Pill, Shirt, Brain, Salad, Bath, ShoppingBa
 import { supabase } from '@/lib/supabase';
 import LiveSearch from '@/components/search/LiveSearch';
 import MeTooButton from '@/components/question/MeTooButton';
+import WelcomeBackCard from '@/components/home/WelcomeBackCard';
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   'beauty-skincare': <Sparkles className="w-5 h-5" />,
@@ -181,6 +182,10 @@ export default function Home() {
         </div>
       ) : (
         <>
+          <div className="max-w-7xl mx-auto px-4 mt-8">
+            <WelcomeBackCard />
+          </div>
+
           {/* ─── TRENDING QUESTIONS ──────────────────────── */}
           <section className="relative w-full bg-[#FAF5FF] py-16 px-4">
             <div className="max-w-7xl mx-auto">

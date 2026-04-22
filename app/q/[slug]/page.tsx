@@ -2,26 +2,40 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Clock, Eye, Heart, ArrowLeft, ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
+import { buildFAQSchema, buildBreadcrumbSchema } from '@/lib/schema';
 import QuestionClient from '@/components/question/QuestionClient';
 import FollowUpChat from '@/components/question/FollowUpChat';
 import MeTooButton from '@/components/question/MeTooButton';
 import AnswerWaiter from '@/components/question/AnswerWaiter';
+import EmotionBar from '@/components/question/EmotionBar';
 import { SITE_NAME } from '@/lib/constants';
 
-export const runtime = 'edge';
+export const revalidate = 3600; // ISR: rebuild every hour
+
+// ─── Static Params (pre-render up to 500 approved questions) ─────
+export async function generateStaticParams() {
+  const { data } = await supabaseAdmin
+    .from('questions')
+    .select('slug')
+    .in('status', ['approved', 'featured'])
+    .order('created_at', { ascending: false })
+    .limit(500);
+
+  return (data || []).map((q) => ({ slug: q.slug }));
+}
 
 interface QuestionPageProps {
   params: Promise<{ slug: string }>;
 }
 
 async function getQuestionData(slug: string) {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('questions')
     .select(`
       id, slug, title, description, created_at, view_count, metoo_count, category_id,
       categories (name, slug),
-      answers (chat_log, products)
+      answers (chat_log, products, summary, detailed, bullet_points, faqs, disclaimer)
     `)
     .eq('slug', slug)
     .single();
@@ -58,8 +72,22 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
 
   if (!question) notFound();
 
+  // Build schema markup
+  const faqSchema = buildFAQSchema({
+    title: question.title,
+    slug: question.slug,
+    created_at: question.created_at,
+    answers: question.answers,
+    categories: question.categories,
+  });
+  const breadcrumbSchema = buildBreadcrumbSchema({
+    title: question.title,
+    slug: question.slug,
+    categories: question.categories,
+  });
+
   // Fetch related questions
-  const { data: related } = await supabase
+  const { data: related } = await supabaseAdmin
     .from('questions')
     .select('slug, title')
     .eq('category_id', question.category_id)
@@ -71,6 +99,18 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-white">
+      {/* Schema Markup for SEO */}
+      {faqSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+      )}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+
       {/* Page-level orb backgrounds */}
       <div className="orb orb-purple w-[500px] h-[500px] top-[-100px] right-[-100px] opacity-25" />
       <div className="orb orb-pink w-[400px] h-[400px] bottom-[200px] left-[-80px] opacity-20" />
@@ -106,6 +146,11 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
           <span className="flex items-center gap-1.5 text-sm text-gray-400">
             <Heart className="w-3.5 h-3.5 text-pink-400" /> {(question.metoo_count || 0).toLocaleString()}
           </span>
+        </div>
+
+        {/* Emotion Intelligence Layer */}
+        <div className="animate-slide-up stagger-1">
+          <EmotionBar questionText={question.title} />
         </div>
 
         {question.answers ? (

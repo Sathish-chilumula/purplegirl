@@ -1,12 +1,26 @@
-'use client';
-
-export const runtime = 'edge';
-
-import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, Sparkles, Heart, Loader2, ArrowRight } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { notFound } from 'next/navigation';
+import { ArrowLeft, Sparkles, Heart, ArrowRight } from 'lucide-react';
+import { supabaseAdmin } from '@/lib/supabase-admin';
+import { buildItemListSchema } from '@/lib/schema';
+import { SITE_NAME } from '@/lib/constants';
+
+export const revalidate = 3600; // ISR: rebuild every hour
+
+// ─── Static Params ───────────────────────────────────────
+export async function generateStaticParams() {
+  const { data } = await supabaseAdmin
+    .from('categories')
+    .select('slug');
+
+  return (data || []).map((c) => ({ slug: c.slug }));
+}
+
+// ─── Types ───────────────────────────────────────────────
+interface CategoryPageProps {
+  params: Promise<{ slug: string }>;
+}
 
 interface CategoryData {
   id: string;
@@ -23,78 +37,67 @@ interface QuestionSummary {
   metoo_count: number;
 }
 
-export default function CategoryPage() {
-  const { slug } = useParams();
-  const [category, setCategory] = useState<CategoryData | null>(null);
-  const [questions, setQuestions] = useState<QuestionSummary[]>([]);
-  const [loading, setLoading] = useState(true);
+// ─── Data Fetching ───────────────────────────────────────
+async function getCategoryData(slug: string) {
+  const { data, error } = await supabaseAdmin
+    .from('categories')
+    .select('*')
+    .eq('slug', slug)
+    .single();
 
-  useEffect(() => {
-    async function fetchCategoryData() {
-      if (!slug) return;
-      setLoading(true);
-      try {
-        // 1. Fetch category details
-        const { data: catData, error: catError } = await supabase
-          .from('categories')
-          .select('*')
-          .eq('slug', slug)
-          .single();
+  if (error || !data) return null;
+  return data as CategoryData;
+}
 
-        if (catError || !catData) {
-          console.error('Category error:', catError);
-          return;
-        }
-        setCategory(catData);
+async function getCategoryQuestions(categoryId: string) {
+  const { data } = await supabaseAdmin
+    .from('questions')
+    .select('slug, title, metoo_count')
+    .eq('category_id', categoryId)
+    .eq('status', 'approved')
+    .order('created_at', { ascending: false });
 
-        // 2. Fetch questions in this category
-        const { data: qData, error: qError } = await supabase
-          .from('questions')
-          .select('slug, title, metoo_count')
-          .eq('category_id', catData.id)
-          .eq('status', 'approved')
-          .order('created_at', { ascending: false });
+  return (data || []) as QuestionSummary[];
+}
 
-        if (qError) {
-          console.error('Questions error:', qError);
-          return;
-        }
-        setQuestions(qData || []);
-      } catch (err) {
-        console.error('General error:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchCategoryData();
-  }, [slug]);
+// ─── Metadata ────────────────────────────────────────────
+export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const category = await getCategoryData(slug);
 
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-200 to-pink-200 flex items-center justify-center shadow-lg animate-float">
-          <Loader2 className="w-8 h-8 text-purple-600 animate-spin" />
-        </div>
-        <p className="text-gray-500 font-bold animate-pulse">Gathering sisterly topics...</p>
-      </div>
-    );
-  }
+  if (!category) return { title: 'Topic Not Found' };
 
-  if (!category) {
-    return (
-      <div className="max-w-xl mx-auto px-4 py-24 text-center">
-        <div className="text-6xl mb-6">🏜️</div>
-        <h1 className="font-playfair font-bold text-4xl mb-4 text-[#1F1235]">Topic not found</h1>
-        <p className="text-gray-500 mb-10 text-lg">This topic doesn&apos;t exist yet or has been moved to a new home.</p>
-        <Link href="/" className="bg-gradient-to-r from-purple-600 to-pink-500 text-white px-10 py-4 rounded-full font-bold shadow-lg shadow-purple-200 hover:scale-105 transition-transform inline-block">
-          Explore other topics
-        </Link>
-      </div>
-    );
-  }
+  return {
+    title: `${category.name} — Questions & Advice | ${SITE_NAME}`,
+    description: category.description || `Explore honest questions and sisterly guidance about ${category.name}. Real advice for Indian women.`,
+    openGraph: {
+      title: `${category.name} | ${SITE_NAME}`,
+      description: `Browse ${category.name} questions answered with empathy on ${SITE_NAME}`,
+      type: 'website',
+    },
+  };
+}
+
+// ─── Page Component (Server-Side Rendered) ───────────────
+export default async function CategoryPage({ params }: CategoryPageProps) {
+  const { slug } = await params;
+  const category = await getCategoryData(slug);
+
+  if (!category) notFound();
+
+  const questions = await getCategoryQuestions(category.id);
+
+  // Build schema markup
+  const itemListSchema = buildItemListSchema(category, questions);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-white">
+      {/* Schema Markup */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
+      />
+
       {/* Page-level orb backgrounds */}
       <div className="orb orb-purple w-[600px] h-[600px] top-[-100px] right-[-100px] opacity-20" />
       <div className="orb orb-pink w-[500px] h-[500px] bottom-[-80px] left-[-60px] opacity-15" />
@@ -166,7 +169,7 @@ export default function CategoryPage() {
           </div>
         )}
         
-        {/* Load More Mock */}
+        {/* Load More */}
         {questions.length > 20 && (
           <div className="mt-16 text-center animate-slide-up stagger-4">
             <button className="bg-white border-2 border-purple-100 text-purple-600 px-10 py-4 rounded-full font-bold hover:bg-purple-50 transition-all shadow-md active:scale-95">
@@ -178,4 +181,3 @@ export default function CategoryPage() {
     </div>
   );
 }
-
