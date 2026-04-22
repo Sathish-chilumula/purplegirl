@@ -75,7 +75,7 @@ export default function AskPage() {
             description,
             slug,
             category_id: selectedCat.id,
-            status: 'pending',
+            status: 'approved', // Immediately approved so the page works on redirect
           },
         ]);
 
