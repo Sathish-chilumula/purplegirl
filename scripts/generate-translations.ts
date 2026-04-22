@@ -93,11 +93,13 @@ async function run() {
     const filterCol = `chat_log_${lang}`;
     
     // Fetch questions needing translation
-    const { data: questions, error } = await supabase
+    const { data: questionsData, error } = await supabase
       .from('questions')
       .select(`id, title, answers(id, chat_log, summary, bullet_points, ${filterCol})`)
       .in('status', ['approved', 'featured'])
       .limit(limitArg);
+
+    const questions = questionsData as any[] | null;
 
     if (error || !questions) {
       console.error(`Failed to fetch questions: ${error?.message}`);
