@@ -6,7 +6,8 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 import { buildItemListSchema } from '@/lib/schema';
 import { SITE_NAME } from '@/lib/constants';
 
-export const revalidate = 3600; // ISR: rebuild every hour
+// SSG: Fully static build
+// export const revalidate = 3600; 
 
 // ─── Static Params ───────────────────────────────────────
 export async function generateStaticParams() {

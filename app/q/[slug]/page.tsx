@@ -11,7 +11,8 @@ import AnswerWaiter from '@/components/question/AnswerWaiter';
 import EmotionBar from '@/components/question/EmotionBar';
 import { SITE_NAME } from '@/lib/constants';
 
-export const revalidate = 3600; // ISR: rebuild every hour
+// SSG: Fully static build
+// export const revalidate = 3600;
 
 // ─── Static Params (pre-render up to 500 approved questions) ─────
 export async function generateStaticParams() {
