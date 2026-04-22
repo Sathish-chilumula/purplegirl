@@ -9,6 +9,7 @@ import FollowUpChat from '@/components/question/FollowUpChat';
 import MeTooButton from '@/components/question/MeTooButton';
 import AnswerWaiter from '@/components/question/AnswerWaiter';
 import EmotionBar from '@/components/question/EmotionBar';
+import LanguageSwitcher from '@/components/question/LanguageSwitcher';
 import { SITE_NAME } from '@/lib/constants';
 
 export const runtime = 'edge';
@@ -25,7 +26,7 @@ async function getQuestionData(slug: string) {
     .select(`
       id, slug, title, description, created_at, view_count, metoo_count, category_id,
       categories (name, slug),
-      answers (chat_log, products, summary, detailed, bullet_points, faqs, disclaimer)
+      answers (chat_log, products, summary, detailed, bullet_points, faqs, disclaimer, chat_log_hi, chat_log_te)
     `)
     .eq('slug', slug)
     .single();
@@ -121,6 +122,15 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
         </h1>
         
         <MeTooButton questionId={question.id} initialCount={question.metoo_count || 0} variant="prominent" />
+
+        {/* Language Switcher for multilingual SEO */}
+        <div className="mb-6 animate-slide-up">
+          <LanguageSwitcher
+            slug={question.slug}
+            hasHindi={!!(question.answers?.chat_log_hi && (question.answers.chat_log_hi as any[]).length > 0)}
+            hasTelugu={!!(question.answers?.chat_log_te && (question.answers.chat_log_te as any[]).length > 0)}
+          />
+        </div>
 
         {/* Category + Meta glass bar */}
         <div className="glass rounded-2xl px-5 py-3.5 flex flex-wrap items-center gap-3 mb-12 shadow-sm animate-slide-up stagger-1">

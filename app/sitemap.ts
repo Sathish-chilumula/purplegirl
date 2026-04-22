@@ -1,6 +1,8 @@
 import { MetadataRoute } from 'next';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 
+export const runtime = 'edge';
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://purplegirl.in';
 
@@ -10,6 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/ask',
     '/search',
     '/trending',
+    '/whisper',
   ].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
@@ -20,17 +23,62 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 2. Fetch all approved questions
   const { data: questions } = await supabaseAdmin
     .from('questions')
-    .select('slug, updated_at')
+    .select('id, slug, updated_at')
     .in('status', ['approved', 'featured']);
 
-  const questionRoutes = (questions || []).map((q) => ({
-    url: `${baseUrl}/q/${q.slug}`,
-    lastModified: new Date(q.updated_at),
-    changeFrequency: 'weekly' as const,
-    priority: 0.9,
-  }));
+  const questionIds = (questions || []).map((q) => q.id).filter(Boolean);
 
-  // 3. Fetch all categories
+  // 3. Fetch translation availability for all questions
+  let translationMap = new Map<string, { hasHindi: boolean; hasTelugu: boolean }>();
+  if (questionIds.length > 0) {
+    const { data: answers } = await supabaseAdmin
+      .from('answers')
+      .select('question_id, chat_log_hi, chat_log_te')
+      .in('question_id', questionIds);
+
+    for (const a of answers || []) {
+      if (a.question_id) {
+        translationMap.set(a.question_id, {
+          hasHindi: Array.isArray(a.chat_log_hi) && (a.chat_log_hi as any[]).length > 0,
+          hasTelugu: Array.isArray(a.chat_log_te) && (a.chat_log_te as any[]).length > 0,
+        });
+      }
+    }
+  }
+
+  // 4. Build question routes (English + Hindi + Telugu where available)
+  const questionRoutes: MetadataRoute.Sitemap = [];
+  for (const q of questions || []) {
+    const lastMod = new Date(q.updated_at);
+    const trans = translationMap.get(q.id);
+
+    questionRoutes.push({
+      url: `${baseUrl}/q/${q.slug}`,
+      lastModified: lastMod,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    });
+
+    if (trans?.hasHindi) {
+      questionRoutes.push({
+        url: `${baseUrl}/q/${q.slug}/hindi`,
+        lastModified: lastMod,
+        changeFrequency: 'weekly',
+        priority: 0.85,
+      });
+    }
+
+    if (trans?.hasTelugu) {
+      questionRoutes.push({
+        url: `${baseUrl}/q/${q.slug}/telugu`,
+        lastModified: lastMod,
+        changeFrequency: 'weekly',
+        priority: 0.85,
+      });
+    }
+  }
+
+  // 5. Fetch all categories
   const { data: categories } = await supabaseAdmin
     .from('categories')
     .select('slug');
