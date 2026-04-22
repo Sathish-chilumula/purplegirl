@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+export const runtime = 'edge';
+
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
 // Crisis keywords that bypass AI and immediately return helpline info
