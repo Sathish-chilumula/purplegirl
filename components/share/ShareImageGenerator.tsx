@@ -17,33 +17,46 @@ export const ShareImageGenerator = forwardRef<HTMLDivElement, ShareImageGenerato
       return (
         <div 
           ref={ref}
-          className="fixed w-[1080px] h-[1080px] bg-gradient-to-br from-[#FAF5FF] to-[#FDF2F8] p-16 flex flex-col justify-between overflow-hidden"
-          style={{ left: '-2000px', top: '0', zIndex: -100, fontFamily: 'Inter, sans-serif' }}
+          style={{ 
+            position: 'fixed',
+            width: '1080px', 
+            height: '1080px', 
+            padding: '64px', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            justifyContent: 'space-between', 
+            overflow: 'hidden',
+            left: '-2000px', 
+            top: '0', 
+            zIndex: -100, 
+            fontFamily: 'Inter, sans-serif',
+            background: 'linear-gradient(to bottom right, #FAF5FF, #FDF2F8)'
+          }}
         >
-          <div className="flex justify-between items-start">
-             <div className="text-[#7C3AED] font-bold text-3xl">💜 purplegirl.in</div>
-             <div className="bg-purple-100 text-[#7C3AED] px-6 py-2 rounded-full font-bold text-2xl uppercase tracking-wider">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+             <div style={{ color: '#7C3AED', fontWeight: 'bold', fontSize: '30px' }}>💜 purplegirl.in</div>
+             <div style={{ backgroundColor: '#F3E8FF', color: '#7C3AED', padding: '8px 24px', borderRadius: '9999px', fontWeight: 'bold', fontSize: '24px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                {categoryName}
              </div>
           </div>
-          <div className="flex-1 flex flex-col justify-center">
-              <h1 className="font-bold text-7xl text-[#1F1235] leading-[1.2] mb-12 tracking-tight">
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <h1 style={{ color: '#1F1235', fontWeight: 'bold', fontSize: '72px', lineHeight: '1.2', marginBottom: '48px', letterSpacing: '-0.02em' }}>
                 "{questionTitle}"
               </h1>
-              <div className="bg-white rounded-[2rem] p-12 shadow-sm border border-purple-100">
-                 <h2 className="text-3xl font-bold text-[#7C3AED] mb-8 uppercase tracking-widest">Top Advice:</h2>
-                 <div className="flex flex-col gap-8">
+              <div style={{ backgroundColor: '#ffffff', borderRadius: '32px', padding: '48px', border: '1px solid #F3E8FF', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                 <h2 style={{ color: '#7C3AED', fontSize: '30px', fontWeight: 'bold', marginBottom: '32px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Top Advice:</h2>
+                 <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
                    {tips.slice(0, 3).map((tip, i) => (
-                     <div key={i} className="flex gap-6 items-start">
-                       <span className="text-4xl shrink-0">✅</span>
-                       <p className="text-4xl text-gray-800 font-medium leading-relaxed">{tip}</p>
+                     <div key={i} style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
+                       <span style={{ fontSize: '36px', flexShrink: 0 }}>✅</span>
+                       <p style={{ color: '#374151', fontSize: '36px', fontWeight: '500', lineHeight: '1.6' }}>{tip}</p>
                      </div>
                    ))}
                  </div>
               </div>
           </div>
-          <div className="text-center pt-8 border-t border-purple-200">
-            <p className="text-[#6B7280] text-3xl font-bold">Ask anything you can't ask anyone. No login required.</p>
+          <div style={{ textAlign: 'center', paddingTop: '32px', borderTop: '1px solid #E9D5FF' }}>
+            <p style={{ color: '#6B7280', fontSize: '30px', fontWeight: 'bold' }}>Ask anything you can't ask anyone. No login required.</p>
           </div>
         </div>
       );
@@ -54,36 +67,49 @@ export const ShareImageGenerator = forwardRef<HTMLDivElement, ShareImageGenerato
       return (
         <div 
           ref={ref}
-          className="fixed w-[1080px] h-[1080px] bg-[#110B1D] p-16 flex flex-col justify-between overflow-hidden"
-          style={{ left: '-2000px', top: '0', zIndex: -100, fontFamily: 'Inter, sans-serif' }}
+          style={{ 
+            position: 'fixed',
+            width: '1080px', 
+            height: '1080px', 
+            padding: '64px', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            justifyContent: 'space-between', 
+            overflow: 'hidden',
+            left: '-2000px', 
+            top: '0', 
+            zIndex: -100, 
+            fontFamily: 'Inter, sans-serif',
+            backgroundColor: '#110B1D'
+          }}
         >
-          <div className="absolute top-[-200px] right-[-200px] w-[600px] h-[600px] bg-[#7C3AED] rounded-full blur-[150px] opacity-30" />
-          <div className="absolute bottom-[-100px] left-[-100px] w-[400px] h-[400px] bg-[#EC4899] rounded-full blur-[120px] opacity-20" />
+          <div style={{ position: 'absolute', top: '-200px', right: '-200px', width: '600px', height: '600px', borderRadius: '9999px', filter: 'blur(150px)', opacity: 0.3, backgroundColor: '#7C3AED' }} />
+          <div style={{ position: 'absolute', bottom: '-100px', left: '-100px', width: '400px', height: '400px', borderRadius: '9999px', filter: 'blur(120px)', opacity: 0.2, backgroundColor: '#EC4899' }} />
           
-          <div className="flex justify-between items-start relative z-10">
-             <div className="text-white font-bold text-3xl">💜 purplegirl.in</div>
-             <div className="bg-white/10 text-white border border-white/20 px-6 py-2 rounded-full font-bold text-2xl uppercase tracking-wider backdrop-blur-md">
+          <div style={{ position: 'relative', zIndex: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+             <div style={{ color: '#ffffff', fontWeight: 'bold', fontSize: '30px' }}>💜 purplegirl.in</div>
+             <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#ffffff', border: '1px solid rgba(255, 255, 255, 0.2)', padding: '8px 24px', borderRadius: '9999px', fontWeight: 'bold', fontSize: '24px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                {categoryName}
              </div>
           </div>
-          <div className="flex-1 flex flex-col justify-center relative z-10">
-              <h1 className="font-playfair font-bold text-7xl text-white leading-[1.2] mb-12 tracking-tight">
+          <div style={{ position: 'relative', zIndex: 10, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <h1 style={{ color: '#ffffff', fontWeight: 'bold', fontSize: '72px', lineHeight: '1.2', marginBottom: '48px', letterSpacing: '-0.02em' }}>
                 "{questionTitle}"
               </h1>
-              <div className="bg-white/5 backdrop-blur-xl rounded-[2rem] p-12 border border-white/10">
-                 <h2 className="text-3xl font-bold text-pink-400 mb-8 uppercase tracking-widest">Sisterly Advice:</h2>
-                 <div className="flex flex-col gap-8">
+              <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', borderRadius: '32px', padding: '48px', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                 <h2 style={{ color: '#F472B6', fontSize: '30px', fontWeight: 'bold', marginBottom: '32px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Sisterly Advice:</h2>
+                 <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
                    {tips.slice(0, 3).map((tip, i) => (
-                     <div key={i} className="flex gap-6 items-start">
-                       <span className="text-4xl shrink-0">✨</span>
-                       <p className="text-4xl text-gray-200 font-medium leading-relaxed">{tip}</p>
+                     <div key={i} style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
+                       <span style={{ fontSize: '36px', flexShrink: 0 }}>✨</span>
+                       <p style={{ color: '#E5E7EB', fontSize: '36px', fontWeight: '500', lineHeight: '1.6' }}>{tip}</p>
                      </div>
                    ))}
                  </div>
               </div>
           </div>
-          <div className="text-center pt-8 border-t border-white/10 relative z-10">
-            <p className="text-gray-400 text-3xl font-medium">Real advice for Indian women.</p>
+          <div style={{ position: 'relative', zIndex: 10, textAlign: 'center', paddingTop: '32px', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+            <p style={{ color: '#9CA3AF', fontSize: '30px', fontWeight: '500' }}>Real advice for Indian women.</p>
           </div>
         </div>
       );
@@ -94,19 +120,42 @@ export const ShareImageGenerator = forwardRef<HTMLDivElement, ShareImageGenerato
       return (
         <div 
           ref={ref}
-          className="fixed w-[1080px] h-[1080px] bg-[#F9FAFB] p-16 flex flex-col justify-center items-center text-center overflow-hidden"
-          style={{ left: '-2000px', top: '0', zIndex: -100, fontFamily: 'Inter, sans-serif' }}
+          style={{ 
+            position: 'fixed',
+            width: '1080px',
+            height: '1080px',
+            padding: '64px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            textAlign: 'center',
+            overflow: 'hidden',
+            left: '-2000px', 
+            top: '0', 
+            zIndex: -100, 
+            fontFamily: 'Inter, sans-serif',
+            backgroundColor: '#F9FAFB'
+          }}
         >
-          <div className="text-[#EC4899] font-bold text-4xl mb-12">purplegirl.in</div>
-          <div className="bg-white shadow-2xl shadow-purple-100/50 rounded-[3rem] p-16 border border-gray-100 w-full max-w-4xl">
-             <div className="text-[#7C3AED] font-bold text-2xl uppercase tracking-widest mb-6">
+          <div style={{ color: '#EC4899', fontWeight: 'bold', fontSize: '40px', marginBottom: '48px' }}>purplegirl.in</div>
+          <div style={{ 
+            backgroundColor: '#ffffff', 
+            boxShadow: '0 25px 50px -12px rgba(147, 51, 234, 0.15)', 
+            borderRadius: '48px', 
+            padding: '64px', 
+            border: '1px solid #F3F4F6',
+            width: '100%',
+            maxWidth: '896px'
+          }}>
+             <div style={{ color: '#7C3AED', fontWeight: 'bold', fontSize: '24px', letterSpacing: '0.1em', marginBottom: '24px', textTransform: 'uppercase' }}>
                Question of the day
              </div>
-             <h1 className="font-playfair font-bold text-6xl text-[#111827] leading-[1.3] mb-12">
+             <h1 style={{ color: '#111827', fontWeight: 'bold', fontSize: '60px', lineHeight: '1.3', marginBottom: '48px' }}>
                "{questionTitle}"
              </h1>
-             <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto mb-12" />
-             <p className="text-4xl text-gray-600 font-medium leading-relaxed italic">
+             <div style={{ width: '96px', height: '4px', background: 'linear-gradient(to right, #A855F7, #EC4899)', margin: '0 auto 48px auto' }} />
+             <p style={{ color: '#4B5563', fontSize: '36px', fontWeight: '500', lineHeight: '1.6', fontStyle: 'italic' }}>
                "{tips[0] || 'Real answers to questions you can\'t ask anyone else.'}"
              </p>
           </div>
@@ -118,22 +167,35 @@ export const ShareImageGenerator = forwardRef<HTMLDivElement, ShareImageGenerato
     return (
       <div 
         ref={ref}
-        className="fixed w-[1080px] h-[1080px] bg-[#7C3AED] p-20 flex flex-col justify-center overflow-hidden"
-        style={{ left: '-2000px', top: '0', zIndex: -100, fontFamily: 'Inter, sans-serif' }}
+        style={{ 
+          position: 'fixed',
+          width: '1080px',
+          height: '1080px',
+          padding: '80px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          overflow: 'hidden',
+          left: '-2000px', 
+          top: '0', 
+          zIndex: -100, 
+          fontFamily: 'Inter, sans-serif',
+          backgroundColor: '#7C3AED'
+        }}
       >
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent" />
-        <div className="relative z-10">
-          <div className="text-8xl text-pink-300 opacity-50 font-playfair leading-none mb-4">"</div>
-          <h1 className="font-bold text-6xl text-white leading-[1.4] mb-16">
+        <div style={{ position: 'absolute', inset: 0, opacity: 0.1, background: 'radial-gradient(circle at center, #ffffff, transparent)', pointerEvents: 'none' }} />
+        <div style={{ position: 'relative', zIndex: 10 }}>
+          <div style={{ color: '#F9A8D4', fontSize: '96px', lineHeight: 1, marginBottom: '16px', opacity: 0.5 }}>"</div>
+          <h1 style={{ color: '#ffffff', fontWeight: 'bold', fontSize: '60px', lineHeight: '1.4', marginBottom: '64px' }}>
             {tips[0] || questionTitle}
           </h1>
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 inline-block">
-             <p className="text-3xl text-purple-100 font-medium mb-2">In response to:</p>
-             <p className="text-3xl text-white font-bold">{questionTitle}</p>
+          <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', borderRadius: '16px', padding: '32px', border: '1px solid rgba(255, 255, 255, 0.2)', display: 'inline-block' }}>
+             <p style={{ color: '#F3E8FF', fontSize: '30px', fontWeight: '500', marginBottom: '8px' }}>In response to:</p>
+             <p style={{ color: '#ffffff', fontSize: '30px', fontWeight: 'bold' }}>{questionTitle}</p>
           </div>
         </div>
-        <div className="absolute bottom-20 right-20 text-white/80 text-4xl font-bold flex items-center gap-4">
-          purplegirl.in <span className="text-pink-400">💜</span>
+        <div style={{ position: 'absolute', bottom: '80px', right: '80px', color: 'rgba(255, 255, 255, 0.8)', fontSize: '36px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '16px' }}>
+          purplegirl.in <span style={{ color: '#F472B6' }}>💜</span>
         </div>
       </div>
     );
