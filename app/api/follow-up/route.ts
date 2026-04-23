@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { createClient } from '@/utils/supabase/server';
 
 export const runtime = 'edge';
 
-const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
+// Initialize the Gemini API with the environment variable
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 export async function POST(req: Request) {
   try {
@@ -13,6 +14,9 @@ export async function POST(req: Request) {
     if (!query) {
       return NextResponse.json({ error: 'Query is required' }, { status: 400 });
     }
+
+    // Initialize the model (using the verified free flash model)
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' }); // SDK handles 'gemini-1.5-flash' well
 
     // Try to get authenticated user and their metadata for hyper-personalization
     const supabase = await createClient();
@@ -46,25 +50,10 @@ export async function POST(req: Request) {
       Respond directly to the girl's follow-up question in a warm, practical, brief, and conversational tone (maximum 3 short paragraphs). Do not use markdown headers, just plain text with occasional emojis. Keep the sisterly, supportive tone.
     `;
 
-    // Using @google/genai SDK syntax
-    const result = await genAI.models.generateContent({
-      model: 'gemini-1.5-flash',
-      contents: [{ role: 'user', parts: [{ text: prompt }] }]
-    });
-    
-    // Robust response parsing for various SDK versions
-    let text = '';
-    try {
-      if ((result as any).value?.content?.parts?.[0]?.text) {
-        text = (result as any).value.content.parts[0].text;
-      } else if ((result as any).content?.parts?.[0]?.text) {
-        text = (result as any).content.parts[0].text;
-      } else if ((result as any).response?.text) {
-        text = typeof (result as any).response.text === 'function' ? (result as any).response.text() : (result as any).response.text;
-      }
-    } catch (e) {
-      console.error('Error parsing Gemini response:', e);
-    }
+    // Generate content using the new SDK syntax
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
     
     if (!text) throw new Error('No response from AI sister. Please try again.');
 
