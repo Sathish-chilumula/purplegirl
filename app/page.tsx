@@ -138,8 +138,8 @@ export default function Home() {
               <div className="animate-reveal-up" style={{ animationDelay: '0.3s' }}>anyone.</div>
             </h1>
 
-            <div className="text-2xl md:text-3xl font-medium text-purple-800 h-10 relative overflow-hidden">
-              About <span className="font-playfair italic absolute inset-y-0 left-20 transition-all duration-500 animate-fade-in" key={wordIndex}>{ROTATING_WORDS[wordIndex]}</span>
+            <div className="text-2xl md:text-3xl font-medium text-purple-800 flex items-center justify-center md:justify-start gap-2 h-10">
+              About <span className="font-playfair italic transition-all duration-500 animate-fade-in inline-block text-pink-600" key={wordIndex}>{ROTATING_WORDS[wordIndex]}</span>
             </div>
 
             <div className="max-w-lg mx-auto md:mx-0 pt-4">
