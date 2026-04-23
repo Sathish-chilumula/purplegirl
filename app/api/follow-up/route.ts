@@ -52,11 +52,26 @@ export async function POST(req: Request) {
       contents: [{ role: 'user', parts: [{ text: prompt }] }]
     });
     
-    const text = (result as any).value?.content?.parts?.[0]?.text || (result as any).content?.parts?.[0]?.text || '';
+    // Robust response parsing for various SDK versions
+    let text = '';
+    try {
+      if ((result as any).value?.content?.parts?.[0]?.text) {
+        text = (result as any).value.content.parts[0].text;
+      } else if ((result as any).content?.parts?.[0]?.text) {
+        text = (result as any).content.parts[0].text;
+      } else if ((result as any).response?.text) {
+        text = typeof (result as any).response.text === 'function' ? (result as any).response.text() : (result as any).response.text;
+      }
+    } catch (e) {
+      console.error('Error parsing Gemini response:', e);
+    }
     
-    if (!text) throw new Error('No response from AI');
+    if (!text) throw new Error('No response from AI sister. Please try again.');
 
-    return NextResponse.json({ success: true, answer: text });
+    // Clean up response text in case it has markdown code blocks or extra whitespace
+    const cleanedText = text.replace(/```[a-z]*\n?/g, '').replace(/```/g, '').trim();
+
+    return NextResponse.json({ success: true, answer: cleanedText });
 
   } catch (error: any) {
     console.error('AI Follow-up error:', error);

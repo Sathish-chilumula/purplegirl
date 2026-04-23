@@ -247,15 +247,16 @@
 }
 
 /* Emotion-Aware Theming */
-[data-emotion="Scared"] .mood-accent { color: #818CF8; }
-[data-emotion="Scared"] .mood-bg { background: rgba(129,140,248,0.04); }
-[data-emotion="Sad"] .mood-accent { color: #94A3B8; }
-[data-emotion="Sad"] .mood-bg { background: rgba(148,163,184,0.04); }
-[data-emotion="Angry"] .mood-accent { color: #F87171; }
-[data-emotion="Angry"] .mood-bg { background: rgba(248,113,113,0.04); }
-[data-emotion="Hopeful"] .mood-accent { color: #A78BFA; }
-[data-emotion="Hopeful"] .mood-bg { background: rgba(167,139,250,0.06); }
-[data-emotion="Embarrassed"] .mood-accent { color: #FB7185; }
-[data-emotion="Embarrassed"] .mood-bg { background: rgba(251,113,133,0.04); }
-[data-emotion="Confused"] .mood-accent { color: #60A5FA; }
-[data-emotion="Confused"] .mood-bg { background: rgba(96,165,250,0.04); }
+/* Emotion-Aware Theming - Darker, higher contrast colors for readability */
+[data-emotion="Scared"] .mood-accent { color: #4338CA; }
+[data-emotion="Scared"] .mood-bg { background: rgba(129,140,248,0.06); }
+[data-emotion="Sad"] .mood-accent { color: #334155; }
+[data-emotion="Sad"] .mood-bg { background: rgba(148,163,184,0.06); }
+[data-emotion="Angry"] .mood-accent { color: #B91C1C; }
+[data-emotion="Angry"] .mood-bg { background: rgba(248,113,113,0.06); }
+[data-emotion="Hopeful"] .mood-accent { color: #6D28D9; }
+[data-emotion="Hopeful"] .mood-bg { background: rgba(167,139,250,0.08); }
+[data-emotion="Embarrassed"] .mood-accent { color: #BE123C; }
+[data-emotion="Embarrassed"] .mood-bg { background: rgba(251,113,133,0.06); }
+[data-emotion="Confused"] .mood-accent { color: #1D4ED8; }
+[data-emotion="Confused"] .mood-bg { background: rgba(96,165,250,0.06); }
