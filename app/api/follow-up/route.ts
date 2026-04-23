@@ -15,8 +15,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Query is required' }, { status: 400 });
     }
 
-    // Initialize the model (using the verified free flash model)
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' }); // SDK handles 'gemini-1.5-flash' well
+    // Initialize the model (using the verified free 2.5 flash lite model)
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
 
     // Try to get authenticated user and their metadata for hyper-personalization
     const supabase = await createClient();
