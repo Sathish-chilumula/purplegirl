@@ -25,6 +25,20 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <body className="font-sans bg-[#FAF5FF] text-[#1F1235] antialiased flex flex-col min-h-screen" suppressHydrationWarning>
+        <Script 
+          async 
+          src="https://www.googletagmanager.com/gtag/js?id=G-ECLMKP650Q" 
+          strategy="afterInteractive" 
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-ECLMKP650Q');
+          `}
+        </Script>
         {process.env.NEXT_PUBLIC_ADSENSE_ID && (
           <Script 
             id="adsense"
