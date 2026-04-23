@@ -28,6 +28,15 @@ export default function MoodCheckin({ questions }: MoodCheckinProps) {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [dismissed, setDismissed] = useState(false);
   const [recommended, setRecommended] = useState<Question[]>([]);
+  const [greeting, setGreeting] = useState('Good morning');
+
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) setGreeting('Good morning');
+    else if (hour < 17) setGreeting('Good afternoon');
+    else if (hour < 21) setGreeting('Good evening');
+    else setGreeting('Good night');
+  }, []);
 
   useEffect(() => {
     const today = new Date().toDateString();
@@ -85,7 +94,7 @@ export default function MoodCheckin({ questions }: MoodCheckinProps) {
         {!selectedMood ? (
           <div className="text-center animate-fade-in">
             <h2 className="font-playfair font-bold text-3xl text-[#1F1235] mb-2">
-              Good morning, Sister 💜
+              {greeting}, Sister 💜
             </h2>
             <p className="text-gray-500 mb-8">How are you feeling today?</p>
             
