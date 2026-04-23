@@ -6,6 +6,9 @@ export const runtime = 'edge';
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://purplegirl.in';
 
+  // Helper to format date for strict Google compliance (no milliseconds)
+  const formatDate = (date: Date) => date.toISOString().split('.')[0] + 'Z';
+
   // 1. Static routes
   const staticRoutes = [
     '',
@@ -15,7 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/whisper',
   ].map((route) => ({
     url: `${baseUrl}${route}`,
-    lastModified: new Date(),
+    lastModified: formatDate(new Date()),
     changeFrequency: 'daily' as const,
     priority: route === '' ? 1 : 0.8,
   }));
@@ -28,7 +31,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const questionIds = (questions || []).map((q) => q.id).filter(Boolean);
 
-  // 3. Fetch translation availability for all questions
+  // 3. Fetch translation availability
   let translationMap = new Map<string, { hasHindi: boolean; hasTelugu: boolean }>();
   if (questionIds.length > 0) {
     const { data: answers } = await supabaseAdmin
@@ -46,10 +49,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  // 4. Build question routes (English + Hindi + Telugu where available)
+  // 4. Build question routes
   const questionRoutes: MetadataRoute.Sitemap = [];
   for (const q of questions || []) {
-    const lastMod = new Date(q.updated_at);
+    const lastMod = formatDate(new Date(q.updated_at));
     const trans = translationMap.get(q.id);
 
     questionRoutes.push({
@@ -85,7 +88,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const categoryRoutes = (categories || []).map((c) => ({
     url: `${baseUrl}/category/${c.slug}`,
-    lastModified: new Date(),
+    lastModified: formatDate(new Date()),
     changeFrequency: 'weekly' as const,
     priority: 0.7,
   }));
