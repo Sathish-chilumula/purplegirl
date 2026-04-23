@@ -50,15 +50,59 @@ export async function POST(req: Request) {
       Respond directly to the girl's follow-up question in a warm, practical, brief, and conversational tone (maximum 3 short paragraphs). Do not use markdown headers, just plain text with occasional emojis. Keep the sisterly, supportive tone.
     `;
 
-    // Generate content using the new SDK syntax
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    // --- AI GENERATION WITH FALLBACK ---
+    let cleanedText = '';
     
-    if (!text) throw new Error('No response from AI sister. Please try again.');
+    try {
+      // 1. Try Gemini (Primary)
+      console.log('Attempting Gemini generation...');
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+      
+      if (text) {
+        cleanedText = text.replace(/```[a-z]*\n?/g, '').replace(/```/g, '').trim();
+        console.log('Gemini generation successful');
+      }
+    } catch (geminiError: any) {
+      console.error('Gemini failed, attempting Groq fallback:', geminiError.message);
+      
+      // 2. Fallback to Groq
+      if (process.env.GROQ_API_KEY) {
+        try {
+          const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              model: 'llama-3.3-70b-versatile',
+              messages: [{ role: 'user', content: prompt }],
+              temperature: 0.7,
+              max_tokens: 500
+            })
+          });
 
-    // Clean up response text in case it has markdown code blocks or extra whitespace
-    const cleanedText = text.replace(/```[a-z]*\n?/g, '').replace(/```/g, '').trim();
+          if (groqResponse.ok) {
+            const groqData = await groqResponse.json();
+            const groqText = groqData.choices[0]?.message?.content;
+            if (groqText) {
+              cleanedText = groqText.replace(/```[a-z]*\n?/g, '').replace(/```/g, '').trim();
+              console.log('Groq fallback successful');
+            }
+          } else {
+            console.error('Groq fallback failed too:', await groqResponse.text());
+          }
+        } catch (groqError: any) {
+          console.error('Critical failure: Both Gemini and Groq failed:', groqError.message);
+        }
+      }
+    }
+
+    if (!cleanedText) {
+      throw new Error('Our AI sisters are currently resting. Please try again in a moment! 💜');
+    }
 
     return NextResponse.json({ success: true, answer: cleanedText });
 
