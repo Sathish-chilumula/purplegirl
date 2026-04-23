@@ -34,14 +34,16 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-4 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8">
             <div className="md:col-span-2 space-y-6">
-              <Link href="/" className="flex items-center gap-2 shrink-0 group transition-transform active:scale-95 overflow-visible -ml-4">
-                <Image 
-                  src="/logo.png" 
-                  alt="PurpleGirl Logo" 
-                  width={240} 
-                  height={80} 
-                  className="h-24 w-auto object-contain -my-6"
-                />
+              <Link href="/" className="flex items-center gap-2 group transition-transform duration-300 hover:scale-[1.02] -ml-1">
+                <span className="text-3xl filter drop-shadow-sm group-hover:drop-shadow-md transition-all">💜</span>
+                <div className="flex flex-col -gap-1">
+                  <span className="text-2xl md:text-3xl font-black tracking-tighter bg-gradient-to-r from-[#7C3AED] via-[#A855F7] to-[#EC4899] bg-clip-text text-transparent font-serif leading-tight">
+                    PurpleGirl
+                  </span>
+                  <span className="text-[10px] md:text-[11px] font-bold text-[#6B7280] uppercase tracking-[0.2em] -mt-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                    Answers for Women
+                  </span>
+                </div>
               </Link>
               <p className="text-gray-500 leading-relaxed max-w-sm">
                 The safe house where every girl finds her voice.

@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export const runtime = 'edge';
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 export async function POST(req: Request) {
   try {
@@ -10,11 +13,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Image is required' }, { status: 400 });
     }
 
+    // Gemini expects the base64 string without the data:image/png;base64, prefix
+    const base64Data = imageBase64.split(',')[1] || imageBase64;
+    const mimeType = imageBase64.split(';')[0].split(':')[1] || 'image/jpeg';
+
     const prompt = `
 You are a highly empathetic, expert dermatologist and "virtual elder sister" for Indian women.
 Analyze this photo of a skin concern (e.g., dark spots, acne, pigmentation).
 
-Return ONLY valid JSON (no markdown, no extra text):
+Return ONLY valid JSON:
 {
   "condition_appears_to_be": "Brief description of what it looks like (e.g., Post-inflammatory hyperpigmentation)",
   "causes": ["Cause 1", "Cause 2"],
@@ -27,43 +34,35 @@ Return ONLY valid JSON (no markdown, no extra text):
 IMPORTANT: Always use language like "appears to be" or "looks like". Never provide a definitive medical diagnosis.
 `;
 
-    // Make sure we pass the correct format for image URLs in the messages array
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'llama-3.2-90b-vision-preview',
-        messages: [
-          {
-            role: 'user',
-            content: [
-              { type: 'text', text: prompt },
-              { type: 'image_url', image_url: { url: imageBase64 } }
-            ]
+    // 1. Try Gemini Vision (Primary)
+    try {
+      const model = genAI.getGenerativeModel({ 
+        model: 'gemini-1.5-flash',
+        generationConfig: { responseMimeType: "application/json" }
+      });
+
+      const result = await model.generateContent([
+        prompt,
+        {
+          inlineData: {
+            data: base64Data,
+            mimeType: mimeType
           }
-        ]
-      })
-    });
+        }
+      ]);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Groq Vision API Error:', errorText);
-      throw new Error(`Groq Vision API failed: ${response.status}`);
+      const responseText = result.response.text();
+      if (!responseText) throw new Error('No response from Gemini Vision');
+      
+      const analysisData = JSON.parse(responseText);
+      return NextResponse.json({ success: true, analysis: analysisData });
+
+    } catch (geminiError: any) {
+      console.error('Gemini Vision failed:', geminiError);
+      
+      // Fallback or specific error handling
+      throw new Error(`AI Analysis failed: ${geminiError.message}`);
     }
-
-    const result = await response.json();
-    const responseText = result.choices[0]?.message?.content;
-    
-    if (!responseText) throw new Error('No response from AI');
-    
-    // Clean up response text in case it has markdown code blocks
-    let cleanedText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
-    const analysisData = JSON.parse(cleanedText);
-
-    return NextResponse.json({ success: true, analysis: analysisData });
 
   } catch (error: any) {
     console.error('Skin Analysis error:', error);

@@ -47,15 +47,16 @@ export default function Header() {
       {/* Fixed height header with better responsive sizing and higher opacity */}
       <header className="sticky top-0 z-[100] bg-white/90 backdrop-blur-xl border-b border-purple-100/50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 h-16 md:h-20 flex items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2 shrink-0 group transition-transform active:scale-95 overflow-visible">
-            <Image 
-              src="/logo.png" 
-              alt="PurpleGirl Logo" 
-              width={240} 
-              height={80} 
-              className="h-20 md:h-28 w-auto object-contain -my-4 md:-my-6"
-              priority
-            />
+          <Link href="/" className="flex items-center gap-2 group transition-transform duration-300 hover:scale-[1.02]">
+            <span className="text-3xl filter drop-shadow-sm group-hover:drop-shadow-md transition-all">💜</span>
+            <div className="flex flex-col -gap-1">
+              <span className="text-2xl md:text-3xl font-black tracking-tighter bg-gradient-to-r from-[#7C3AED] via-[#A855F7] to-[#EC4899] bg-clip-text text-transparent font-serif leading-tight">
+                PurpleGirl
+              </span>
+              <span className="text-[10px] md:text-[11px] font-bold text-[#6B7280] uppercase tracking-[0.2em] -mt-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                Answers for Women
+              </span>
+            </div>
           </Link>
           
           {/* Desktop Search */}
