@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export const runtime = 'edge';
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
 export async function POST(req: Request) {
   try {
@@ -31,7 +35,7 @@ Question: "${question.title}"
 Context: ${question.description || 'None.'}
 ${customContext || ''}
 
-Return ONLY valid JSON (no markdown, no extra text):
+Return ONLY valid JSON:
 {
   "chat_bubbles": [
     "Bubble 1: Pure emotional validation — make her feel understood and completely safe (2-3 warm sentences)",
@@ -56,31 +60,46 @@ Return ONLY valid JSON (no markdown, no extra text):
 }
 `;
 
-    // 2. Generate answer with Groq API
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'llama-3.1-70b-versatile',
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
+    let responseText = '';
+    let usedModel = 'gemini-2.5-flash-lite';
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Groq API Error:', errorText);
-      throw new Error(`Groq API failed: ${response.status}`);
+    // 2. Generate answer with Primary (Gemini)
+    try {
+      const model = genAI.getGenerativeModel({ 
+        model: 'gemini-2.5-flash-lite',
+        generationConfig: { responseMimeType: "application/json" }
+      });
+      const result = await model.generateContent(prompt);
+      responseText = result.response.text();
+    } catch (geminiError) {
+      console.error('Gemini answer generation failed, trying Groq:', geminiError);
+      
+      // Fallback to Groq
+      if (GROQ_API_KEY) {
+        usedModel = 'llama-3.3-70b-versatile';
+        const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${GROQ_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'llama-3.3-70b-versatile',
+            messages: [{ role: 'user', content: prompt }],
+            response_format: { type: "json_object" }
+          })
+        });
+
+        if (groqRes.ok) {
+          const data = await groqRes.json();
+          responseText = data.choices[0]?.message?.content;
+        }
+      }
     }
-
-    const result = await response.json();
-    const responseText = result.choices[0]?.message?.content;
     
-    if (!responseText) throw new Error('No response from AI');
+    if (!responseText) throw new Error('No response from AI systems');
     
-    // Clean up response text in case it has markdown code blocks
+    // Clean up response text
     let cleanedText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
     const answerData = JSON.parse(cleanedText);
 
@@ -106,7 +125,7 @@ Return ONLY valid JSON (no markdown, no extra text):
         faqs: answerData.faqs || [],
         disclaimer: answerData.disclaimer || null,
         products: affiliatedProducts.length > 0 ? affiliatedProducts : null,
-        ai_model: 'llama-3.1-70b-versatile',
+        ai_model: usedModel,
       })
       .select()
       .single();
