@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Footer() {
   return (
@@ -33,9 +34,14 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-4 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8">
             <div className="md:col-span-2 space-y-6">
-              <Link href="/" className="font-playfair font-black text-3xl tracking-tighter group">
-                <span className="gradient-text-animate">Purple</span>
-                <span className="text-[#1F1235]">Girl</span>
+              <Link href="/" className="flex items-center gap-2 shrink-0 group transition-transform active:scale-95">
+                <Image 
+                  src="/logo.png" 
+                  alt="PurpleGirl Logo" 
+                  width={160} 
+                  height={40} 
+                  className="h-10 w-auto object-contain"
+                />
               </Link>
               <p className="text-gray-500 leading-relaxed max-w-sm">
                 The safe house where every girl finds her voice.

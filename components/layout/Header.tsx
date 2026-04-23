@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Search, Plus, EyeOff, X } from 'lucide-react';
 import LiveSearch from '../search/LiveSearch';
 import AuthButton from '../auth/AuthButton';
+import Image from 'next/image';
 
 export default function Header() {
   const pathname = usePathname();
@@ -47,11 +48,14 @@ export default function Header() {
       <header className="sticky top-0 z-[100] glass backdrop-blur-xl border-b border-transparent [border-image:linear-gradient(to_right,transparent,rgba(124,58,237,0.2),rgba(236,72,153,0.2),transparent)_1]">
         <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between gap-6">
           <Link href="/" className="flex items-center gap-2 shrink-0 group transition-transform active:scale-95">
-            <span className="font-playfair font-black text-2xl tracking-tighter transition-colors">
-              <span className="gradient-text-animate">Purple</span>
-              <span className="text-[#1F1235]">Girl</span>
-            </span>
-            <div className="w-2 h-2 rounded-full bg-pink-500 animate-pulse" />
+            <Image 
+              src="/logo.png" 
+              alt="PurpleGirl Logo" 
+              width={160} 
+              height={40} 
+              className="h-10 w-auto object-contain"
+              priority
+            />
           </Link>
           
           {/* Desktop Search */}
