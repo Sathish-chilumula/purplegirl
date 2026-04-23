@@ -31,8 +31,8 @@ export default function Header() {
   return (
     <>
       {showAnnouncement && (
-        <div className="aurora-bg py-2 px-4 flex items-center justify-center relative border-b border-purple-200">
-          <p className="text-sm font-bold text-[#1F1235] text-center pr-8">
+        <div className="aurora-bg py-1.5 px-4 flex items-center justify-center relative border-b border-purple-200">
+          <p className="text-xs font-bold text-[#1F1235] text-center pr-8">
             💜 Ask anything — completely anonymous. No login needed.
           </p>
           <button 
@@ -44,16 +44,16 @@ export default function Header() {
         </div>
       )}
       
-      {/* Added subtle gradient border class via global css or tailwind border tricks */}
-      <header className="sticky top-0 z-[100] glass backdrop-blur-xl border-b border-transparent [border-image:linear-gradient(to_right,transparent,rgba(124,58,237,0.2),rgba(236,72,153,0.2),transparent)_1]">
-        <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between gap-6">
-          <Link href="/" className="flex items-center gap-2 shrink-0 group transition-transform active:scale-95">
+      {/* Fixed height header with better responsive sizing and higher opacity */}
+      <header className="sticky top-0 z-[100] bg-white/90 backdrop-blur-xl border-b border-purple-100/50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 h-16 md:h-20 flex items-center justify-between gap-4">
+          <Link href="/" className="flex items-center gap-2 shrink-0 group transition-transform active:scale-95 overflow-visible">
             <Image 
               src="/logo.png" 
               alt="PurpleGirl Logo" 
-              width={160} 
-              height={40} 
-              className="h-10 w-auto object-contain"
+              width={240} 
+              height={80} 
+              className="h-20 md:h-28 w-auto object-contain -my-4 md:-my-6"
               priority
             />
           </Link>
@@ -82,10 +82,10 @@ export default function Header() {
 
             <Link 
               href="/ask" 
-              className="relative inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-500 text-white px-6 py-3 rounded-full font-bold text-sm hover:shadow-lg hover:shadow-purple-200 transition-all active:scale-95 whitespace-nowrap animate-pulse [animation-duration:3s]"
+              className="relative inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-500 text-white px-4 md:px-6 py-2.5 md:py-3 rounded-full font-bold text-xs md:text-sm hover:shadow-lg hover:shadow-purple-200 transition-all active:scale-95 whitespace-nowrap"
             >
-              <Plus className="w-4 h-4 hidden xs:block" />
-              <span>Ask Sister</span>
+              <Plus className="w-4 h-4 hidden sm:block" />
+              <span>Ask <span className="hidden sm:inline">Sister</span></span>
               <span className="absolute -top-1 -right-1 text-base animate-sparkle" style={{ animationDuration: '4s' }}>✨</span>
             </Link>
           </div>

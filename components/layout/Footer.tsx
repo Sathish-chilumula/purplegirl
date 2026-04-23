@@ -34,13 +34,13 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-4 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8">
             <div className="md:col-span-2 space-y-6">
-              <Link href="/" className="flex items-center gap-2 shrink-0 group transition-transform active:scale-95">
+              <Link href="/" className="flex items-center gap-2 shrink-0 group transition-transform active:scale-95 overflow-visible -ml-4">
                 <Image 
                   src="/logo.png" 
                   alt="PurpleGirl Logo" 
-                  width={160} 
-                  height={40} 
-                  className="h-10 w-auto object-contain"
+                  width={240} 
+                  height={80} 
+                  className="h-24 w-auto object-contain -my-6"
                 />
               </Link>
               <p className="text-gray-500 leading-relaxed max-w-sm">
