@@ -16,8 +16,8 @@ export const metadata: Metadata = {
   description: SEO_CONFIG.description,
   metadataBase: new URL(SEO_CONFIG.url),
   icons: {
-    icon: '/icon.png',
-    apple: '/icon.png',
+    icon: '/favicon.ico',
+    apple: '/favicon.ico',
   }
 };
 
