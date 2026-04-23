@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Sparkles, Heart, Briefcase, Pill, Shirt, Brain, Salad, Loader2 } from 'lucide-react';
+import { ArrowLeft, Sparkles, Heart, Briefcase, Pill, Shirt, Brain, Salad, Loader2, Check } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { slugify } from '@/lib/slugify';
@@ -96,43 +96,38 @@ export default function AskPage() {
         console.error('Error triggering AI generation:', err);
       }
 
-      alert('Question submitted successfully! Our sisters are writing an answer for you. It will be ready in 1-2 minutes 💜');
       router.push(`/q/${slug}`);
     } catch (err) {
       console.error('Error submitting question:', err);
       alert('Failed to submit question. Please check your Supabase configuration.');
-    } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-white">
-      {/* Page-level orb backgrounds */}
-      <div className="orb orb-purple w-[600px] h-[600px] top-[-100px] left-[-100px] opacity-20" />
-      <div className="orb orb-pink w-[500px] h-[500px] bottom-[-80px] right-[-60px] opacity-15" />
-
+    <div className="relative min-h-screen overflow-hidden aurora-bg">
       <div className="max-w-3xl mx-auto px-4 py-12 md:py-16 relative z-10">
-        <Link href="/" className="inline-flex items-center text-gray-500 hover:text-purple-600 mb-8 transition-colors font-medium group animate-slide-up">
+        <Link href="/" className="inline-flex items-center text-purple-600 hover:text-purple-800 mb-8 transition-colors font-medium group animate-slide-up bg-white/50 backdrop-blur px-4 py-2 rounded-full border border-purple-100 shadow-sm">
           <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" /> Back to home
         </Link>
         
-        <div className="glass rounded-[2rem] p-8 md:p-12 shadow-xl border border-purple-100/60 animate-slide-up stagger-1">
+        <div className="bg-white/80 backdrop-blur-2xl rounded-[3rem] p-8 md:p-12 shadow-2xl border border-white/60 animate-slide-up stagger-1">
           <div className="text-center mb-12">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-200 to-pink-200 flex items-center justify-center text-4xl mx-auto mb-6 shadow-md animate-float">💜</div>
-            <h1 className="font-playfair font-bold text-4xl text-[#1F1235] tracking-tight mb-4">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-200 to-pink-200 flex items-center justify-center text-5xl mx-auto mb-6 shadow-lg animate-glow-pulse border-4 border-white">
+              💜
+            </div>
+            <p className="font-playfair italic text-gray-500 mb-2">Your sister is listening...</p>
+            <h1 className="text-editorial text-4xl text-[#1F1235] tracking-tight mb-4">
               Ask <span className="gradient-text-animate">anything</span> you want
             </h1>
-            <p className="text-gray-500 text-lg">100% anonymous. No judgments. Get a helpful answer from your AI elder sister.</p>
           </div>
           
           <form onSubmit={handleSubmit} className="space-y-10">
             <div className="animate-slide-up stagger-2">
-              <label className="block font-playfair font-bold text-[#1F1235] mb-3 text-xl">What&apos;s on your mind?</label>
-              <div className="relative">
+              <div className="relative group">
                 <textarea
-                  className="w-full bg-[#FAF5FF]/50 border border-purple-100 rounded-3xl p-6 min-h-[140px] text-lg focus:outline-none focus:ring-4 focus:ring-purple-200/50 placeholder:text-purple-300 resize-none transition-all"
-                  placeholder="E.g. How do I deal with a toxic manager?"
+                  className="w-full bg-[#FAF5FF] rounded-3xl p-6 min-h-[140px] text-lg focus:outline-none focus:bg-white placeholder:text-purple-300 resize-none transition-all shadow-inner border border-transparent focus:border-transparent [border-image:linear-gradient(to_right,rgba(124,58,237,0.5),rgba(236,72,153,0.5))_1] focus:[box-shadow:inset_0_0_20px_rgba(124,58,237,0.1)]"
+                  placeholder="Type what's on your heart... I'm listening. 💜"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   required
@@ -143,10 +138,10 @@ export default function AskPage() {
             </div>
             
             <div className="animate-slide-up stagger-3">
-              <label className="block font-playfair font-bold text-[#1F1235] mb-3 text-lg">More details (optional)</label>
+              <label className="block text-editorial text-xl text-[#1F1235] mb-3">More details (optional)</label>
               <div className="relative">
                 <textarea
-                  className="w-full bg-[#FAF5FF]/50 border border-purple-100 rounded-3xl p-6 min-h-[140px] focus:outline-none focus:ring-4 focus:ring-purple-200/50 placeholder:text-purple-300 resize-none transition-all"
+                  className="w-full bg-[#FAF5FF] rounded-3xl p-6 min-h-[120px] focus:outline-none focus:bg-white placeholder:text-purple-300 resize-none transition-all shadow-inner border border-transparent focus:border-transparent focus:[border-image:linear-gradient(to_right,rgba(124,58,237,0.5),rgba(236,72,153,0.5))_1]"
                   placeholder="Give some context so we can give you a better answer..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -157,7 +152,7 @@ export default function AskPage() {
             </div>
             
             <div className="animate-slide-up stagger-4">
-              <label className="block font-playfair font-bold text-[#1F1235] mb-4 text-lg">Choose a category</label>
+              <label className="block text-editorial text-xl text-[#1F1235] mb-4">Choose a category</label>
               {isLoadingCats ? (
                 <div className="flex items-center gap-2 text-purple-600 animate-pulse">
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -165,23 +160,31 @@ export default function AskPage() {
                 </div>
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {categories.map((cat) => (
-                    <button
-                      type="button"
-                      key={cat.id}
-                      onClick={() => setCategorySlug(cat.slug)}
-                      className={`flex items-center gap-3 px-4 py-4 rounded-2xl border transition-all duration-300 transform active:scale-95 ${
-                        categorySlug === cat.slug 
-                          ? 'bg-gradient-to-br from-purple-600 to-pink-500 border-transparent text-white font-bold shadow-lg shadow-purple-200' 
-                          : 'bg-white border-purple-50 text-gray-500 hover:border-purple-200 hover:bg-purple-50/50'
-                      }`}
-                    >
-                      <span className={`${categorySlug === cat.slug ? 'text-white' : 'text-purple-400'}`}>
-                        {CATEGORY_ICONS[cat.slug] || <Heart className="w-5 h-5" />}
-                      </span>
-                      <span className="text-sm">{cat.name}</span>
-                    </button>
-                  ))}
+                  {categories.map((cat) => {
+                    const isSelected = categorySlug === cat.slug;
+                    return (
+                      <button
+                        type="button"
+                        key={cat.id}
+                        onClick={() => setCategorySlug(cat.slug)}
+                        className={`relative flex items-center gap-3 px-4 py-4 rounded-2xl border transition-all duration-300 transform active:scale-95 ${
+                          isSelected 
+                            ? 'bg-gradient-to-br from-purple-600 to-pink-500 border-transparent text-white font-bold shadow-lg shadow-purple-200' 
+                            : 'glass border-white/50 text-gray-500 hover:border-purple-200 hover:bg-white/90 shadow-sm'
+                        }`}
+                      >
+                        <span className={`${isSelected ? 'text-white' : 'text-purple-500'}`}>
+                          {CATEGORY_ICONS[cat.slug] || <Heart className="w-5 h-5" />}
+                        </span>
+                        <span className="text-sm text-left">{cat.name}</span>
+                        {isSelected && (
+                          <div className="absolute top-2 right-2 bg-white text-purple-600 rounded-full p-0.5">
+                            <Check className="w-3 h-3" />
+                          </div>
+                        )}
+                      </button>
+                    )
+                  })}
                 </div>
               )}
             </div>
@@ -190,18 +193,30 @@ export default function AskPage() {
               <PersonalizedIntake onIntakeChange={setIntakeData} />
             </div>
             
-            <div className="pt-6 border-t border-purple-50/60 animate-slide-up stagger-5">
+            <div className="pt-6 animate-slide-up stagger-5">
               <button
                 type="submit"
                 disabled={isSubmitting || !title || !categorySlug}
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white py-5 rounded-full font-bold text-xl hover:shadow-2xl hover:shadow-purple-300 transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-xl"
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white py-5 rounded-full font-bold text-xl hover:shadow-2xl hover:shadow-purple-300 transition-all hover:scale-[1.02] disabled:opacity-60 disabled:hover:scale-100 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-xl"
               >
                 {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : <span>✨</span>}
                 {isSubmitting ? 'Sending securely...' : 'Submit Anonymously'}
               </button>
-              <div className="mt-6 flex items-center justify-center gap-2 text-sm text-gray-400 font-medium">
-                <span className="text-green-500 text-lg">🔒</span> 
-                Your identity is 100% protected. We never track who you are.
+              
+              <div className="text-center mt-3 text-sm font-medium text-purple-500">
+                Estimated response time: ~30 seconds
+              </div>
+
+              <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-sm text-gray-500 font-medium">
+                <div className="flex items-center gap-1.5 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                  <div className="bg-green-100 text-green-600 rounded-full p-0.5"><Check className="w-3 h-3" /></div> Identity protected
+                </div>
+                <div className="flex items-center gap-1.5 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+                  <div className="bg-green-100 text-green-600 rounded-full p-0.5"><Check className="w-3 h-3" /></div> Not stored publicly
+                </div>
+                <div className="flex items-center gap-1.5 animate-fade-in" style={{ animationDelay: '0.6s' }}>
+                  <div className="bg-green-100 text-green-600 rounded-full p-0.5"><Check className="w-3 h-3" /></div> Answered with care
+                </div>
               </div>
             </div>
           </form>
@@ -210,4 +225,3 @@ export default function AskPage() {
     </div>
   );
 }
-

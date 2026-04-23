@@ -5,16 +5,16 @@ import { Clock, Eye, Heart, ArrowLeft, ArrowRight, Sparkles, CheckCircle2 } from
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { buildFAQSchema, buildBreadcrumbSchema } from '@/lib/schema';
 import QuestionClient from '@/components/question/QuestionClient';
+import CommunityValidation from '@/components/question/CommunityValidation';
 import FollowUpChat from '@/components/question/FollowUpChat';
 import MeTooButton from '@/components/question/MeTooButton';
 import AnswerWaiter from '@/components/question/AnswerWaiter';
 import EmotionBar from '@/components/question/EmotionBar';
 import LanguageSwitcher from '@/components/question/LanguageSwitcher';
+import EmotionPageTheme from '@/components/question/EmotionPageTheme';
 import { SITE_NAME } from '@/lib/constants';
 
 export const runtime = 'edge';
-// SSR: Removed SSG generateStaticParams to fix 404 on new questions for Cloudflare
-
 
 interface QuestionPageProps {
   params: Promise<{ slug: string }>;
@@ -48,10 +48,10 @@ export async function generateMetadata({ params }: QuestionPageProps): Promise<M
 
   return {
     title: `${question.title} | ${SITE_NAME}`,
-    description: `Real support and advice for: "${question.title}"`,
+    description: question.answers?.summary || `Read the conversation for: ${question.title}`,
     openGraph: {
       title: question.title,
-      description: `Read the conversation for: ${question.title}`,
+      description: question.answers?.summary || `Read the conversation for: ${question.title}`,
       type: 'article',
     }
   };
@@ -63,7 +63,6 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
 
   if (!question) notFound();
 
-  // Build schema markup
   const faqSchema = buildFAQSchema({
     title: question.title,
     slug: question.slug,
@@ -77,7 +76,6 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
     categories: question.categories,
   });
 
-  // Fetch related questions
   const { data: related } = await supabaseAdmin
     .from('questions')
     .select('slug, title')
@@ -88,43 +86,42 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
 
   const timeAgo = question.created_at ? new Date(question.created_at).toLocaleDateString() : 'Recently';
 
-  return (
-    <div className="relative min-h-screen overflow-hidden bg-white">
-      {/* Schema Markup for SEO */}
-      {faqSchema && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-        />
-      )}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
+  // Default to Hopeful for now as we don't have emotion in DB yet.
+  const pageEmotion = 'Hopeful';
 
-      {/* Page-level orb backgrounds */}
+  return (
+    <div className="relative min-h-screen overflow-hidden bg-white mood-bg transition-colors duration-1000">
+      <EmotionPageTheme emotion={pageEmotion} />
+      
+      {faqSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+
       <div className="orb orb-purple w-[500px] h-[500px] top-[-100px] right-[-100px] opacity-25" />
       <div className="orb orb-pink w-[400px] h-[400px] bottom-[200px] left-[-80px] opacity-20" />
 
       <div className="max-w-2xl mx-auto px-4 py-8 pb-40 relative z-10">
-        {/* Breadcrumb */}
         <div className="flex items-center text-sm font-medium text-gray-400 mb-8 gap-2 overflow-x-auto whitespace-nowrap hide-scrollbar animate-slide-up">
           <Link href="/" className="hover:text-purple-600 transition-colors">Home</Link>
           <span>›</span>
-          <Link href={`/search?category=${question.categories?.slug}`} className="hover:text-purple-600 transition-colors">{question.categories?.name}</Link>
+          <Link href={`/category/${question.categories?.slug}`} className="hover:text-purple-600 transition-colors">{question.categories?.name}</Link>
           <span>›</span>
           <span className="text-[#1F1235] truncate max-w-[200px]">{question.title}</span>
         </div>
 
-        {/* Header */}
-        <h1 className="font-playfair font-bold text-3xl md:text-5xl text-[#1F1235] tracking-tight leading-tight mb-8 animate-slide-up">
-          {question.title}
-        </h1>
+        {/* Editorial Quote Header */}
+        <div className="mb-10 animate-slide-up relative">
+          <div className="absolute -top-6 -left-4 text-7xl text-purple-200 font-playfair opacity-50">"</div>
+          <h1 className="font-playfair font-black text-3xl md:text-5xl text-[#1F1235] tracking-tight leading-tight relative z-10 mood-accent">
+            {question.title}
+          </h1>
+          {question.description && (
+            <p className="mt-4 text-lg text-gray-600 italic border-l-4 border-purple-200 pl-4">{question.description}</p>
+          )}
+        </div>
         
         <MeTooButton questionId={question.id} initialCount={question.metoo_count || 0} variant="prominent" />
 
-        {/* Language Switcher for multilingual SEO */}
-        <div className="mb-6 animate-slide-up">
+        <div className="mb-6 animate-slide-up mt-6">
           <LanguageSwitcher
             slug={question.slug}
             hasHindi={!!(question.answers?.chat_log_hi && (question.answers.chat_log_hi as any[]).length > 0)}
@@ -132,7 +129,6 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
           />
         </div>
 
-        {/* Category + Meta glass bar */}
         <div className="glass rounded-2xl px-5 py-3.5 flex flex-wrap items-center gap-3 mb-12 shadow-sm animate-slide-up stagger-1">
           <span className="font-bold text-purple-700 bg-purple-100 px-3 py-1 rounded-full text-xs uppercase tracking-widest">
             {question.categories?.name}
@@ -148,98 +144,108 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
           </span>
         </div>
 
-        {/* Emotion Intelligence Layer */}
         <div className="animate-slide-up stagger-1">
           <EmotionBar questionText={question.title} />
         </div>
 
         {question.answers ? (
-          <div className="flex flex-col gap-8 animate-slide-up stagger-2">
-            {/* User Bubble (The Question) */}
-            <div className="flex justify-end">
-              <div className="bubble-user text-white rounded-[2rem] rounded-tr-md px-6 py-4 max-w-[85%]">
-                <p className="text-lg font-medium leading-relaxed">{question.title}</p>
-                {question.description && (
-                  <p className="text-sm mt-3 pt-3 border-t border-purple-400/50 opacity-85">{question.description}</p>
-                )}
+          <div className="flex flex-col gap-10 animate-slide-up stagger-2 mt-8">
+            
+            {/* The Bottom Line (Summary) */}
+            {question.answers?.summary && (
+              <div className="shimmer-card card-premium p-8 bg-gradient-to-br from-purple-50 to-pink-50 border-none shadow-md">
+                <h2 className="font-playfair font-bold text-xl text-purple-800 mb-3 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5" /> The Bottom Line
+                </h2>
+                <p className="text-gray-800 font-medium leading-relaxed">{question.answers.summary}</p>
               </div>
-            </div>
+            )}
 
             {/* Sister Bubbles (The Answer) */}
             {question.answers.chat_log && Array.isArray(question.answers.chat_log) ? (
-              question.answers.chat_log.map((msg: string, i: number) => (
-                <div key={i} className="flex justify-start animate-slide-up" style={{ animationDelay: `${(i + 1) * 250}ms`, animationFillMode: 'both' }}>
-                  <div className="flex items-end gap-3 max-w-[92%]">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-200 to-pink-200 flex items-center justify-center shrink-0 border-2 border-white shadow-md">
-                      <span className="text-xl">💜</span>
-                    </div>
-                    <div className="bubble-sister rounded-[2rem] rounded-tl-md px-6 py-4 text-[#1F1235] text-base leading-relaxed border border-purple-50">
-                      {String(msg).split('\n').map((line: string, lineIndex: number) => (
-                        <p key={lineIndex} className={lineIndex > 0 ? "mt-3" : ""}>{line}</p>
-                      ))}
+              <div className="space-y-6 bg-gray-50/50 p-6 md:p-8 rounded-[2rem] border border-gray-100">
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest text-center mb-6">Conversation</h3>
+                {question.answers.chat_log.map((msg: string, i: number) => (
+                  <div key={i} className="flex justify-start animate-slide-up" style={{ animationDelay: `${(i + 1) * 150}ms`, animationFillMode: 'both' }}>
+                    <div className="flex items-end gap-3 max-w-[95%] md:max-w-[85%]">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-200 to-pink-200 flex items-center justify-center shrink-0 border-2 border-white shadow-sm z-10">
+                        <span className="text-xl">💜</span>
+                      </div>
+                      <div className="bubble-sister rounded-[2rem] rounded-tl-sm px-6 py-4 text-[#1F1235] text-base leading-relaxed border border-purple-50">
+                        {String(msg).split('\n').map((line: string, lineIndex: number) => (
+                          <p key={lineIndex} className={lineIndex > 0 ? "mt-3" : ""}>{line}</p>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))
+                ))}
+              </div>
             ) : (
               <p className="text-center text-gray-400 italic">Asking our elders for the best advice...</p>
             )}
 
-            {/* Affiliated Products */}
-            {question.answers.products && question.answers.products.length > 0 && (
-              <div className="flex justify-start w-full mt-4 animate-slide-up" style={{ animationDelay: '1000ms', animationFillMode: 'both' }}>
-                <div className="ml-12 w-full">
-                  <div className="glass rounded-3xl p-6 border border-pink-100 shadow-sm relative overflow-hidden">
-                    <div className="orb orb-pink w-40 h-40 top-0 right-0 opacity-20" />
-                    <p className="text-xs font-bold text-pink-500 uppercase tracking-widest mb-4 flex items-center gap-2 relative z-10">
-                      <Sparkles className="w-3.5 h-3.5" /> Curated just for you
-                    </p>
-                    <div className="flex overflow-x-auto gap-4 pb-2 hide-scrollbar relative z-10">
-                      {question.answers.products.map((p: any, i: number) => (
-                        <a key={i} href={p.link} target="_blank" rel="noopener noreferrer"
-                          className="card-premium min-w-[200px] p-3 hover:translate-y-[-4px] transition-transform">
-                          <img src={p.image} alt={p.title} className="w-full aspect-square object-cover rounded-xl mb-3 bg-purple-50" />
-                          <p className="font-bold text-sm text-[#1F1235] line-clamp-2">{p.title}</p>
-                          <p className="text-xs font-bold text-pink-500 mt-1">{p.price}</p>
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {/* Practical Tips */}
             {question.answers?.bullet_points && question.answers.bullet_points.length > 0 && (
-              <section className="ml-12 glass rounded-[2rem] p-8 border border-purple-100 shadow-sm animate-slide-up" style={{ animationDelay: '1200ms', animationFillMode: 'both' }}>
+              <section className="animate-slide-up">
                 <h2 className="font-playfair font-bold text-2xl text-[#1F1235] mb-6 flex items-center gap-2">
-                  <Sparkles className="w-6 h-6 text-purple-500" /> Practical Tips
+                  <CheckCircle2 className="w-6 h-6 text-purple-500" /> Action Plan
                 </h2>
-                <ul className="space-y-4">
+                <ul className="grid grid-cols-1 gap-3">
                   {question.answers.bullet_points.map((tip: string, i: number) => (
-                    <li key={i} className="flex items-start gap-4 bg-white/50 p-4 rounded-2xl border border-purple-50 transition-all hover:border-purple-200">
-                      <CheckCircle2 className="w-5 h-5 text-purple-600 shrink-0 mt-0.5" />
-                      <span className="text-[#1F1235] font-medium leading-relaxed">{tip}</span>
+                    <li key={i} className="flex items-start gap-4 bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:border-purple-200 hover:shadow-md transition-all">
+                      <div className="w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center shrink-0 font-bold text-xs mt-0.5">{i+1}</div>
+                      <span className="text-gray-700 font-medium leading-relaxed">{tip}</span>
                     </li>
                   ))}
                 </ul>
               </section>
             )}
 
+            {/* Community Validation */}
+            {question.answers?.bullet_points && question.answers.bullet_points.length > 0 && (
+              <CommunityValidation 
+                answerId={question.answers.id}
+                bulletPoints={question.answers.bullet_points}
+                initialTips={question.answers.helpful_tips}
+              />
+            )}
+
+            {/* Affiliated Products */}
+            {question.answers.products && question.answers.products.length > 0 && (
+              <div className="animate-slide-up w-full">
+                <div className="glass rounded-[2rem] p-8 border border-pink-100 shadow-sm relative overflow-hidden">
+                  <div className="orb orb-pink w-40 h-40 top-0 right-0 opacity-20" />
+                  <p className="text-xs font-bold text-pink-500 uppercase tracking-widest mb-6 flex items-center gap-2 relative z-10">
+                    <Sparkles className="w-4 h-4" /> Recommended for you
+                  </p>
+                  <div className="flex overflow-x-auto gap-4 pb-2 hide-scrollbar relative z-10">
+                    {question.answers.products.map((p: any, i: number) => (
+                      <a key={i} href={p.link} target="_blank" rel="noopener noreferrer"
+                        className="card-premium min-w-[180px] p-3 hover:translate-y-[-4px] transition-transform bg-white">
+                        <img src={p.image} alt={p.title} className="w-full aspect-square object-cover rounded-xl mb-3 bg-gray-50" />
+                        <p className="font-bold text-sm text-[#1F1235] line-clamp-2">{p.title}</p>
+                        <p className="text-xs font-bold text-pink-500 mt-2 bg-pink-50 inline-block px-2 py-1 rounded-md">{p.price}</p>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* FAQs */}
             {question.answers?.faqs && question.answers.faqs.length > 0 && (
-              <section className="ml-12 animate-slide-up" style={{ animationDelay: '1400ms', animationFillMode: 'both' }}>
-                <h2 className="font-playfair font-bold text-2xl text-[#1F1235] mb-6">Common Questions</h2>
+              <section className="animate-slide-up">
+                <h2 className="font-playfair font-bold text-2xl text-[#1F1235] mb-6">Frequently Asked</h2>
                 <div className="space-y-3">
                   {question.answers.faqs.map((faq: any, i: number) => (
-                    <details key={i} className="group glass rounded-2xl border border-purple-100 overflow-hidden transition-all duration-300">
-                      <summary className="flex items-center justify-between p-5 font-bold text-[#1F1235] cursor-pointer hover:bg-purple-50/50 transition-colors list-none">
+                    <details key={i} className="group bg-white rounded-2xl border border-gray-100 overflow-hidden transition-all duration-300 shadow-sm hover:border-purple-200">
+                      <summary className="flex items-center justify-between p-5 font-bold text-[#1F1235] cursor-pointer hover:bg-purple-50/30 transition-colors list-none">
                         {faq.q}
-                        <span className="transition-transform group-open:rotate-180">
-                          <svg fill="none" height="20" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="20"><path d="M6 9l6 6 6-6"></path></svg>
+                        <span className="transition-transform group-open:rotate-180 w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center shrink-0">
+                          <svg fill="none" height="16" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="16"><path d="M6 9l6 6 6-6"></path></svg>
                         </span>
                       </summary>
-                      <div className="p-5 pt-0 text-gray-600 leading-relaxed text-sm bg-white/30">
+                      <div className="p-5 pt-0 text-gray-600 leading-relaxed text-sm bg-white">
                         {faq.a}
                       </div>
                     </details>
@@ -250,15 +256,15 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
 
             {/* Disclaimer */}
             {question.answers?.disclaimer && (
-              <div className="ml-12 mt-8 text-center animate-slide-up">
-                <p className="text-xs text-gray-400 italic bg-gray-50/50 px-4 py-3 rounded-xl inline-block max-w-md">
-                  {question.answers.disclaimer}
+              <div className="mt-8 text-center animate-slide-up">
+                <p className="text-xs text-gray-500 italic bg-gray-50 px-6 py-4 rounded-2xl inline-block max-w-md border border-gray-100">
+                  ⚠️ {question.answers.disclaimer}
                 </p>
               </div>
             )}
 
-            {/* Me Too / Share / Interaction Block */}
-            <div className="ml-12 animate-slide-up mt-8">
+            {/* Share / Interaction Block */}
+            <div className="animate-slide-up mt-8">
               <QuestionClient
                 questionId={question.id}
                 initialMeToo={question.metoo_count}
@@ -266,14 +272,19 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
                 questionSlug={question.slug}
                 bulletPoints={question.answers?.bullet_points}
                 summary={question.answers?.summary}
+                categoryName={question.categories?.name}
+                categorySlug={question.categories?.slug}
               />
             </div>
 
             {/* Follow-up Chat */}
-            <div className="mt-12 pt-12 border-t border-purple-100/60 ml-12 animate-slide-up">
-              <div className="flex items-center gap-2 mb-6">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-200 to-pink-200 flex items-center justify-center text-sm border-2 border-white shadow">💜</div>
-                <p className="font-bold text-[#1F1235] text-sm">Continue the conversation…</p>
+            <div className="mt-12 pt-12 border-t border-purple-100/60 animate-slide-up">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-200 to-pink-200 flex items-center justify-center text-lg border-2 border-white shadow-sm">💜</div>
+                <div>
+                  <p className="font-bold text-[#1F1235]">Still curious?</p>
+                  <p className="text-sm text-gray-500">Ask a follow-up question anonymously.</p>
+                </div>
               </div>
               <FollowUpChat questionTitle={question.title} categoryName={question.categories?.name || 'General'} />
             </div>

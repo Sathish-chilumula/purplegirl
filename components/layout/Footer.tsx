@@ -2,54 +2,78 @@ import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className="bg-white border-t border-purple-50 py-20 pb-32 md:pb-20 mt-auto relative overflow-hidden">
-      {/* Decorative blobs */}
-      <div className="absolute top-0 left-0 w-64 h-64 bg-purple-50 rounded-full blur-[100px] opacity-50 -translate-x-1/2 -translate-y-1/2" />
-      <div className="absolute bottom-0 right-0 w-64 h-64 bg-pink-50 rounded-full blur-[100px] opacity-50 translate-x-1/2 translate-y-1/2" />
-      
-      <div className="max-w-7xl mx-auto px-4 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8">
-          <div className="md:col-span-2 space-y-6">
-            <Link href="/" className="font-playfair font-black text-3xl tracking-tighter group">
-              <span className="gradient-text-animate">Purple</span>
-              <span className="text-[#1F1235]">Girl</span>
+    <footer className="mt-auto relative overflow-hidden">
+      {/* Top Section - Aurora Gradient Band */}
+      <div className="aurora-bg py-16 px-4 relative z-10 border-t border-purple-100 shadow-inner">
+        <div className="max-w-4xl mx-auto text-center space-y-6">
+          <h2 className="font-playfair font-bold text-4xl text-[#1F1235] tracking-tight">
+            Still have <span className="gradient-text-animate">questions?</span>
+          </h2>
+          <p className="text-gray-600 text-lg">Your sister is always here. Anonymous, always.</p>
+          <div className="pt-4">
+            <Link 
+              href="/ask" 
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-500 text-white px-8 py-4 rounded-full font-bold text-lg hover:shadow-xl hover:shadow-purple-300 transition-all hover:scale-105"
+            >
+              Ask Anything <span className="text-xl">→</span>
             </Link>
-            <p className="text-gray-500 text-lg leading-relaxed max-w-md">
-              The safe house where every girl finds her voice. Anonymous, judgment-free, and always here for you when you can&apos;t ask anyone else.
-            </p>
-            <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-purple-400">
-              <span className="w-10 h-px bg-purple-100" />
-              Empowering Indian Women
+          </div>
+          <div className="flex items-center justify-center gap-4 text-xs font-bold text-gray-500 pt-4 flex-wrap">
+            <span className="flex items-center gap-1.5"><span>🔒</span> Zero data stored</span>
+            <span className="text-gray-300">|</span>
+            <span className="flex items-center gap-1.5"><span>💜</span> Zero judgment</span>
+            <span className="text-gray-300">|</span>
+            <span className="flex items-center gap-1.5"><span>⚡</span> Zero login</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Section - Standard Footer Links */}
+      <div className="bg-white py-16 pb-32 md:pb-16 relative">
+        <div className="max-w-7xl mx-auto px-4 relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8">
+            <div className="md:col-span-2 space-y-6">
+              <Link href="/" className="font-playfair font-black text-3xl tracking-tighter group">
+                <span className="gradient-text-animate">Purple</span>
+                <span className="text-[#1F1235]">Girl</span>
+              </Link>
+              <p className="text-gray-500 leading-relaxed max-w-sm">
+                The safe house where every girl finds her voice.
+              </p>
+              <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-purple-400">
+                <span className="w-10 h-px bg-purple-100" />
+                Empowering Indian Women
+              </div>
+            </div>
+            
+            <div className="space-y-6">
+              <h3 className="font-playfair font-bold text-[#1F1235] text-xl">Guidance</h3>
+              <ul className="space-y-4">
+                <li><Link href="/about" className="text-gray-500 hover:text-purple-600 transition-colors font-medium">Our Mission</Link></li>
+                <li><Link href="/privacy" className="text-gray-500 hover:text-purple-600 transition-colors font-medium">Privacy First</Link></li>
+                <li><Link href="/terms" className="text-gray-500 hover:text-purple-600 transition-colors font-medium">Service Terms</Link></li>
+                <li><Link href="/contact" className="text-gray-500 hover:text-purple-600 transition-colors font-medium">Talk to Us</Link></li>
+              </ul>
+            </div>
+            
+            <div className="space-y-6">
+              <h3 className="font-playfair font-bold text-[#1F1235] text-xl">Popular Topics</h3>
+              <div className="flex flex-wrap gap-2">
+                <Link href="/category/beauty-skincare" className="pill-badge bg-pink-50 text-pink-600 border border-pink-100 hover:bg-pink-100 transition-colors">Glow & Care</Link>
+                <Link href="/category/relationships" className="pill-badge bg-purple-50 text-purple-600 border border-purple-100 hover:bg-purple-100 transition-colors">Heart & Soul</Link>
+                <Link href="/category/career-money" className="pill-badge bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-100 transition-colors">Ambition & Growth</Link>
+                <Link href="/category/mental-wellness" className="pill-badge bg-indigo-50 text-indigo-600 border border-indigo-100 hover:bg-indigo-100 transition-colors">Mind Matters</Link>
+              </div>
             </div>
           </div>
           
-          <div className="space-y-6">
-            <h3 className="font-playfair font-bold text-[#1F1235] text-xl">Guidance</h3>
-            <ul className="space-y-4">
-              <li><Link href="/about" className="text-gray-500 hover:text-purple-600 transition-colors font-medium">Our Mission</Link></li>
-              <li><Link href="/privacy" className="text-gray-500 hover:text-purple-600 transition-colors font-medium">Privacy First</Link></li>
-              <li><Link href="/terms" className="text-gray-500 hover:text-purple-600 transition-colors font-medium">Service Terms</Link></li>
-              <li><Link href="/contact" className="text-gray-500 hover:text-purple-600 transition-colors font-medium">Talk to Us</Link></li>
-            </ul>
-          </div>
-          
-          <div className="space-y-6">
-            <h3 className="font-playfair font-bold text-[#1F1235] text-xl">Popular Topics</h3>
-            <ul className="space-y-4">
-              <li><Link href="/category/beauty-skincare" className="text-gray-500 hover:text-purple-600 transition-colors font-medium">Glow & Care</Link></li>
-              <li><Link href="/category/relationships" className="text-gray-500 hover:text-purple-600 transition-colors font-medium">Heart & Soul</Link></li>
-              <li><Link href="/category/career-money" className="text-gray-500 hover:text-purple-600 transition-colors font-medium">Ambition & Growth</Link></li>
-              <li><Link href="/category/mental-wellness" className="text-gray-500 hover:text-purple-600 transition-colors font-medium">Mind Matters</Link></li>
-            </ul>
-          </div>
-        </div>
-        
-        <div className="mt-20 pt-10 border-t border-purple-50 flex flex-col md:flex-row items-center justify-between gap-6 text-gray-400 text-sm font-medium">
-          <p>&copy; {new Date().getFullYear()} PurpleGirl.in • Made with 💜 for every girl.</p>
-          <div className="flex items-center gap-6">
-            <a href="#" className="hover:text-purple-600 transition-colors">Instagram</a>
-            <a href="#" className="hover:text-purple-600 transition-colors">Pinterest</a>
-            <a href="#" className="hover:text-purple-600 transition-colors">Threads</a>
+          <div className="mt-16 pt-8 border-t border-purple-50 flex flex-col md:flex-row items-center justify-between gap-6 text-gray-400 text-sm font-medium">
+            <p>&copy; {new Date().getFullYear()} PurpleGirl.in • Made with 💜 for every girl.</p>
+            <div className="flex items-center gap-4">
+              <a href="#" className="w-10 h-10 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center hover:bg-purple-600 hover:text-white transition-all shadow-sm">IG</a>
+              <a href="#" className="w-10 h-10 rounded-full bg-pink-50 text-pink-600 flex items-center justify-center hover:bg-pink-600 hover:text-white transition-all shadow-sm">PT</a>
+              <a href="#" className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center hover:bg-indigo-600 hover:text-white transition-all shadow-sm">TH</a>
+            </div>
           </div>
         </div>
       </div>

@@ -4,6 +4,7 @@ import './globals.css'; // Global styles
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import MobileBottomNav from '@/components/layout/MobileBottomNav';
+import FloatingAskButton from '@/components/ui/FloatingAskButton';
 import { SEO_CONFIG } from '@/lib/constants';
 import Script from 'next/script';
 
@@ -35,6 +36,7 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
         </main>
         <Footer />
         <MobileBottomNav />
+        <FloatingAskButton />
       </body>
     </html>
   );

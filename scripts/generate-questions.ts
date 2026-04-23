@@ -19,12 +19,16 @@ async function generateTrendingQuestions() {
   console.log("Brainstorming new questions with AI...");
 
   const niches = [
-    { name: 'Fashion & Styling', slug: 'fashion' },
-    { name: 'Relationships', slug: 'relationships' },
-    { name: 'Motherhood & Baby care', slug: 'motherhood-baby' },
-    { name: 'Career & Money', slug: 'career-money' },
-    { name: 'Beauty & Skincare', slug: 'beauty-skincare' },
-    { name: 'Mental Wellness', slug: 'mental-wellness' }
+    { name: 'Fashion & Style',       slug: 'fashion-style' },
+    { name: 'Relationships & Love',  slug: 'relationships-love' },
+    { name: 'Pregnancy & Baby Care', slug: 'pregnancy-baby-care' },
+    { name: 'Career & Money',        slug: 'career-money' },
+    { name: 'Beauty & Skincare',     slug: 'beauty-skincare' },
+    { name: 'Mental Wellness',       slug: 'mental-wellness' },
+    { name: 'Health Basics',         slug: 'health-basics' },
+    { name: 'Haircare',              slug: 'haircare' },
+    { name: 'Self-Care & Glow Up',   slug: 'self-care-glow-up' },
+    { name: 'Food & Nutrition',      slug: 'food-nutrition' },
   ];
 
   const targetNiche = niches[Math.floor(Math.random() * niches.length)];

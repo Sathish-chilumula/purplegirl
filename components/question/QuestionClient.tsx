@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Share, Sparkles } from 'lucide-react';
 import ShareModal from '../share/ShareModal';
 import MeTooButton from './MeTooButton';
+import { recordCategoryVisit, recordQuestionAsk } from '@/lib/sisterMemory';
 
 interface QuestionClientProps {
   questionId: string;
@@ -13,6 +14,7 @@ interface QuestionClientProps {
   bulletPoints: string[];
   summary: string;
   categoryName?: string;
+  categorySlug?: string;
   chatLog?: string[];
 }
 
@@ -24,9 +26,20 @@ export default function QuestionClient({
   bulletPoints, 
   summary,
   categoryName = 'PurpleGirl',
+  categorySlug,
   chatLog = []
 }: QuestionClientProps) {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+
+  useEffect(() => {
+    // Feed the Sister Memory so the platform learns what the user cares about
+    if (categorySlug) {
+      recordCategoryVisit(categorySlug);
+    }
+    if (questionSlug) {
+      recordQuestionAsk(questionSlug);
+    }
+  }, [categorySlug, questionSlug]);
 
   return (
     <>

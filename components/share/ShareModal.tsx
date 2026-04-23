@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { X, MessageCircle, Instagram, Copy, Check, Loader2, Download, Image as ImageIcon } from 'lucide-react';
+import { X, MessageCircle, Instagram, Copy, Check, Loader2, Download, Video } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { ShareImageGenerator, ShareTemplate } from './ShareImageGenerator';
+import ReelScriptGenerator from './ReelScriptGenerator';
 import { openWhatsApp, buildWhatsAppText } from '@/lib/whatsapp';
 
 interface ShareModalProps {
@@ -25,7 +26,7 @@ export default function ShareModal({
   chatLog = [],
   bulletPoints = [],
 }: ShareModalProps) {
-  const [activeTab, setActiveTab] = useState<'social' | 'instagram'>('social');
+  const [activeTab, setActiveTab] = useState<'social' | 'instagram' | 'reel'>('social');
   const [template, setTemplate] = useState<ShareTemplate>('gradient');
   const [copied, setCopied] = useState(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
@@ -79,7 +80,7 @@ export default function ShareModal({
       />
       
       {/* Modal */}
-      <div className="relative w-full max-w-lg bg-white rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="relative w-full max-w-2xl bg-white rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-purple-100">
           <h2 className="font-playfair font-bold text-2xl text-[#1F1235]">Share Answer 💜</h2>
@@ -107,7 +108,7 @@ export default function ShareModal({
           <div className="flex bg-purple-50/50 p-1 rounded-xl mb-6 border border-purple-100/50">
             <button
               onClick={() => setActiveTab('social')}
-              className={`flex-1 py-2.5 px-4 rounded-lg font-medium text-sm transition-all ${
+              className={`flex-1 py-2.5 px-3 rounded-lg font-medium text-sm transition-all ${
                 activeTab === 'social' 
                   ? 'bg-white text-purple-700 shadow-sm border border-purple-200/50' 
                   : 'text-gray-500 hover:text-purple-600'
@@ -117,7 +118,7 @@ export default function ShareModal({
             </button>
             <button
               onClick={() => setActiveTab('instagram')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-medium text-sm transition-all ${
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-lg font-medium text-sm transition-all ${
                 activeTab === 'instagram' 
                   ? 'bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F56040] text-white shadow-sm' 
                   : 'text-gray-500 hover:text-pink-600'
@@ -126,10 +127,21 @@ export default function ShareModal({
               <Instagram className="w-4 h-4" />
               Image Maker
             </button>
+            <button
+              onClick={() => setActiveTab('reel')}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-lg font-medium text-sm transition-all ${
+                activeTab === 'reel' 
+                  ? 'bg-[#1F1235] text-white shadow-sm border border-[#1F1235]' 
+                  : 'text-gray-500 hover:text-purple-600'
+              }`}
+            >
+              <Video className="w-4 h-4" />
+              Reel Script
+            </button>
           </div>
 
           {activeTab === 'social' && (
-            <div className="space-y-4">
+            <div className="space-y-4 max-w-lg mx-auto">
               <button 
                 onClick={handleWhatsApp}
                 className="w-full flex items-center justify-between p-4 rounded-2xl border border-[#25D366]/20 bg-[#25D366]/5 hover:bg-[#25D366]/10 transition-colors group"
@@ -163,7 +175,7 @@ export default function ShareModal({
           )}
 
           {activeTab === 'instagram' && (
-            <div className="space-y-6">
+            <div className="space-y-6 max-w-lg mx-auto">
               <div>
                 <label className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3 block">Choose Design</label>
                 <div className="grid grid-cols-2 gap-3">
@@ -198,6 +210,17 @@ export default function ShareModal({
               <p className="text-center text-xs text-gray-400">
                 Perfect 1080×1080 size for Instagram Posts
               </p>
+            </div>
+          )}
+
+          {activeTab === 'reel' && (
+            <div className="w-full">
+              <ReelScriptGenerator 
+                questionTitle={questionTitle}
+                categoryName={categoryName}
+                bulletPoints={bulletPoints}
+                chatLog={chatLog}
+              />
             </div>
           )}
         </div>

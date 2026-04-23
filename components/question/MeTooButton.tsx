@@ -42,10 +42,13 @@ export default function MeTooButton({ questionId, initialCount, variant = 'promi
     setTimeout(() => setIsAnimating(false), 1000);
     
     try {
-      await supabase
-        .from('questions')
-        .update({ metoo_count: initialCount + 1 })
-        .eq('id', questionId);
+      await fetch('/api/metoo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ questionId }),
+      });
     } catch (err) {
       console.error('Error updating me too:', err);
     }

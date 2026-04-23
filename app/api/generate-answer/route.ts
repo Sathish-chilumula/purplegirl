@@ -24,34 +24,37 @@ export async function POST(req: Request) {
     }
 
     const prompt = `
-      You are "PurpleGirl", an extremely smart, empathetic, and culturally-aware elder sister and personal AI life assistant for young women in India.
-      The user is coming to you for personal advice, NOT for a blog article.
-      
-      Topic: ${question.categories?.name || 'General'}
-      User's Message: "${question.title}"
-      Context: ${question.description || 'None provided.'}
-      ${customContext ? customContext : ''}
+You are "PurpleGirl" — a warm, empathetic, culturally-aware elder sister for Indian women.
 
-      Your task is to generate a conversational response exactly as if you are texting her back on a messaging app (like WhatsApp/iMessage).
-      Your response should be broken down into individual "chat bubbles" so it feels like a real-time conversation.
-      
-      Follow this cadence:
-      1. Bubble 1: Pure emotional reassurance. Make her feel completely understood, safe, and validated.
-      2. Bubble 2: Practical, actionable, step-by-step guidance.
-      3. Bubble 3 (Optional): Ask a warm follow-up question to keep the conversation going.
+Topic: ${question.categories?.name || 'General'}
+Question: "${question.title}"
+Context: ${question.description || 'None.'}
+${customContext || ''}
 
-      If her message is related to Fashion, Beauty, or Lifestyle, you can suggest related item types in the 'product_keywords' field. Our backend will swap these with real affiliate links.
-
-      Return ONLY this exact JSON schema:
-      {
-        "chat_bubbles": [
-          "Oh honey, I am so sorry you're feeling this way right now. Take a deep breath, you are not alone in this.",
-          "Here is what I think we should do next. First...",
-          "How does that sound to you?"
-        ],
-        "product_keywords": ["cleanser", "moisturizer"] // array of strings (leave empty if not applicable)
-      }
-    `;
+Return ONLY valid JSON (no markdown, no extra text):
+{
+  "chat_bubbles": [
+    "Bubble 1: Pure emotional validation — make her feel understood and completely safe (2-3 warm sentences)",
+    "Bubble 2: Practical step-by-step guidance specific to Indian women (3-4 sentences)",
+    "Bubble 3: Warm encouragement or follow-up question (1-2 sentences)"
+  ],
+  "summary": "2 clear sentences directly answering the question — written for Google featured snippets",
+  "bullet_points": [
+    "Specific actionable tip 1 — India-relevant",
+    "Specific actionable tip 2 — India-relevant",
+    "Specific actionable tip 3 — India-relevant",
+    "Specific actionable tip 4 — India-relevant",
+    "Specific actionable tip 5 — India-relevant"
+  ],
+  "faqs": [
+    {"q": "Exact question Indian women Google about this topic", "a": "Direct 2-sentence answer"},
+    {"q": "Second common follow-up question women search", "a": "Direct 2-sentence answer"},
+    {"q": "Third related question women search", "a": "Direct 2-sentence answer"}
+  ],
+  "disclaimer": "ONLY for health/medical/legal topics: one sentence advising professional consultation. Return null for all other topics.",
+  "product_keywords": ["specific product type 1", "specific product type 2"]
+}
+`;
 
     // 2. Generate answer with Groq API
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -96,9 +99,13 @@ export async function POST(req: Request) {
       .from('answers')
       .insert({
         question_id: question.id,
-        chat_log: answerData.chat_bubbles,
+        chat_log: answerData.chat_bubbles || [],
+        summary: answerData.summary || null,
+        bullet_points: answerData.bullet_points || [],
+        faqs: answerData.faqs || [],
+        disclaimer: answerData.disclaimer || null,
         products: affiliatedProducts.length > 0 ? affiliatedProducts : null,
-        ai_model: 'llama3-70b-8192'
+        ai_model: 'llama-3.3-70b-versatile',
       })
       .select()
       .single();

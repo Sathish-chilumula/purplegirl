@@ -1869,30 +1869,36 @@ New env vars needed:
   ANTHROPIC_API_KEY         — Skin Photo Analysis (Claude Vision)
 ```
 
-### Implementation Priority Order
+### Implementation Priority Order (Updated Roadmap)
 ```
-Phase A — SEO Critical (NOW):
-  1. Fix Category SSG (Gap 1)
-  2. Add generateStaticParams to /q/[slug] (Gap 2)
-  3. Add FAQPage schema markup (Gap 4)
-  4. Fix MeToo localStorage persistence
-  5. Full ShareModal with templates (Gap 5)
+LEGEND: ✅ Completed | 🔧 In Progress | ⬜ Pending
 
-Phase B — Differentiators (Month 2-3):
-  6. Emotion Intelligence Layer (Feature 1)
-  7. Whisper Mode (Feature 4)
-  8. Sister Memory (Feature 6)
-  9. Personalized Intake (Feature 9)
+✅ PHASE 1: CORE APP & AI NATIVE FEATURES (COMPLETED)
+  - Next.js App Router + Tailwind + Supabase Foundation
+  - OpenRouter AI Pipeline (chat logs, auto-categorization)
+  - SEO Foundations (Dynamic sitemaps, Edge rendering)
+  - Reel Script Generator
+  - Skin Photo Analysis (Vision AI)
+  - Emotion Theme & Intelligence Layer
+  - Smart Sister Memory & Personalized Intake
 
-Phase C — Engagement (Month 3-5):
-  10. Voice Sister Mode (Feature 2)
-  11. Skin Photo Analysis (Feature 3)
-  12. Reel Script Generator (Feature 7)
+⬜ PHASE 2: 4-WEEK ADVANCED ROADMAP (PENDING)
+  Week 1: Trust & Habit Loop (NEXT UP)
+  - ⬜ Community Validation (helpful yes/no on tips)
+  - ⬜ Mood Check-in Homepage (Dynamic recommendation)
+  - ⬜ Life Stage Mode (Student, Pregnant, Single, etc. mapping)
 
-Phase D — Community (Month 5+):
-  13. Sisterhood Circles (Feature 8)
-  14. Live Sisterhood Pulse (Feature 5)
-  15. Collective Intelligence Dashboard (Feature 10)
+  Week 2: Retention Engine
+  - ⬜ Didi Protocol (7-day automated follow-up via Resend + Cron)
+  - ⬜ Collective Intelligence Answers (AI answers enriched by DB metrics)
+
+  Week 3: Community & SEO
+  - ⬜ Silent Sisterhood Matching (Keyword-based related questions)
+  - ⬜ Before/After Anonymous Stories (Success stories board)
+
+  Week 4: Distribution
+  - ⬜ India Pulse Map (Interactive SVG frontend)
+  - ⬜ Voice Input (Web Speech API integration)
 ```
 
 ---
