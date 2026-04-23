@@ -36,7 +36,6 @@ IMPORTANT: Always use language like "appears to be" or "looks like". Never provi
       },
       body: JSON.stringify({
         model: 'llama-3.2-90b-vision-preview',
-        response_format: { type: 'json_object' },
         messages: [
           {
             role: 'user',
@@ -60,7 +59,9 @@ IMPORTANT: Always use language like "appears to be" or "looks like". Never provi
     
     if (!responseText) throw new Error('No response from AI');
     
-    const analysisData = JSON.parse(responseText);
+    // Clean up response text in case it has markdown code blocks
+    let cleanedText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+    const analysisData = JSON.parse(cleanedText);
 
     return NextResponse.json({ success: true, analysis: analysisData });
 

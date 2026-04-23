@@ -64,8 +64,7 @@ Return ONLY valid JSON (no markdown, no extra text):
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        response_format: { type: 'json_object' },
+        model: 'llama-3.1-70b-versatile',
         messages: [{ role: 'user', content: prompt }]
       })
     });
@@ -81,7 +80,9 @@ Return ONLY valid JSON (no markdown, no extra text):
     
     if (!responseText) throw new Error('No response from AI');
     
-    const answerData = JSON.parse(responseText);
+    // Clean up response text in case it has markdown code blocks
+    let cleanedText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+    const answerData = JSON.parse(cleanedText);
 
     // Mock API for Cuelinks/Affiliate links based on keywords
     let affiliatedProducts = [];
@@ -105,7 +106,7 @@ Return ONLY valid JSON (no markdown, no extra text):
         faqs: answerData.faqs || [],
         disclaimer: answerData.disclaimer || null,
         products: affiliatedProducts.length > 0 ? affiliatedProducts : null,
-        ai_model: 'llama-3.3-70b-versatile',
+        ai_model: 'llama-3.1-70b-versatile',
       })
       .select()
       .single();

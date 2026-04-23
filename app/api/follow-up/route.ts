@@ -41,19 +41,22 @@ export async function POST(req: Request) {
       User's new follow-up question: ${query}
 
       Previous Chat History:
-      ${history.map((h: any) => `${h.role === 'user' ? 'Girl' : 'You'}: ${h.content}`).join('\n')}
+      ${history?.map((h: any) => `${h.role === 'user' ? 'Girl' : 'You'}: ${h.content}`).join('\n') || 'None'}
 
       Respond directly to the girl's follow-up question in a warm, practical, brief, and conversational tone (maximum 3 short paragraphs). Do not use markdown headers, just plain text with occasional emojis. Keep the sisterly, supportive tone.
     `;
 
+    // Using @google/genai SDK syntax
     const result = await genAI.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: prompt,
+      model: 'gemini-1.5-flash',
+      contents: [{ role: 'user', parts: [{ text: prompt }] }]
     });
     
-    if (!result.text) throw new Error('No response from AI');
+    const text = (result as any).value?.content?.parts?.[0]?.text || (result as any).content?.parts?.[0]?.text || '';
+    
+    if (!text) throw new Error('No response from AI');
 
-    return NextResponse.json({ success: true, answer: result.text });
+    return NextResponse.json({ success: true, answer: text });
 
   } catch (error: any) {
     console.error('AI Follow-up error:', error);

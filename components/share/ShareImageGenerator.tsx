@@ -17,8 +17,8 @@ export const ShareImageGenerator = forwardRef<HTMLDivElement, ShareImageGenerato
       return (
         <div 
           ref={ref}
-          className="absolute w-[1080px] h-[1080px] bg-gradient-to-br from-[#FAF5FF] to-[#FDF2F8] p-16 flex flex-col justify-between overflow-hidden z-[-1]"
-          style={{ left: '-9999px', top: '-9999px', fontFamily: 'Inter, sans-serif' }}
+          className="fixed w-[1080px] h-[1080px] bg-gradient-to-br from-[#FAF5FF] to-[#FDF2F8] p-16 flex flex-col justify-between overflow-hidden"
+          style={{ left: '-2000px', top: '0', zIndex: -100, fontFamily: 'Inter, sans-serif' }}
         >
           <div className="flex justify-between items-start">
              <div className="text-[#7C3AED] font-bold text-3xl">💜 purplegirl.in</div>
@@ -54,8 +54,8 @@ export const ShareImageGenerator = forwardRef<HTMLDivElement, ShareImageGenerato
       return (
         <div 
           ref={ref}
-          className="absolute w-[1080px] h-[1080px] bg-[#110B1D] p-16 flex flex-col justify-between overflow-hidden z-[-1]"
-          style={{ left: '-9999px', top: '-9999px', fontFamily: 'Inter, sans-serif' }}
+          className="fixed w-[1080px] h-[1080px] bg-[#110B1D] p-16 flex flex-col justify-between overflow-hidden"
+          style={{ left: '-2000px', top: '0', zIndex: -100, fontFamily: 'Inter, sans-serif' }}
         >
           <div className="absolute top-[-200px] right-[-200px] w-[600px] h-[600px] bg-[#7C3AED] rounded-full blur-[150px] opacity-30" />
           <div className="absolute bottom-[-100px] left-[-100px] w-[400px] h-[400px] bg-[#EC4899] rounded-full blur-[120px] opacity-20" />
@@ -94,8 +94,8 @@ export const ShareImageGenerator = forwardRef<HTMLDivElement, ShareImageGenerato
       return (
         <div 
           ref={ref}
-          className="absolute w-[1080px] h-[1080px] bg-[#F9FAFB] p-16 flex flex-col justify-center items-center text-center overflow-hidden z-[-1]"
-          style={{ left: '-9999px', top: '-9999px', fontFamily: 'Inter, sans-serif' }}
+          className="fixed w-[1080px] h-[1080px] bg-[#F9FAFB] p-16 flex flex-col justify-center items-center text-center overflow-hidden"
+          style={{ left: '-2000px', top: '0', zIndex: -100, fontFamily: 'Inter, sans-serif' }}
         >
           <div className="text-[#EC4899] font-bold text-4xl mb-12">purplegirl.in</div>
           <div className="bg-white shadow-2xl shadow-purple-100/50 rounded-[3rem] p-16 border border-gray-100 w-full max-w-4xl">
@@ -118,8 +118,8 @@ export const ShareImageGenerator = forwardRef<HTMLDivElement, ShareImageGenerato
     return (
       <div 
         ref={ref}
-        className="absolute w-[1080px] h-[1080px] bg-[#7C3AED] p-20 flex flex-col justify-center overflow-hidden z-[-1]"
-        style={{ left: '-9999px', top: '-9999px', fontFamily: 'Inter, sans-serif' }}
+        className="fixed w-[1080px] h-[1080px] bg-[#7C3AED] p-20 flex flex-col justify-center overflow-hidden"
+        style={{ left: '-2000px', top: '0', zIndex: -100, fontFamily: 'Inter, sans-serif' }}
       >
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent" />
         <div className="relative z-10">
