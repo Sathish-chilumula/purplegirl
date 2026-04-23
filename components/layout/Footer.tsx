@@ -34,8 +34,21 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-4 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8">
             <div className="md:col-span-2 space-y-6">
-              <Link href="/" className="flex items-center gap-2 group transition-transform duration-300 hover:scale-[1.02] -ml-1">
-                <span className="text-3xl filter drop-shadow-sm group-hover:drop-shadow-md transition-all">💜</span>
+              <Link href="/" className="flex items-center gap-3 group transition-transform duration-300 hover:scale-[1.02] -ml-1">
+                {/* Beautifully Designed Heart Symbol */}
+                <div className="relative flex items-center justify-center scale-90 md:scale-100">
+                  <div className="absolute inset-0 bg-purple-400/20 blur-xl rounded-full scale-150 animate-glow-pulse" />
+                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="relative z-10 filter drop-shadow-sm group-hover:scale-110 transition-transform">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="url(#footer-logo-gradient)" />
+                    <defs>
+                      <linearGradient id="footer-logo-gradient" x1="2" y1="3" x2="22" y2="21.35" gradientUnits="userSpaceOnUse">
+                        <stop stopColor="#7C3AED" />
+                        <stop offset="1" stopColor="#EC4899" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                </div>
+
                 <div className="flex flex-col -gap-1">
                   <span className="text-2xl md:text-3xl font-black tracking-tighter bg-gradient-to-r from-[#7C3AED] via-[#A855F7] to-[#EC4899] bg-clip-text text-transparent font-serif leading-tight">
                     PurpleGirl
