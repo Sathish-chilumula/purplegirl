@@ -1,6 +1,5 @@
 import { MetadataRoute } from 'next';
 import { supabaseAdmin } from '@/lib/supabase-admin';
-import { FOLIOS } from '@/lib/folios';
 import { SITE_URL } from '@/lib/constants';
 
 export const runtime = 'edge';
@@ -23,9 +22,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: route === '' ? 1 : 0.8,
   }));
 
-  // 2. Volume routes (from FOLIOS)
-  const volumeRoutes = FOLIOS.map((folio) => ({
-    url: `${baseUrl}/volumes/${folio.id}`,
+  // 2. Fetch all categories
+  const { data: categories } = await supabaseAdmin
+    .from('categories')
+    .select('slug');
+
+  const categoryRoutes = (categories || []).map((cat) => ({
+    url: `${baseUrl}/category/${cat.slug}`,
     lastModified: formatDate(new Date()),
     changeFrequency: 'weekly' as const,
     priority: 0.9,
@@ -37,57 +40,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .select('id, slug, updated_at')
     .in('status', ['approved', 'published']);
 
-  const questionIds = (questions || []).map((q) => q.id).filter(Boolean);
+  const questionRoutes = (questions || []).map((q) => ({
+    url: `${baseUrl}/q/${q.slug}`,
+    lastModified: formatDate(new Date(q.updated_at || Date.now())),
+    changeFrequency: 'weekly' as const,
+    priority: 0.9,
+  }));
 
-  // 4. Fetch translation availability
-  let translationMap = new Map<string, { hasHindi: boolean; hasTelugu: boolean }>();
-  if (questionIds.length > 0) {
-    const { data: answers } = await supabaseAdmin
-      .from('answers')
-      .select('question_id, chat_log_hi, chat_log_te')
-      .in('question_id', questionIds);
-
-    for (const a of answers || []) {
-      if (a.question_id) {
-        translationMap.set(a.question_id, {
-          hasHindi: Array.isArray(a.chat_log_hi) && (a.chat_log_hi as any[]).length > 0,
-          hasTelugu: Array.isArray(a.chat_log_te) && (a.chat_log_te as any[]).length > 0,
-        });
-      }
-    }
-  }
-
-  // 5. Build question routes
-  const questionRoutes: MetadataRoute.Sitemap = [];
-  for (const q of questions || []) {
-    const lastMod = formatDate(new Date(q.updated_at || Date.now()));
-    const trans = translationMap.get(q.id);
-
-    questionRoutes.push({
-      url: `${baseUrl}/q/${q.slug}`,
-      lastModified: lastMod,
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    });
-
-    if (trans?.hasHindi) {
-      questionRoutes.push({
-        url: `${baseUrl}/q/${q.slug}/hindi`,
-        lastModified: lastMod,
-        changeFrequency: 'weekly',
-        priority: 0.85,
-      });
-    }
-
-    if (trans?.hasTelugu) {
-      questionRoutes.push({
-        url: `${baseUrl}/q/${q.slug}/telugu`,
-        lastModified: lastMod,
-        changeFrequency: 'weekly',
-        priority: 0.85,
-      });
-    }
-  }
-
-  return [...staticRoutes, ...volumeRoutes, ...questionRoutes];
+  return [...staticRoutes, ...categoryRoutes, ...questionRoutes];
 }

@@ -1,136 +1,111 @@
-'use client';
-
-import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { ArrowRight, Sparkles, Shield, Zap, TrendingUp } from 'lucide-react';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 import { PageBackground } from '@/components/PageBackground';
-import { IlluminatedDropCap } from '@/components/IlluminatedDropCap';
-import { OrnDivider } from '@/components/OrnDivider';
-import { AskBox } from '@/components/AskBox';
-import { FolioCard } from '@/components/FolioCard';
-import { FOLIOS } from '@/lib/folios';
-import { DustMotes } from '@/components/DustMotes';
-import { supabase } from '@/lib/supabase';
-import { Question } from '@/lib/types';
-import { AnswerCard } from '@/components/AnswerCard';
+import { CategoryCard } from '@/components/CategoryCard';
 
-export default function Home() {
-  const [liveQuestion, setLiveQuestion] = useState<Question | null>(null);
+export const runtime = 'edge';
 
-  useEffect(() => {
-    // Fetch one recent question to show the live answer card format
-    async function fetchRecent() {
-      const { data } = await supabase
-        .from('questions')
-        .select('*')
-        .eq('status', 'approved')
-        .not('chat_log', 'is', null)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
-      
-      if (data) {
-        setLiveQuestion(data as Question);
-      }
-    }
-    fetchRecent();
-  }, []);
+async function getInitialData() {
+  const [categoriesRes, recentRes] = await Promise.all([
+    supabaseAdmin.from('categories').select('*').order('name'),
+    supabaseAdmin.from('questions').select('slug, title').eq('status', 'approved').order('created_at', { ascending: false }).limit(10)
+  ]);
+
+  return {
+    categories: categoriesRes.data || [],
+    recentQuestions: recentRes.data || []
+  };
+}
+
+export default async function Home() {
+  const { categories, recentQuestions } = await getInitialData();
 
   return (
-    <div className="app relative overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden">
       <PageBackground />
-      <DustMotes />
-
-      {/* ── 1. HERO SECTION ───────────────────────────── */}
-      <section className="relative min-h-[85vh] flex flex-col items-center justify-center text-center px-6 pt-20 pb-12 z-10" id="whisper">
-        <IlluminatedDropCap letter="Q" className="-left-4 top-1/4" />
-        
-        <div className="type-eyebrow mb-6 animate-slide-up stagger-1">
-          ✦ SPEAK FREELY · NO NAME · NO TRACE ✦
+      
+      {/* 1. HERO SECTION — High Impact & Provocative */}
+      <section className="relative pt-20 pb-32 px-6 md:px-12 flex flex-col items-center text-center">
+        <div className="inline-flex items-center gap-2 bg-purple-50 text-purple-700 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest mb-8 animate-slide-up">
+          <Zap size={14} className="fill-purple-700" /> 100% Anonymous Insider Advice
         </div>
         
-        <h1 className="type-h1 mb-6 animate-slide-up stagger-2 max-w-4xl mx-auto flex flex-col items-center gap-2">
-          <span>Ask the</span>
-          <span className="text-pg-crimson-600">Eternal Cipher</span>
-          <span className="font-im-fell font-normal text-pg-parch-400">of the Sisterhood</span>
+        <h1 className="font-syne text-5xl md:text-8xl font-extrabold text-slate-900 tracking-tighter mb-8 leading-[0.9] animate-slide-up stagger-1">
+          The Secrets Your <br />
+          <span className="text-gradient">Mother Never Told You.</span>
         </h1>
-
-        <div className="type-lead max-w-2xl mx-auto mb-12 animate-slide-up stagger-3">
-          The question your family told you to forget is the one that needs answering. 
-          Step into the shadows of the vault—anonymous, untraceable, understood.
-        </div>
-
-        <OrnDivider variant="both" className="mb-12" />
-
-        <div className="w-full relative z-20">
-          <AskBox />
-        </div>
-
-        {liveQuestion && (
-          <div className="mt-20 w-full animate-slide-up stagger-3">
-            <div className="type-eyebrow mb-4 opacity-50">Recently Deciphered</div>
-            <AnswerCard question={liveQuestion} folio={FOLIOS[0]} />
-          </div>
-        )}
-      </section>
-
-      {/* ── 2. HOW IT WORKS ───────────────────────────── */}
-      <section className="section-alt py-24 relative border-y border-pg-parch-200 z-10" id="cipher">
-        <IlluminatedDropCap letter="T" variant="gold" className="-right-8 top-12" />
         
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <div className="type-eyebrow mb-3">The Ritual</div>
-            <h2 className="type-h2">How the Cipher Protects You</h2>
-          </div>
+        <p className="max-w-2xl text-lg md:text-xl text-slate-600 mb-12 leading-relaxed animate-slide-up stagger-2">
+          No judgment. No filters. Just the blunt truth about bodies, beauty, and the things girls are afraid to ask. Join the elite circle of insiders today.
+        </p>
 
-          <div className="grid md:grid-cols-3 gap-8 md:gap-12">
-            {[
-              { num: 'I', title: 'The Whisper', desc: 'You ask without a name. We do not ask for a login. We do not track your stars.' },
-              { num: 'II', title: 'The Illumination', desc: 'Our Oracle reads the history of the Sisterhood, pulling truth from thousands of anonymous voices.' },
-              { num: 'III', title: 'The Dispersal', desc: 'The answer is given, and the cipher is burned. No trace of your whisper remains.' }
-            ].map((step, i) => (
-              <div key={step.num} className="surface-card p-8 text-center flex flex-col items-center relative overflow-hidden group parchment-unfurl" style={{ animationDelay: `${i * 0.2}s` }}>
-                <div className="text-4xl font-cinzel text-pg-parch-200 font-black mb-4 group-hover:text-pg-gold-300 transition-colors duration-500">{step.num}</div>
-                <h3 className="type-h3 mb-4">{step.title}</h3>
-                <p className="type-body text-pg-ink-600">{step.desc}</p>
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-pg-crimson-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
-              </div>
-            ))}
-          </div>
+        <div className="flex flex-col sm:flex-row gap-4 animate-slide-up stagger-3">
+          <Link href="/ask" className="btn-premium px-10 py-5 text-lg flex items-center gap-2 group">
+            Ask A Taboo Question <ArrowRight className="group-hover:translate-x-2 transition-transform" />
+          </Link>
+          <Link href="#categories" className="px-10 py-5 text-lg font-bold text-slate-900 hover:text-purple-600 transition-colors">
+            Browse The Vault
+          </Link>
         </div>
       </section>
 
-      {/* ── 3. FOLIO GALLERY ──────────────────────────── */}
-      <section className="py-24 relative z-10" id="volumes">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <OrnDivider variant="simple" className="mb-6" />
-            <div className="type-eyebrow mb-3">The Library of Shadows</div>
-            <h2 className="type-h2 mb-4">Browse the Four Volumes</h2>
-            <p className="type-lead max-w-2xl mx-auto text-base">
-              Systematic knowledge distilled from the anonymous whispers of the women who came before you.
-            </p>
-          </div>
+      {/* 2. TRENDING TICKER — Social Proof */}
+      <div className="ticker-wrap mb-24">
+        <div className="ticker-move">
+          {[...recentQuestions, ...recentQuestions].map((q, i) => (
+            <Link 
+              key={i} 
+              href={`/q/${q.slug}`}
+              className="flex items-center gap-4 px-8 text-sm font-bold text-slate-500 hover:text-purple-600 transition-colors uppercase tracking-widest border-r border-slate-200"
+            >
+              <TrendingUp size={16} /> {q.title}
+            </Link>
+          ))}
+        </div>
+      </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {FOLIOS.map((folio, i) => (
-              <FolioCard key={folio.id} folio={folio} staggerDelay={i * 0.15} />
-            ))}
+      {/* 3. CATEGORY GRID — The Vault */}
+      <section id="categories" className="px-6 md:px-12 pb-40">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+          <div>
+            <h2 className="text-4xl md:text-5xl text-slate-900 mb-4">Choose Your <span className="text-gradient italic">Obsession.</span></h2>
+            <p className="text-slate-500 max-w-lg">Everything you need to level up, from skincare secrets to relationship reality checks.</p>
           </div>
+          <div className="flex items-center gap-2 text-sm font-bold text-purple-600 uppercase tracking-widest">
+            <Sparkles size={18} /> 12 Categories Unlocked
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          {categories.map((cat, i) => (
+            <CategoryCard 
+              key={cat.id} 
+              category={cat} 
+              staggerDelay={i * 0.1}
+            />
+          ))}
         </div>
       </section>
 
-      {/* ── 4. CTA ────────────────────────────────────── */}
-      <section className="relative py-32 bg-pg-crimson-600 border-t-4 border-pg-gold-500 z-10 overflow-hidden" id="sisterhood">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'400\\' height=\\'400\\'%3E%3Cfilter id=\\'n\\'%3E%3CfeTurbulence type=\\'fractalNoise\\' baseFrequency=\\'0.8\\' numOctaves=\\'5\\' stitchTiles=\\'stitch\\'/%3E%3C/filter%3E%3Crect width=\\'400\\' height=\\'400\\' filter=\\'url(%23n)\\' opacity=\\'0.15\\'/%3E%3C/svg%3E')] mix-blend-multiply opacity-50" />
-        
-        <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-          <div className="font-unifraktur text-6xl text-pg-gold-500 mb-6 opacity-80">A</div>
-          <h2 className="font-cinzel text-3xl md:text-5xl font-bold text-white mb-8 leading-tight drop-shadow-md">
-            Ask the question that <br /> has no other home.
-          </h2>
-          <button onClick={() => document.getElementById('whisper')?.scrollIntoView({ behavior: 'smooth' })} className="bg-pg-gold-500 hover:bg-pg-gold-400 text-pg-ink-900 font-cinzel text-sm font-bold tracking-[0.2em] uppercase px-10 py-4 shadow-xl transition-transform hover:-translate-y-1">
-            OPEN THE CIPHER
-          </button>
+      {/* 4. TRUST STRIP */}
+      <section className="bg-slate-900 py-20 px-6 md:px-12 text-center text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-tr from-purple-900/40 to-transparent z-0" />
+        <div className="relative z-10 max-w-4xl mx-auto">
+          <div className="flex justify-center mb-8">
+            <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-md">
+              <Shield size={32} className="text-purple-400" />
+            </div>
+          </div>
+          <h2 className="text-3xl md:text-5xl mb-6">Encrypted. Anonymous. <span className="text-purple-400">Safe.</span></h2>
+          <p className="text-slate-400 text-lg mb-12 leading-relaxed">
+            Your identity is never stored. Your questions are processed by a private AI engine trained on sisterly wisdom and 100% honesty. Speak freely.
+          </p>
+          <div className="flex flex-wrap justify-center gap-12 text-slate-500 font-bold uppercase tracking-[0.3em] text-[10px]">
+             <span>No Logs</span>
+             <span>No Tracking</span>
+             <span>No Judgment</span>
+          </div>
         </div>
       </section>
     </div>

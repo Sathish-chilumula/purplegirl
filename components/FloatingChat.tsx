@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageSquare, X, Send } from 'lucide-react';
+import { Heart, X, Send, Sparkles } from 'lucide-react';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -11,7 +11,7 @@ interface Message {
 export function FloatingChat() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'Speak, sister. The cipher is open.' }
+    { role: 'assistant', content: "Hey girl! I'm your digital big sister. No topic is too taboo here. What's on your mind? 💖" }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -48,7 +48,7 @@ export function FloatingChat() {
       const data = await res.json();
       setMessages(prev => [...prev, data.message]);
     } catch (error) {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'The connection has faded. Try again.' }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: "The connection dropped, girl. Try again!" }]);
     } finally {
       setIsLoading(false);
     }
@@ -56,43 +56,47 @@ export function FloatingChat() {
 
   return (
     <>
-      {/* Floating Action Button */}
+      {/* Heart FAB */}
       <button
         onClick={() => setIsOpen(true)}
-        className={`fixed bottom-6 right-6 z-50 p-4 rounded-full bg-pg-violet-700 text-pg-gold-300 shadow-lg hover:bg-pg-violet-600 hover:scale-110 transition-all duration-300 ${isOpen ? 'scale-0 opacity-0 pointer-events-none' : 'scale-100 opacity-100'}`}
-        aria-label="Open Oracle Chat"
+        className={`fixed bottom-8 right-8 z-50 w-16 h-16 flex items-center justify-center rounded-full shadow-2xl transition-all duration-500 hover:scale-110 active:scale-95 heart-glow ${isOpen ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}`}
+        style={{ background: 'var(--grad-heart)', backgroundSize: '400% 400%' }}
       >
-        <MessageSquare size={24} />
+        <Heart size={30} className="text-white fill-white" />
       </button>
 
-      {/* Chat Window */}
+      {/* Modern Chat Window */}
       <div 
-        className={`fixed bottom-6 right-6 z-50 w-[350px] sm:w-[400px] max-w-[calc(100vw-3rem)] bg-pg-parch-50 border-2 border-pg-violet-800/30 shadow-[0_20px_40px_rgba(90,48,160,0.25)] rounded-t-xl rounded-bl-xl overflow-hidden flex flex-col transition-all duration-500 origin-bottom-right ${isOpen ? 'scale-100 opacity-100' : 'scale-0 opacity-0 pointer-events-none'}`}
-        style={{ height: '500px', maxHeight: 'calc(100vh - 6rem)' }}
+        className={`fixed bottom-8 right-8 z-50 w-[380px] max-w-[calc(100vw-4rem)] h-[550px] max-h-[calc(100vh-8rem)] bg-white rounded-3xl shadow-[0_20px_50px_rgba(76,29,149,0.3)] border border-slate-100 flex flex-col transition-all duration-500 origin-bottom-right ${isOpen ? 'scale-100 opacity-100 translate-y-0' : 'scale-0 opacity-0 translate-y-10 pointer-events-none'}`}
       >
         {/* Header */}
-        <div className="bg-pg-violet-900 text-pg-gold-300 p-4 flex justify-between items-center border-b border-pg-violet-700">
-          <div>
-            <h3 className="font-cinzel font-bold tracking-widest text-sm">The Oracle</h3>
-            <p className="text-[10px] uppercase tracking-widest opacity-70">Awaiting your whisper</p>
+        <div className="p-5 border-b border-slate-50 flex justify-between items-center bg-gradient-to-r from-purple-600 to-pink-500 rounded-t-3xl text-white">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-md">
+              <Sparkles size={20} />
+            </div>
+            <div>
+              <h3 className="font-syne font-bold text-lg leading-tight">PurpleGirl Chat</h3>
+              <p className="text-[10px] uppercase tracking-widest opacity-80 font-bold">Safe • Anonymous • Real</p>
+            </div>
           </div>
           <button 
             onClick={() => setIsOpen(false)}
-            className="text-pg-gold-300 hover:text-white transition-colors"
+            className="p-2 hover:bg-white/20 rounded-full transition-colors"
           >
             <X size={20} />
           </button>
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[url('/images/bg-parchment.png')] bg-cover bg-center" style={{ backgroundColor: 'rgba(253, 250, 243, 0.9)', backgroundBlendMode: 'overlay' }}>
+        <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-slate-50/50">
           {messages.map((msg, idx) => (
             <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div 
-                className={`max-w-[80%] p-3 rounded-md shadow-sm ${
+                className={`max-w-[85%] p-4 rounded-2xl text-sm shadow-sm ${
                   msg.role === 'user' 
-                    ? 'bg-pg-ink-800 text-pg-parch-100 rounded-tr-none' 
-                    : 'bg-pg-parch-100 border border-pg-parch-300 text-pg-ink-900 rounded-tl-none font-im-fell text-[17px] leading-relaxed'
+                    ? 'bg-purple-600 text-white rounded-tr-none' 
+                    : 'bg-white border border-slate-100 text-slate-800 rounded-tl-none leading-relaxed font-medium'
                 }`}
               >
                 {msg.content}
@@ -101,8 +105,13 @@ export function FloatingChat() {
           ))}
           {isLoading && (
             <div className="flex justify-start">
-              <div className="bg-pg-parch-100 border border-pg-parch-300 text-pg-violet-700 p-3 rounded-md rounded-tl-none font-im-fell text-[17px] italic animate-pulse">
-                Consulting the codex...
+              <div className="bg-white border border-slate-100 text-purple-600 p-4 rounded-2xl rounded-tl-none text-sm italic font-bold flex gap-2 items-center">
+                <div className="flex gap-1">
+                  <span className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce" />
+                  <span className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-bounce [animation-delay:0.2s]" />
+                  <span className="w-1.5 h-1.5 bg-purple-600 rounded-full animate-bounce [animation-delay:0.4s]" />
+                </div>
+                Typing secrets...
               </div>
             </div>
           )}
@@ -110,19 +119,19 @@ export function FloatingChat() {
         </div>
 
         {/* Input */}
-        <form onSubmit={handleSubmit} className="p-3 bg-pg-parch-100 border-t border-pg-parch-300 flex gap-2">
+        <form onSubmit={handleSubmit} className="p-4 bg-white border-t border-slate-50 flex gap-2 items-center rounded-b-3xl">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask the Sisterhood..."
-            className="flex-1 bg-white border border-pg-parch-300 rounded px-3 py-2 text-pg-ink-900 placeholder:text-pg-ink-400 focus:outline-none focus:border-pg-violet-500 font-im-fell"
+            placeholder="Tell me anything, girl..."
+            className="flex-1 bg-slate-100 border-none rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-purple-500 transition-all outline-none"
             disabled={isLoading}
           />
           <button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className="bg-pg-violet-800 text-pg-gold-300 p-2 rounded hover:bg-pg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center w-10"
+            className="bg-purple-600 text-white p-3 rounded-2xl hover:bg-purple-700 disabled:opacity-50 disabled:scale-90 transition-all flex items-center justify-center shadow-lg shadow-purple-200"
           >
             <Send size={18} />
           </button>

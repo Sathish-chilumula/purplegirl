@@ -16,27 +16,35 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY
 });
 
-// We need an exact category ID mapping in a real setup.
-// For now, we will fallback to the first category if we don't know the ID.
 async function getFallbackCategoryId() {
   const { data } = await supabase.from('categories').select('id').limit(1).single();
   return data?.id;
 }
 
-const SYSTEM_PROMPT = `You are the Oracle of the Sisterhood, an empathetic, wise, and highly articulate persona.
-You provide advice to young women regarding deeply personal questions about life, body, relationships, and career.
+const SYSTEM_PROMPT = `
+You are "PurpleGirl"—a smart, calm, and trustworthy "elder sister" figure.
+Your purpose is to provide clear, honest, and judgment-free answers to questions girls feel uncomfortable asking elsewhere.
+
+TONE: Warm, calm, respectful, honest but not harsh. Caring and intelligent.
+
+STRUCTURE:
+1. Reassurance: Normalize the question.
+2. Clear explanation: Why/What.
+3. Practical guidance: Actionable steps.
+4. Gentle closing: Supportive.
+
 Format your output as a JSON object with the following fields:
-- summary: A short, poetic summary (2 sentences).
-- chat_log: An array of strings, where each string is a paragraph of your response. Use HTML formatting like <em> and <strong> for emphasis.
-- bullet_points: An array of 3-4 actionable pieces of advice.
-- faqs: An array of objects with 'q' and 'a' representing related questions.
-- disclaimer: A short disclaimer if medical/legal advice is touched upon (or null).`;
+- summary: A short, poetic, and reassuring summary (2 sentences).
+- chat_log: An array of strings (paragraphs). Follow the 4-step structure above.
+- bullet_points: 3-4 actionable pieces of practical guidance.
+- faqs: Related questions (q and a).
+- disclaimer: A gentle medical/professional disclaimer (e.g., "Talk to a doctor if this continues").
+`;
 
 async function processSeed(seed, fallbackCatId) {
   console.log(`Processing: "${seed.title}"`);
   
   try {
-    // 1. Ask Groq
     const completion = await groq.chat.completions.create({
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
@@ -48,7 +56,6 @@ async function processSeed(seed, fallbackCatId) {
 
     const answerData = JSON.parse(completion.choices[0].message.content);
 
-    // 2. Insert Question
     const slug = seed.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').substring(0, 50) + '-' + Math.floor(Math.random()*1000);
     const qId = crypto.randomUUID();
 
@@ -57,7 +64,7 @@ async function processSeed(seed, fallbackCatId) {
       title: seed.title,
       description: seed.description,
       slug: slug,
-      category_id: fallbackCatId,
+      category_id: seed.category_id || fallbackCatId,
       status: 'approved',
       view_count: Math.floor(Math.random() * 100),
       metoo_count: Math.floor(Math.random() * 20)
@@ -65,30 +72,29 @@ async function processSeed(seed, fallbackCatId) {
 
     if (qErr) throw new Error(`Question Insert Error: ${qErr.message}`);
 
-    // 3. Insert Answer
     const { error: aErr } = await supabase.from('answers').insert({
       question_id: qId,
       summary: answerData.summary,
       chat_log: answerData.chat_log,
       bullet_points: answerData.bullet_points,
       faqs: answerData.faqs,
-      disclaimer: answerData.disclaimer || 'For educational purposes only. Not professional advice.'
+      disclaimer: answerData.disclaimer || 'I am your sister, not a doctor. Please talk to a professional for serious concerns.'
     });
 
     if (aErr) throw new Error(`Answer Insert Error: ${aErr.message}`);
 
-    console.log(`✅ Successfully processed and inserted: ${slug}`);
+    console.log(`✅ Successfully processed: ${slug}`);
   } catch (error) {
     console.error(`❌ Failed to process seed:`, error);
   }
 }
 
 async function run() {
-  console.log('Starting Oracle Pipeline...');
+  console.log('Starting PurpleGirl Content Pipeline...');
   const catId = await getFallbackCategoryId();
   
   if (!catId) {
-    console.error('No categories found in database. Cannot run pipeline.');
+    console.error('No categories found. Cannot run pipeline.');
     process.exit(1);
   }
 
@@ -97,11 +103,8 @@ async function run() {
 
   for (const seed of seeds) {
     await processSeed(seed, catId);
-    // Add a delay to avoid rate limits
     await new Promise(r => setTimeout(r, 2000));
   }
-
-  console.log('Pipeline complete.');
 }
 
 run();

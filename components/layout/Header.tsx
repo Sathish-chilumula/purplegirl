@@ -1,27 +1,35 @@
 'use client';
 
 import Link from 'next/link';
+import { Search, User, Menu } from 'lucide-react';
 
 export default function Header() {
   return (
-    <header className="sticky top-0 z-50 px-6 md:px-9 h-[60px] flex items-center justify-between bg-pg-parch-50/90 backdrop-blur-md border-b border-pg-crimson-600/10">
-      {/* Top ornamental line (part of the header) */}
-      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-pg-crimson-600 to-transparent opacity-70" />
-
-      <Link href="/" className="flex items-center gap-3 font-cinzel text-lg font-black tracking-[0.25em] text-pg-ink-900 uppercase">
-        <div className="w-2.5 h-2.5 rounded-full bg-pg-crimson-600 seal-pulse" />
-        PURPLEGIRL
+    <header className="sticky top-0 z-50 w-full h-20 flex items-center justify-between px-6 md:px-12 bg-white/70 backdrop-blur-xl border-b border-slate-100">
+      <Link href="/" className="flex items-center gap-2 group">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center text-white shadow-lg group-hover:rotate-12 transition-transform duration-500">
+          <span className="font-syne font-bold text-xl">P</span>
+        </div>
+        <span className="font-syne font-extrabold text-2xl tracking-tighter text-slate-900">
+          PurpleGirl<span className="text-purple-600">.</span>
+        </span>
       </Link>
       
-      <nav className="hidden md:flex gap-8 font-cinzel text-[10px] tracking-[0.25em] text-pg-ink-600 font-semibold items-center">
-        <Link href="#whisper" className="hover:text-pg-crimson-600 underline-draw pb-1">WHISPER</Link>
-        <Link href="#volumes" className="hover:text-pg-crimson-600 underline-draw pb-1">VOLUMES</Link>
-        <Link href="#cipher" className="hover:text-pg-crimson-600 underline-draw pb-1">THE CIPHER</Link>
-        <Link href="#sisterhood" className="hover:text-pg-crimson-600 underline-draw pb-1">SISTERHOOD</Link>
-        <div className="ml-4 font-cinzel text-[9px] tracking-widest text-pg-crimson-600 border border-pg-crimson-600/30 bg-pg-crimson-600/5 px-3 py-1.5 rounded-[1px]">
-          ARCHIVE
-        </div>
+      <nav className="hidden md:flex items-center gap-10">
+        <Link href="/category/beauty-skincare" className="text-sm font-semibold text-slate-600 hover:text-purple-600 transition-colors">Beauty</Link>
+        <Link href="/category/fashion-style" className="text-sm font-semibold text-slate-600 hover:text-purple-600 transition-colors">Fashion</Link>
+        <Link href="/category/relationships-love" className="text-sm font-semibold text-slate-600 hover:text-purple-600 transition-colors">Love</Link>
+        <Link href="/ask" className="btn-premium py-2 px-6 text-sm">Ask Anything</Link>
       </nav>
+
+      <div className="flex items-center gap-4">
+        <button className="p-2 text-slate-500 hover:text-purple-600 transition-colors hidden sm:block">
+          <Search size={20} />
+        </button>
+        <button className="md:hidden p-2 text-slate-900">
+          <Menu size={24} />
+        </button>
+      </div>
     </header>
   );
 }
