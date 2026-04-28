@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Heart, X, Send, Sparkles } from 'lucide-react';
+import { X, Send, Sparkles } from 'lucide-react';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -11,18 +11,17 @@ interface Message {
 export function FloatingChat() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: "Hey girl! I'm your digital big sister. No topic is too taboo here. What's on your mind? 💖" }
+    {
+      role: 'assistant',
+      content: "Hey girl 💜 I'm PurpleGirl — your anonymous big sister. No topic is too uncomfortable. What's on your mind?",
+    },
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   useEffect(() => {
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,17 +37,15 @@ export function FloatingChat() {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: [...messages, { role: 'user', content: userMessage }]
-        }),
+        body: JSON.stringify({ messages: [...messages, { role: 'user', content: userMessage }] }),
       });
-
-      if (!res.ok) throw new Error('Failed to fetch');
-      
       const data = await res.json();
       setMessages(prev => [...prev, data.message]);
-    } catch (error) {
-      setMessages(prev => [...prev, { role: 'assistant', content: "The connection dropped, girl. Try again!" }]);
+    } catch {
+      setMessages(prev => [
+        ...prev,
+        { role: 'assistant', content: "I lost connection for a moment. Can you say that again?" },
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -56,87 +53,241 @@ export function FloatingChat() {
 
   return (
     <>
-      {/* Heart FAB */}
+      {/* ── FAB — Multicolour Spinning Heart ─────────────── */}
       <button
         onClick={() => setIsOpen(true)}
-        className={`fixed bottom-8 right-8 z-50 w-16 h-16 flex items-center justify-center rounded-full shadow-2xl transition-all duration-500 hover:scale-110 active:scale-95 heart-glow ${isOpen ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}`}
-        style={{ background: 'var(--grad-heart)', backgroundSize: '400% 400%' }}
+        aria-label="Open PurpleGirl Chat"
+        style={{
+          position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 60,
+          width: '64px', height: '64px',
+          borderRadius: '50%',
+          background: 'white',
+          border: 'none',
+          cursor: 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          opacity: isOpen ? 0 : 1,
+          transform: isOpen ? 'scale(0)' : 'scale(1)',
+          pointerEvents: isOpen ? 'none' : 'auto',
+        }}
+        className="heart-fab"
       >
-        <Heart size={30} className="text-white fill-white" />
+        {/* Heart SVG (coloured with gradient fill) */}
+        <svg viewBox="0 0 24 24" width="30" height="30" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="heart-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#ec4899" />
+              <stop offset="50%" stopColor="#7c3aed" />
+              <stop offset="100%" stopColor="#06b6d4" />
+            </linearGradient>
+          </defs>
+          <path
+            fill="url(#heart-grad)"
+            d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"
+          />
+        </svg>
       </button>
 
-      {/* Modern Chat Window */}
-      <div 
-        className={`fixed bottom-8 right-8 z-50 w-[380px] max-w-[calc(100vw-4rem)] h-[550px] max-h-[calc(100vh-8rem)] bg-white rounded-3xl shadow-[0_20px_50px_rgba(76,29,149,0.3)] border border-slate-100 flex flex-col transition-all duration-500 origin-bottom-right ${isOpen ? 'scale-100 opacity-100 translate-y-0' : 'scale-0 opacity-0 translate-y-10 pointer-events-none'}`}
+      {/* ── Chat Window ────────────────────────────────────── */}
+      <div
+        style={{
+          position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 60,
+          width: '380px', maxWidth: 'calc(100vw - 2rem)',
+          height: '560px', maxHeight: 'calc(100vh - 6rem)',
+          background: 'white',
+          borderRadius: '2rem',
+          boxShadow: '0 30px 80px rgba(59,7,100,0.25), 0 8px 20px rgba(0,0,0,0.1)',
+          border: '1px solid var(--border-soft)',
+          display: 'flex', flexDirection: 'column',
+          overflow: 'hidden',
+          transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          transformOrigin: 'bottom right',
+          transform: isOpen ? 'scale(1) translateY(0)' : 'scale(0.6) translateY(40px)',
+          opacity: isOpen ? 1 : 0,
+          pointerEvents: isOpen ? 'auto' : 'none',
+        }}
       >
         {/* Header */}
-        <div className="p-5 border-b border-slate-50 flex justify-between items-center bg-gradient-to-r from-purple-600 to-pink-500 rounded-t-3xl text-white">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-md">
-              <Sparkles size={20} />
+        <div
+          style={{
+            background: 'var(--grad-brand)',
+            padding: '1.25rem 1.5rem',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            flexShrink: 0,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem' }}>
+            {/* Avatar */}
+            <div
+              style={{
+                width: '44px', height: '44px', borderRadius: '50%',
+                background: 'rgba(255,255,255,0.2)',
+                border: '2px solid rgba(255,255,255,0.4)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '1.2rem', backdropFilter: 'blur(8px)',
+              }}
+            >
+              💜
             </div>
             <div>
-              <h3 className="font-syne font-bold text-lg leading-tight">PurpleGirl Chat</h3>
-              <p className="text-[10px] uppercase tracking-widest opacity-80 font-bold">Safe • Anonymous • Real</p>
+              <div
+                style={{
+                  fontFamily: 'var(--font-display)', fontWeight: 700,
+                  fontSize: '1.05rem', color: 'white', lineHeight: 1.2,
+                }}
+              >
+                PurpleGirl
+              </div>
+              <div
+                style={{
+                  fontSize: '0.6rem', fontWeight: 800,
+                  letterSpacing: '0.15em', textTransform: 'uppercase',
+                  color: 'rgba(255,255,255,0.7)',
+                }}
+              >
+                Your Elder Sister · Always Online
+              </div>
             </div>
           </div>
-          <button 
+
+          <button
             onClick={() => setIsOpen(false)}
-            className="p-2 hover:bg-white/20 rounded-full transition-colors"
+            style={{
+              background: 'rgba(255,255,255,0.15)', border: 'none',
+              borderRadius: '50%', width: '36px', height: '36px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', color: 'white',
+              transition: 'background 0.2s',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.25)')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.15)')}
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-slate-50/50">
-          {messages.map((msg, idx) => (
-            <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div 
-                className={`max-w-[85%] p-4 rounded-2xl text-sm shadow-sm ${
-                  msg.role === 'user' 
-                    ? 'bg-purple-600 text-white rounded-tr-none' 
-                    : 'bg-white border border-slate-100 text-slate-800 rounded-tl-none leading-relaxed font-medium'
-                }`}
+        <div
+          style={{
+            flex: 1, overflowY: 'auto', padding: '1.25rem',
+            display: 'flex', flexDirection: 'column', gap: '1rem',
+            background: 'var(--surface-warm)',
+          }}
+        >
+          {messages.map((msg, i) => (
+            <div
+              key={i}
+              style={{
+                display: 'flex',
+                justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
+              }}
+            >
+              <div
+                style={{
+                  maxWidth: '82%',
+                  padding: '0.875rem 1.125rem',
+                  borderRadius: msg.role === 'user' ? '1.25rem 1.25rem 0.25rem 1.25rem' : '1.25rem 1.25rem 1.25rem 0.25rem',
+                  background: msg.role === 'user' ? 'var(--grad-brand)' : 'white',
+                  color: msg.role === 'user' ? 'white' : 'var(--text-primary)',
+                  fontSize: '0.9rem',
+                  lineHeight: 1.6,
+                  fontWeight: msg.role === 'user' ? 500 : 400,
+                  boxShadow: msg.role === 'user' ? '0 4px 12px rgba(124,58,237,0.25)' : 'var(--shadow-sm)',
+                  border: msg.role === 'assistant' ? '1px solid var(--border-soft)' : 'none',
+                }}
               >
                 {msg.content}
               </div>
             </div>
           ))}
+
           {isLoading && (
-            <div className="flex justify-start">
-              <div className="bg-white border border-slate-100 text-purple-600 p-4 rounded-2xl rounded-tl-none text-sm italic font-bold flex gap-2 items-center">
-                <div className="flex gap-1">
-                  <span className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce" />
-                  <span className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-bounce [animation-delay:0.2s]" />
-                  <span className="w-1.5 h-1.5 bg-purple-600 rounded-full animate-bounce [animation-delay:0.4s]" />
-                </div>
-                Typing secrets...
+            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+              <div
+                style={{
+                  padding: '0.875rem 1.25rem',
+                  background: 'white',
+                  borderRadius: '1.25rem 1.25rem 1.25rem 0.25rem',
+                  border: '1px solid var(--border-soft)',
+                  boxShadow: 'var(--shadow-sm)',
+                  display: 'flex', gap: '5px', alignItems: 'center',
+                }}
+              >
+                {[0, 0.2, 0.4].map((d, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      width: '7px', height: '7px', borderRadius: '50%',
+                      background: 'var(--purple-soft)',
+                      animation: `bounce 1.2s ease-in-out ${d}s infinite`,
+                    }}
+                  />
+                ))}
               </div>
             </div>
           )}
+
           <div ref={messagesEndRef} />
         </div>
 
         {/* Input */}
-        <form onSubmit={handleSubmit} className="p-4 bg-white border-t border-slate-50 flex gap-2 items-center rounded-b-3xl">
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            padding: '1rem 1.25rem',
+            background: 'white',
+            borderTop: '1px solid var(--border-soft)',
+            display: 'flex', gap: '0.75rem', alignItems: 'center',
+            flexShrink: 0,
+          }}
+        >
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Tell me anything, girl..."
-            className="flex-1 bg-slate-100 border-none rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-purple-500 transition-all outline-none"
+            placeholder="Ask me anything, girl…"
             disabled={isLoading}
+            style={{
+              flex: 1,
+              padding: '0.75rem 1.25rem',
+              borderRadius: '9999px',
+              border: '1.5px solid var(--border)',
+              fontSize: '0.9rem',
+              color: 'var(--text-primary)',
+              background: 'var(--surface-soft)',
+              outline: 'none',
+              transition: 'border-color 0.2s',
+            }}
+            onFocus={(e) => (e.currentTarget.style.borderColor = 'var(--purple-mid)')}
+            onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
           />
           <button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className="bg-purple-600 text-white p-3 rounded-2xl hover:bg-purple-700 disabled:opacity-50 disabled:scale-90 transition-all flex items-center justify-center shadow-lg shadow-purple-200"
+            style={{
+              width: '44px', height: '44px', borderRadius: '50%', flexShrink: 0,
+              background: !input.trim() || isLoading ? 'var(--border)' : 'var(--grad-brand)',
+              border: 'none', cursor: !input.trim() || isLoading ? 'not-allowed' : 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: 'white',
+              transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+              boxShadow: !input.trim() || isLoading ? 'none' : '0 4px 16px rgba(124,58,237,0.35)',
+            }}
           >
             <Send size={18} />
           </button>
         </form>
       </div>
+
+      {/* Bounce keyframe for typing dots */}
+      <style>{`
+        @keyframes bounce {
+          0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+          40% { transform: scale(1.2); opacity: 1; }
+        }
+        .group-hover\\:max-h-16:hover .group { max-height: 4rem; }
+        .group-hover\\:opacity-100:hover .group { opacity: 1; }
+      `}</style>
     </>
   );
 }

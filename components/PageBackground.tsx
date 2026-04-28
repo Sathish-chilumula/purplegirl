@@ -4,14 +4,48 @@ import React from 'react';
 
 export function PageBackground() {
   return (
-    <div className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none bg-white">
-      {/* Dynamic Mesh Orbs */}
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-purple-100/40 blur-[120px] animate-pulse" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-pink-100/40 blur-[120px] animate-pulse" style={{ animationDelay: '2s' }} />
-      <div className="absolute top-[20%] right-[10%] w-[30%] h-[30%] rounded-full bg-blue-50/30 blur-[100px] animate-pulse" style={{ animationDelay: '4s' }} />
-      
-      {/* Subtle Grid Pattern */}
-      <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#4c1d95 0.5px, transparent 0.5px)', backgroundSize: '24px 24px' }} />
+    <div className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none" style={{ background: 'var(--surface)' }}>
+      {/* Main gradient glow from top */}
+      <div
+        className="orb"
+        style={{
+          width: '70vw', height: '60vh',
+          top: '-20vh', left: '15%',
+          background: 'radial-gradient(ellipse, rgba(124,58,237,0.10) 0%, transparent 70%)',
+          animationDuration: '12s',
+        }}
+      />
+      {/* Pink accent bottom right */}
+      <div
+        className="orb"
+        style={{
+          width: '50vw', height: '50vh',
+          bottom: '-10vh', right: '-10vw',
+          background: 'radial-gradient(ellipse, rgba(236,72,153,0.08) 0%, transparent 70%)',
+          animationDuration: '10s',
+          animationDelay: '-3s',
+        }}
+      />
+      {/* Soft purple left middle */}
+      <div
+        className="orb"
+        style={{
+          width: '35vw', height: '35vh',
+          top: '40vh', left: '-5vw',
+          background: 'radial-gradient(ellipse, rgba(109,40,217,0.06) 0%, transparent 70%)',
+          animationDuration: '14s',
+          animationDelay: '-6s',
+        }}
+      />
+
+      {/* Subtle dot grid */}
+      <div
+        className="absolute inset-0 opacity-[0.025]"
+        style={{
+          backgroundImage: 'radial-gradient(circle, #7c3aed 1px, transparent 1px)',
+          backgroundSize: '32px 32px',
+        }}
+      />
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Syne, Outfit, Playfair_Display } from 'next/font/google';
+import { Inter, Syne, Playfair_Display, Outfit } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -7,10 +7,28 @@ import { FloatingChat } from '@/components/FloatingChat';
 import { SEO_CONFIG } from '@/lib/constants';
 import Script from 'next/script';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
-const syne = Syne({ subsets: ['latin'], variable: '--font-syne' });
-const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit' });
-const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' });
+/* ── Google Fonts ───────────────────────────────────── */
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+});
+const syne = Syne({
+  subsets: ['latin'],
+  variable: '--font-syne',
+  display: 'swap',
+});
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  variable: '--font-playfair',
+  display: 'swap',
+  style: ['normal', 'italic'],
+});
+const outfit = Outfit({
+  subsets: ['latin'],
+  variable: '--font-outfit',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: SEO_CONFIG.title,
@@ -32,17 +50,21 @@ export const metadata: Metadata = {
   icons: {
     icon: '/favicon.ico',
     apple: '/favicon.ico',
-  }
+  },
 };
 
-export default function RootLayout({children}: {children: React.ReactNode}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${syne.variable} ${outfit.variable} ${playfair.variable} scroll-smooth`}>
-      <body className="font-inter bg-white text-slate-900 antialiased flex flex-col min-h-screen selection:bg-purple-200" suppressHydrationWarning>
-        <Script 
-          async 
-          src="https://www.googletagmanager.com/gtag/js?id=G-ECLMKP650Q" 
-          strategy="afterInteractive" 
+    <html
+      lang="en"
+      className={`${inter.variable} ${syne.variable} ${playfair.variable} ${outfit.variable}`}
+    >
+      <body suppressHydrationWarning>
+        {/* Google Analytics */}
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-ECLMKP650Q"
+          strategy="afterInteractive"
         />
         <Script id="google-analytics" strategy="afterInteractive">
           {`
@@ -52,13 +74,13 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
             gtag('config', 'G-ECLMKP650Q');
           `}
         </Script>
-        
+
         <Header />
-        
-        <main className="flex-grow relative z-10 w-full">
+
+        <main style={{ position: 'relative', zIndex: 1 }}>
           {children}
         </main>
-        
+
         <Footer />
         <FloatingChat />
       </body>

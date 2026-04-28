@@ -1,119 +1,115 @@
 /* ══════════════════════════════════════════════════════
-   PURPLEGIRL.IN — COMPLETE ANIMATION SYSTEM
-   Master Prompt v1.0
+   PURPLEGIRL.IN — MODERN ANIMATION LIBRARY v3.0
+   All manuscript/parchment animations removed.
    ══════════════════════════════════════════════════════ */
 
-/* ── ANIM 1: INK SEEP (text appears like ink absorbing into paper) ── */
-@keyframes inkSeep {
-  0%   {
-    opacity: 0;
-    filter: blur(3px) sepia(0.4);
-    transform: translateY(8px);
-    color: rgba(160,100,40,0.3);  /* starts as faint brown ink */
-  }
-  50%  {
-    filter: blur(1px) sepia(0.1);
-    color: rgba(74,56,32,0.7);    /* darkening as ink spreads */
-  }
-  100% {
-    opacity: 1;
-    filter: blur(0) sepia(0);
-    transform: translateY(0);
-    color: var(--pg-ink-700);     /* final settled ink color */
-  }
-}
-.ink-seep {
-  animation: inkSeep 0.65s var(--ease-out) forwards;
-  /* Stagger each paragraph inline: animation-delay: calc(var(--index) * 120ms) */
+/* ── Core entrance animations ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── ANIM 2: PARCHMENT UNFURL (section/card entrance) ── */
-@keyframes parchmentUnfurl {
-  0%   {
-    opacity: 0;
-    transform: translateY(28px) scaleY(0.96);
-    transform-origin: top center;
-    filter: sepia(0.15);
-  }
-  60%  { filter: sepia(0.03); }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scaleY(1);
-    filter: sepia(0);
-  }
-}
-.parchment-unfurl {
-  animation: parchmentUnfurl 0.7s var(--ease-out) both;
-  will-change: transform, opacity;
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
-/* ── ANIM 3: CIPHER WHEEL SPIN (THE CIPHER astronomical circles) ── */
-@keyframes cipherRotate {
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Ticker scroll ── */
+@keyframes ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ── Heartbeat for FAB ── */
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  14%       { transform: scale(1.08); }
+  28%       { transform: scale(1); }
+  42%       { transform: scale(1.05); }
+  56%       { transform: scale(1); }
+}
+
+/* ── Spinning ring for heart FAB ── */
+@keyframes spin {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }
-@keyframes cipherRotateReverse {
-  from { transform: rotate(360deg); }
-  to   { transform: rotate(0deg); }
+
+/* ── Floating orb drift ── */
+@keyframes floatOrb {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(20px, -30px) scale(1.05); }
+  66%       { transform: translate(-15px, 20px) scale(0.95); }
 }
 
-/* ── ANIM 4: RUBRICATION SWEEP (THE CODEX red ink drawing a line) ── */
-@keyframes rubricationSweep {
-  from { transform: scaleX(0); transform-origin: left center; opacity: 0; }
-  to   { transform: scaleX(1); transform-origin: left center; opacity: 1; }
+/* ── Shimmer (loading skeleton) ── */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
-.rubrication-line {
-  height: 2px;
-  background: linear-gradient(90deg, var(--pg-crimson-600), var(--pg-gold-500), transparent);
-  animation: rubricationSweep 0.9s var(--ease-out) both;
-}
-
-/* ── ANIM 5: SEAL PRESS (THE CODEX wax seal impression) ── */
-@keyframes sealPress {
-  0%,100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 var(--pg-crimson-glow), 0 0 6px rgba(192,32,32,0.3);
-  }
-  45% {
-    transform: scale(0.82);
-    box-shadow: 0 0 0 6px rgba(192,32,32,0), 0 0 2px rgba(192,32,32,0.1);
-  }
+.shimmer {
+  background: linear-gradient(90deg, #f0eefb 25%, #e6e2f7 50%, #f0eefb 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
 }
 
-/* ── ANIM 6: BOTANICAL FLOAT (THE CIPHER plant illustrations drifting) ── */
-@keyframes botanicalFloat {
-  0%,100% { transform: translateY(0) rotate(0deg); opacity: 0.06; }
-  33%     { transform: translateY(-8px) rotate(1.5deg); opacity: 0.08; }
-  66%     { transform: translateY(-4px) rotate(-1deg); opacity: 0.05; }
+/* ── Bounce (typing dots in chat) ── */
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+  40%            { transform: scale(1.2); opacity: 1; }
 }
 
-/* ── ANIM 7: QUILL WRITE (scribal writing animation for AI loading) ── */
-@keyframes quillDip {
-  0%,100% { transform: rotate(-20deg) translateY(0); }
-  50%     { transform: rotate(-8deg) translateY(-5px); }
-}
-@keyframes inkDot {
-  0%,80%,100% { transform: scale(0.4); opacity: 0.25; }
-  40%         { transform: scale(1); opacity: 1; }
+/* ── Gradient animation for hero text ── */
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
-/* ── ANIM 8: BORDER TRACE (SVG stroke drawing itself) ── */
-@keyframes traceRect {
-  to { stroke-dashoffset: 0; }
+/* ── Pulse ring ── */
+@keyframes pulseRing {
+  0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(124,58,237,0.5); }
+  70%  { transform: scale(1);    box-shadow: 0 0 0 16px rgba(124,58,237,0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(124,58,237,0); }
 }
+.pulse-ring { animation: pulseRing 2.5s ease-in-out infinite; }
 
-/* ── ANIM 9: GLYPH SCRAMBLE (JS Hook, no CSS needed here) ── */
+/* ── Convenience utility classes ── */
+.animate-fade-up    { animation: fadeUp   0.8s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.animate-fade-in    { animation: fadeIn   0.6s ease both; }
+.animate-scale-in   { animation: scaleIn  0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.animate-slide-left { animation: slideInLeft  0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.animate-slide-right{ animation: slideInRight 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
-/* ── ANIM 10: PAGE TURN LIFT (CSS implemented in globals.css .card-lift) ── */
+/* Backwards compat */
+.animate-slide-up { animation: fadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
-/* ── ANIM 11: ILLUMINATION GLOW (gold text/element shimmer) ── */
-@keyframes illuminationGlow {
-  0%,100% { text-shadow: none; }
-  50%     {
-    text-shadow:
-      0 0 20px var(--pg-gold-glow),
-      0 0 40px rgba(201,168,76,0.15);
-  }
-}
+/* Stagger helpers */
+.stagger-1 { animation-delay: 0.10s; }
+.stagger-2 { animation-delay: 0.22s; }
+.stagger-3 { animation-delay: 0.36s; }
+.stagger-4 { animation-delay: 0.52s; }
+.stagger-5 { animation-delay: 0.70s; }
 
-/* ── ANIM 12: CRIMSON UNDERLINE DRAW (CSS implemented in globals.css .underline-draw) ── */
+/* ease token */
+:root { --ease-out: cubic-bezier(0.22, 1, 0.36, 1); }

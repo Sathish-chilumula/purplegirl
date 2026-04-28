@@ -1,55 +1,159 @@
 import Link from 'next/link';
-import { Heart } from 'lucide-react';
+
+const categories = [
+  { href: '/category/beauty-skincare',    label: 'Beauty & Skincare' },
+  { href: '/category/fashion-style',      label: 'Fashion & Style' },
+  { href: '/category/haircare',           label: 'Haircare' },
+  { href: '/category/relationships-love', label: 'Relationships & Love' },
+  { href: '/category/mental-wellness',    label: 'Mental Wellness' },
+  { href: '/category/health-basics',      label: 'Health Basics' },
+];
+
+const support = [
+  { href: '/ask',     label: 'Ask a Question' },
+  { href: '/privacy', label: 'Privacy Policy' },
+  { href: '/terms',   label: 'Terms of Use' },
+  { href: '/about',   label: 'About PurpleGirl' },
+  { href: '/contact', label: 'Contact' },
+];
 
 export default function Footer() {
   return (
-    <footer className="bg-slate-950 text-slate-400 py-20 px-6 md:px-12 border-t border-slate-900">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-        {/* Brand */}
-        <div className="col-span-1 md:col-span-2">
-          <Link href="/" className="flex items-center gap-2 mb-6 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center text-white text-sm font-bold">P</div>
-            <span className="font-syne font-extrabold text-2xl tracking-tighter text-white">
-              PurpleGirl<span className="text-purple-500">.</span>
-            </span>
-          </Link>
-          <p className="max-w-sm text-slate-500 leading-relaxed mb-8">
-            Your anonymous digital confidante. A safe space for clear, kind, and judgment-free answers to the questions you can't ask anywhere else.
-          </p>
-          <div className="flex items-center gap-2 text-pink-500 font-bold text-xs uppercase tracking-widest">
-            Made with <Heart size={14} className="fill-pink-500" /> for sisters everywhere.
+    <footer
+      style={{
+        background: 'var(--ink)',
+        color: 'rgba(255,255,255,0.55)',
+        paddingTop: '5rem',
+        paddingBottom: '2.5rem',
+      }}
+    >
+      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem' }}>
+
+        {/* Top grid */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gap: '3rem',
+            marginBottom: '4rem',
+          }}
+        >
+          {/* Brand column */}
+          <div style={{ gridColumn: 'span 2', minWidth: 0 }}>
+            <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.625rem', textDecoration: 'none', marginBottom: '1.25rem' }}>
+              <div
+                style={{
+                  width: 36, height: 36, borderRadius: '10px',
+                  background: 'var(--grad-brand)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '1.1rem', color: 'white',
+                }}
+              >
+                P
+              </div>
+              <span
+                style={{
+                  fontFamily: 'var(--font-display)', fontWeight: 900,
+                  fontSize: '1.3rem', color: 'white', letterSpacing: '-0.03em',
+                }}
+              >
+                PurpleGirl<span style={{ color: 'var(--purple-soft)' }}>.</span>
+              </span>
+            </Link>
+
+            <p style={{ fontSize: '0.9rem', lineHeight: 1.75, maxWidth: '26rem', marginBottom: '1.5rem' }}>
+              India's anonymous elder sister platform. A safe, judgment-free space where girls ask what they can't ask anywhere else — and get real, kind answers.
+            </p>
+
+            {/* Trust badges */}
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+              {['Anonymous', 'Encrypted', 'No Judgment'].map((b) => (
+                <span
+                  key={b}
+                  style={{
+                    fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase',
+                    padding: '0.35rem 0.875rem', borderRadius: '9999px',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    color: 'rgba(255,255,255,0.7)',
+                  }}
+                >
+                  {b}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Topics */}
+          <div>
+            <div
+              style={{
+                fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.18em', textTransform: 'uppercase',
+                color: 'var(--purple-soft)', marginBottom: '1.25rem',
+              }}
+            >
+              Topics
+            </div>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {categories.map(({ href, label }) => (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.55)', textDecoration: 'none', transition: 'color 0.2s' }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = 'white')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.55)')}
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Support */}
+          <div>
+            <div
+              style={{
+                fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.18em', textTransform: 'uppercase',
+                color: 'var(--purple-soft)', marginBottom: '1.25rem',
+              }}
+            >
+              Help & Legal
+            </div>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {support.map(({ href, label }) => (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.55)', textDecoration: 'none', transition: 'color 0.2s' }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = 'white')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.55)')}
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
-        {/* Links: Categories */}
-        <div>
-          <h4 className="text-white font-syne font-bold mb-6 uppercase tracking-widest text-xs">Explore</h4>
-          <ul className="space-y-4 text-sm">
-            <li><Link href="/category/beauty-skincare" className="hover:text-purple-400 transition-colors">Beauty & Skincare</Link></li>
-            <li><Link href="/category/fashion-style" className="hover:text-purple-400 transition-colors">Fashion & Style</Link></li>
-            <li><Link href="/category/relationships-love" className="hover:text-purple-400 transition-colors">Relationships</Link></li>
-            <li><Link href="/category/mental-wellness" className="hover:text-purple-400 transition-colors">Wellness</Link></li>
-          </ul>
-        </div>
+        {/* Divider */}
+        <div style={{ height: '1px', background: 'rgba(255,255,255,0.08)', marginBottom: '2rem' }} />
 
-        {/* Links: Support */}
-        <div>
-          <h4 className="text-white font-syne font-bold mb-6 uppercase tracking-widest text-xs">Confidential</h4>
-          <ul className="space-y-4 text-sm">
-            <li><Link href="/ask" className="hover:text-purple-400 transition-colors">Ask a Question</Link></li>
-            <li><Link href="/privacy" className="hover:text-purple-400 transition-colors">Privacy Policy</Link></li>
-            <li><Link href="/terms" className="hover:text-purple-400 transition-colors">Terms of Use</Link></li>
-            <li><Link href="/contact" className="hover:text-purple-400 transition-colors">Get in Touch</Link></li>
-          </ul>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto pt-8 border-t border-slate-900 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-slate-600">
-        <div>© {new Date().getFullYear()} PurpleGirl Insider. All Rights Reserved.</div>
-        <div className="flex gap-8">
-          <span>Encrypted</span>
-          <span>Anonymous</span>
-          <span>Safe</span>
+        {/* Bottom bar */}
+        <div
+          style={{
+            display: 'flex', flexWrap: 'wrap', gap: '1rem',
+            justifyContent: 'space-between', alignItems: 'center',
+          }}
+        >
+          <p style={{ fontSize: '0.8rem', margin: 0 }}>
+            © {new Date().getFullYear()} PurpleGirl.in — All Rights Reserved.
+          </p>
+          <p style={{ fontSize: '0.8rem', margin: 0 }}>
+            Made with{' '}
+            <span style={{ color: 'var(--pink-hot)' }}>♥</span>
+            {' '}for sisters everywhere.
+          </p>
         </div>
       </div>
     </footer>
