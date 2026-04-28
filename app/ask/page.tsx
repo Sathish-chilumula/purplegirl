@@ -65,7 +65,7 @@ function AskChamberContent() {
       // 3. Fetch the full generated question/answer
       const { data: fullAnswer, error: fetchErr } = await supabase
         .from('questions')
-        .select('*')
+        .select('*, answers(*)')
         .eq('id', questionId)
         .single();
 

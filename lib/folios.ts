@@ -6,7 +6,7 @@ export const FOLIOS: FolioData[] = [
     volumeLabel: 'VOL. I',
     title: 'THE BOTANICAL CODEX',
     description: 'Questions of life, growth, family roots, and the slow unraveling of personal history.',
-    imageSrc: 'https://upload.wikimedia.org/wikipedia/commons/4/4c/Voynich_Manuscript_%286%29.jpg',
+    imageSrc: '/images/vol-1.png',
     topics: ['family', 'childhood', 'parents', 'growth', 'life', 'history', 'roots', 'mother', 'father']
   },
   {
@@ -14,7 +14,7 @@ export const FOLIOS: FolioData[] = [
     volumeLabel: 'VOL. II',
     title: 'THE ASTRONOMICAL WHEEL',
     description: 'Questions of fate, relationships, cosmic timing, and the invisible forces between people.',
-    imageSrc: 'https://upload.wikimedia.org/wikipedia/commons/e/e0/Voynich_Manuscript_bathing.jpg',
+    imageSrc: '/images/vol-2.png',
     topics: ['love', 'relationships', 'marriage', 'fate', 'timing', 'destiny', 'partner', 'loneliness']
   },
   {
@@ -22,7 +22,7 @@ export const FOLIOS: FolioData[] = [
     volumeLabel: 'VOL. III',
     title: 'THE BIOLOGICAL PHARMACOPEIA',
     description: 'Questions of the body, intimacy, health, and the physical truths we hide.',
-    imageSrc: 'https://upload.wikimedia.org/wikipedia/commons/f/fb/Voynich_Manuscript_%2868%29.jpg',
+    imageSrc: '/images/vol-3.png',
     topics: ['body', 'intimacy', 'health', 'physical', 'pain', 'sex', 'shame', 'appearance']
   },
   {
@@ -30,7 +30,7 @@ export const FOLIOS: FolioData[] = [
     volumeLabel: 'VOL. IV',
     title: 'THE ALCHEMICAL RECIPES',
     description: 'Questions of career, ambition, money, and the transformation of the self.',
-    imageSrc: 'https://upload.wikimedia.org/wikipedia/commons/a/a2/Voynich_Manuscript_%2878%29.jpg',
+    imageSrc: '/images/vol-4.png',
     topics: ['career', 'money', 'ambition', 'work', 'success', 'failure', 'future', 'transformation']
   }
 ];

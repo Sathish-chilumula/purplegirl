@@ -25,13 +25,13 @@
   --pg-parch-500:  #a8853a;   /* Strong parchment accent             */
 
   /* ── INK COLORS (THE CODEX black iron-gall ink, aged) ── */
-  --pg-ink-900:    #1a1208;   /* Primary text — warm black not cold  */
-  --pg-ink-800:    #2d2010;   /* Secondary text, headings            */
-  --pg-ink-700:    #4a3820;   /* Body text                           */
-  --pg-ink-600:    #6b5535;   /* Muted text, captions                */
-  --pg-ink-500:    #8a7050;   /* Placeholder, disabled               */
-  --pg-ink-400:    #b09878;   /* Very muted, metadata                */
-  --pg-ink-300:    #cdb898;   /* Ghost text                          */
+  --pg-ink-900:    #0f0a05;   /* Primary text — near black, maximum contrast */
+  --pg-ink-800:    #1a1208;   /* Secondary text, headings            */
+  --pg-ink-700:    #2d2010;   /* Body text                           */
+  --pg-ink-600:    #4a3820;   /* Muted text, captions                */
+  --pg-ink-500:    #6b5535;   /* Placeholder, disabled               */
+  --pg-ink-400:    #8a7050;   /* Very muted, metadata                */
+  --pg-ink-300:    #b09878;   /* Ghost text                          */
 
   /* ── CRIMSON (THE CODEX rubrication — red headings & section marks) ── */
   --pg-crimson-900: #4a0808;

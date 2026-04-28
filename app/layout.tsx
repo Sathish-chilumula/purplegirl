@@ -3,6 +3,7 @@ import { Cinzel, UnifrakturMaguntia, IM_Fell_English, Crimson_Text } from 'next/
 import './globals.css';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import { FloatingChat } from '@/components/FloatingChat';
 import { SEO_CONFIG } from '@/lib/constants';
 import Script from 'next/script';
 
@@ -59,6 +60,7 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
         </main>
         
         <Footer />
+        <FloatingChat />
       </body>
     </html>
   );
