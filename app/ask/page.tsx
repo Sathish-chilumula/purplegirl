@@ -1,227 +1,210 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { ArrowLeft, Sparkles, Heart, Briefcase, Pill, Shirt, Brain, Salad, Loader2, Check } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useCategoryDetect } from '@/lib/hooks/useCategoryDetect';
+import { QuillWriting } from '@/components/QuillWriting';
 import { supabase } from '@/lib/supabase';
 import { slugify } from '@/lib/slugify';
-import PersonalizedIntake from '@/components/question/PersonalizedIntake';
-import { IntakeData, buildPersonalizedContext } from '@/lib/personalizedPrompt';
+import { Question } from '@/lib/types';
+import { AnswerCard } from '@/components/AnswerCard';
+import { FOLIOS } from '@/lib/folios';
 
-const CATEGORY_ICONS: Record<string, React.ReactNode> = {
-  'beauty-skincare': <Sparkles className="w-5 h-5" />,
-  'relationships': <Heart className="w-5 h-5" />,
-  'career-money': <Briefcase className="w-5 h-5" />,
-  'health-basics': <Pill className="w-5 h-5" />,
-  'fashion': <Shirt className="w-5 h-5" />,
-  'mental-wellness': <Brain className="w-5 h-5" />,
-  'food-nutrition': <Salad className="w-5 h-5" />,
-};
-
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-}
-
-export default function AskPage() {
+function AskChamberContent() {
   const router = useRouter();
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [categorySlug, setCategorySlug] = useState('');
-  const [categories, setCategories] = useState<Category[]>([]);
+  const searchParams = useSearchParams();
+  
+  const initialQ = searchParams.get('q') || '';
+  const [question, setQuestion] = useState(initialQ);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoadingCats, setIsLoadingCats] = useState(true);
-  const [intakeData, setIntakeData] = useState<IntakeData>({});
+  const [answer, setAnswer] = useState<Question | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const detectedFolio = useCategoryDetect(question) || FOLIOS[0];
 
   useEffect(() => {
-    async function fetchCategories() {
-      try {
-        const { data, error } = await supabase
-          .from('categories')
-          .select('id, name, slug')
-          .order('name');
-        
-        if (error) throw error;
-        setCategories(data || []);
-      } catch (err) {
-        console.error('Error fetching categories:', err);
-      } finally {
-        setIsLoadingCats(false);
-      }
+    // If we landed here with a question from the homepage, auto-submit it
+    if (initialQ && !answer && !isSubmitting) {
+      handleSubmit(initialQ);
     }
-    fetchCategories();
-  }, []);
+  }, [initialQ]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!title || !categorySlug) return;
-    
+  const handleSubmit = async (qText: string) => {
+    if (!qText.trim()) return;
     setIsSubmitting(true);
+    setError(null);
+
     try {
-      const selectedCat = categories.find(c => c.slug === categorySlug);
-      if (!selectedCat) throw new Error('Category not found');
-
       const questionId = crypto.randomUUID();
-      const slug = `${slugify(title)}-${Math.random().toString(36).substring(2, 7)}`;
+      const slug = `${slugify(qText).substring(0, 40)}-${Math.random().toString(36).substring(2, 7)}`;
 
-      const { error } = await supabase
+      // 1. Insert question
+      const { data: qData, error: qErr } = await supabase
         .from('questions')
-        .insert([
-          {
-            id: questionId,
-            title,
-            description,
-            slug,
-            category_id: selectedCat.id,
-            status: 'approved', // Immediately approved so the page works on redirect
-          },
-        ]);
+        .insert({
+          id: questionId,
+          title: qText.trim(),
+          slug,
+          status: 'pending'
+        })
+        .select()
+        .single();
 
-      if (error) throw error;
+      if (qErr) throw qErr;
 
-      // Trigger AI generation (non-blocking)
-      try {
-        const customContext = buildPersonalizedContext(intakeData);
-        fetch('/api/generate-answer', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            questionId: questionId,
-            customContext: customContext // Pass personalized context to backend
-          }),
-        });
-      } catch (err) {
-        console.error('Error triggering AI generation:', err);
-      }
+      // 2. Trigger generation
+      const res = await fetch('/api/generate-answer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ questionId })
+      });
 
-      router.push(`/q/${slug}`);
-    } catch (err) {
-      console.error('Error submitting question:', err);
-      alert('Failed to submit question. Please check your Supabase configuration.');
+      if (!res.ok) throw new Error('Oracle generation failed');
+      const genData = await res.json();
+
+      // 3. Fetch the full generated question/answer
+      const { data: fullAnswer, error: fetchErr } = await supabase
+        .from('questions')
+        .select('*')
+        .eq('id', questionId)
+        .single();
+
+      if (fetchErr) throw fetchErr;
+
+      setAnswer(fullAnswer as Question);
+      
+    } catch (err: any) {
+      console.error(err);
+      setError("The oracle could not read the cipher. Please try again.");
+    } finally {
       setIsSubmitting(false);
     }
   };
 
+  const handleReset = () => {
+    setQuestion('');
+    setAnswer(null);
+    setError(null);
+    router.replace('/ask');
+  };
+
   return (
-    <div className="relative min-h-screen overflow-hidden aurora-bg">
-      <div className="max-w-3xl mx-auto px-4 py-12 md:py-16 relative z-10">
-        <Link href="/" className="inline-flex items-center text-purple-600 hover:text-purple-800 mb-8 transition-colors font-medium group animate-slide-up bg-white/50 backdrop-blur px-4 py-2 rounded-full border border-purple-100 shadow-sm">
-          <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" /> Back to home
-        </Link>
+    <div className="min-h-screen flex flex-col md:flex-row bg-pg-parch-50 text-pg-ink-900">
+      
+      {/* ── LEFT PANEL: THE FOLIO VIEW ───────────────── */}
+      <div className="w-full md:w-[38%] relative flex flex-col border-r border-pg-parch-200 bg-pg-parch-100 overflow-hidden min-h-[30vh] md:min-h-screen shrink-0">
+        <div className="absolute inset-0 transition-opacity duration-1000">
+          <img 
+            src={detectedFolio.imageSrc} 
+            alt="Folio background" 
+            className="w-full h-full object-cover opacity-60 sepia-[0.3] saturate-[0.8]"
+          />
+        </div>
         
-        <div className="bg-white/80 backdrop-blur-2xl rounded-[3rem] p-8 md:p-12 shadow-2xl border border-white/60 animate-slide-up stagger-1">
-          <div className="text-center mb-12">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-200 to-pink-200 flex items-center justify-center text-5xl mx-auto mb-6 shadow-lg animate-glow-pulse border-4 border-white">
-              💜
-            </div>
-            <p className="font-playfair italic text-gray-500 mb-2">Your sister is listening...</p>
-            <h1 className="text-editorial text-4xl text-[#1F1235] tracking-tight mb-4">
-              Ask <span className="gradient-text-animate">anything</span> you want
-            </h1>
+        {/* Gradient overlays */}
+        <div className="absolute inset-0 bg-gradient-to-b md:bg-gradient-to-r from-pg-parch-100/40 via-pg-parch-100/60 to-pg-parch-50/90" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(45,32,16,0.4)_100%)] pointer-events-none mix-blend-multiply opacity-50" />
+
+        <div className="relative z-10 flex-1 flex flex-col p-8 md:p-12">
+          <div className="font-cinzel text-[9px] tracking-[0.3em] text-pg-gold-600 mb-auto">
+            THE ARCHIVES
           </div>
           
-          <form onSubmit={handleSubmit} className="space-y-10">
-            <div className="animate-slide-up stagger-2">
-              <div className="relative group">
-                <textarea
-                  className="w-full bg-[#FAF5FF] rounded-3xl p-6 min-h-[140px] text-lg focus:outline-none focus:bg-white placeholder:text-purple-300 resize-none transition-all shadow-inner border border-transparent focus:border-transparent [border-image:linear-gradient(to_right,rgba(124,58,237,0.5),rgba(236,72,153,0.5))_1] focus:[box-shadow:inset_0_0_20px_rgba(124,58,237,0.1)]"
-                  placeholder="Type what's on your heart... I'm listening. 💜"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  required
-                  maxLength={150}
-                />
-                <div className="absolute bottom-4 right-6 text-xs text-purple-400 font-bold">{title.length}/150</div>
+          <div className="mt-auto pt-20">
+            <div className="font-cinzel text-[9px] tracking-[0.2em] text-pg-crimson-600 mb-2 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-pg-crimson-600 animate-pulse" />
+              CURRENTLY CONSULTING: {detectedFolio.volumeLabel}
+            </div>
+            <h2 className="font-im-fell text-3xl md:text-4xl italic text-pg-ink-900 leading-tight mb-4">
+              {detectedFolio.title}
+            </h2>
+            <p className="text-pg-ink-600 font-crimson italic max-w-sm">
+              {detectedFolio.description}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── RIGHT PANEL: THE ORACLE CHAMBER ──────────── */}
+      <div className="flex-1 flex flex-col p-6 md:p-12 lg:p-20 relative overflow-y-auto">
+        <div className="max-w-2xl w-full mx-auto my-auto">
+          
+          {answer ? (
+            <div className="animate-fade-in">
+              <AnswerCard question={answer} folio={detectedFolio} />
+              
+              <div className="mt-8 flex gap-4 justify-center">
+                <button onClick={handleReset} className="font-cinzel text-[10px] tracking-[0.2em] border border-pg-parch-300 text-pg-ink-600 hover:text-pg-crimson-600 hover:border-pg-crimson-600 px-6 py-3 rounded-sm transition-colors uppercase">
+                  Ask Another
+                </button>
+                <button onClick={() => navigator.clipboard.writeText(answer.cipher_key || answer.id)} className="font-cinzel text-[10px] tracking-[0.2em] border border-pg-parch-300 text-pg-ink-600 hover:text-pg-gold-600 hover:border-pg-gold-500 px-6 py-3 rounded-sm transition-colors uppercase">
+                  Copy Cipher Key
+                </button>
               </div>
             </div>
-            
-            <div className="animate-slide-up stagger-3">
-              <label className="block text-editorial text-xl text-[#1F1235] mb-3">More details (optional)</label>
-              <div className="relative">
+          ) : (
+            <div className="animate-slide-up">
+              <div className="font-unifraktur text-6xl text-pg-crimson-600 opacity-20 mb-4 select-none">O</div>
+              <h1 className="font-cinzel text-3xl md:text-4xl font-bold text-pg-ink-900 mb-2 uppercase tracking-wide">
+                Speak to the Cipher
+              </h1>
+              <p className="font-crimson italic text-lg text-pg-ink-500 mb-10">
+                Write what you cannot say aloud. The sisterhood will answer.
+              </p>
+
+              <form 
+                onSubmit={(e) => { e.preventDefault(); handleSubmit(question); }}
+                className="relative bg-white border border-pg-parch-200 rounded shadow-sm focus-within:border-pg-crimson-600/50 transition-colors p-6"
+              >
+                <span className="absolute top-6 left-6 font-im-fell text-3xl text-pg-crimson-600 opacity-50">¶</span>
                 <textarea
-                  className="w-full bg-[#FAF5FF] rounded-3xl p-6 min-h-[120px] focus:outline-none focus:bg-white placeholder:text-purple-300 resize-none transition-all shadow-inner border border-transparent focus:border-transparent focus:[border-image:linear-gradient(to_right,rgba(124,58,237,0.5),rgba(236,72,153,0.5))_1]"
-                  placeholder="Give some context so we can give you a better answer..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  maxLength={500}
+                  value={question}
+                  onChange={(e) => setQuestion(e.target.value)}
+                  placeholder="Ask the question that has no other home..."
+                  className="w-full min-h-[160px] pl-10 bg-transparent border-none outline-none font-im-fell text-2xl text-pg-ink-900 placeholder:text-pg-ink-400 placeholder:italic resize-none"
+                  disabled={isSubmitting}
                 />
-                <div className="absolute bottom-4 right-6 text-xs text-purple-400 font-bold">{description.length}/500</div>
-              </div>
-            </div>
-            
-            <div className="animate-slide-up stagger-4">
-              <label className="block text-editorial text-xl text-[#1F1235] mb-4">Choose a category</label>
-              {isLoadingCats ? (
-                <div className="flex items-center gap-2 text-purple-600 animate-pulse">
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span className="font-bold">Gathering topics...</span>
+
+                <div className="mt-6 flex justify-between items-center border-t border-pg-parch-100 pt-4">
+                  <div className="font-cinzel text-[9px] tracking-widest text-pg-ink-400 uppercase">
+                    Anonymous. Not stored.
+                  </div>
+                  {isSubmitting ? (
+                    <QuillWriting text="Consulting Vol. III..." />
+                  ) : (
+                    <button 
+                      type="submit"
+                      disabled={!question.trim()}
+                      className="bg-pg-crimson-600 hover:bg-pg-crimson-500 text-white font-cinzel text-[11px] tracking-[0.2em] px-8 py-3 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm uppercase"
+                    >
+                      Reveal
+                    </button>
+                  )}
                 </div>
-              ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {categories.map((cat) => {
-                    const isSelected = categorySlug === cat.slug;
-                    return (
-                      <button
-                        type="button"
-                        key={cat.id}
-                        onClick={() => setCategorySlug(cat.slug)}
-                        className={`relative flex items-center gap-3 px-4 py-4 rounded-2xl border transition-all duration-300 transform active:scale-95 ${
-                          isSelected 
-                            ? 'bg-gradient-to-br from-purple-600 to-pink-500 border-transparent text-white font-bold shadow-lg shadow-purple-200' 
-                            : 'glass border-white/50 text-gray-500 hover:border-purple-200 hover:bg-white/90 shadow-sm'
-                        }`}
-                      >
-                        <span className={`${isSelected ? 'text-white' : 'text-purple-500'}`}>
-                          {CATEGORY_ICONS[cat.slug] || <Heart className="w-5 h-5" />}
-                        </span>
-                        <span className="text-sm text-left">{cat.name}</span>
-                        {isSelected && (
-                          <div className="absolute top-2 right-2 bg-white text-purple-600 rounded-full p-0.5">
-                            <Check className="w-3 h-3" />
-                          </div>
-                        )}
-                      </button>
-                    )
-                  })}
+              </form>
+
+              {error && (
+                <div className="mt-4 text-pg-crimson-600 font-crimson italic animate-fade-in text-center">
+                  {error}
                 </div>
               )}
             </div>
+          )}
 
-            <div className="animate-slide-up stagger-5">
-              <PersonalizedIntake onIntakeChange={setIntakeData} />
-            </div>
-            
-            <div className="pt-6 animate-slide-up stagger-5">
-              <button
-                type="submit"
-                disabled={isSubmitting || !title || !categorySlug}
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white py-5 rounded-full font-bold text-xl hover:shadow-2xl hover:shadow-purple-300 transition-all hover:scale-[1.02] disabled:opacity-60 disabled:hover:scale-100 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-xl"
-              >
-                {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : <span>✨</span>}
-                {isSubmitting ? 'Sending securely...' : 'Submit Anonymously'}
-              </button>
-              
-              <div className="text-center mt-3 text-sm font-medium text-purple-500">
-                Estimated response time: ~30 seconds
-              </div>
-
-              <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-sm text-gray-500 font-medium">
-                <div className="flex items-center gap-1.5 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                  <div className="bg-green-100 text-green-600 rounded-full p-0.5"><Check className="w-3 h-3" /></div> Identity protected
-                </div>
-                <div className="flex items-center gap-1.5 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-                  <div className="bg-green-100 text-green-600 rounded-full p-0.5"><Check className="w-3 h-3" /></div> Not stored publicly
-                </div>
-                <div className="flex items-center gap-1.5 animate-fade-in" style={{ animationDelay: '0.6s' }}>
-                  <div className="bg-green-100 text-green-600 rounded-full p-0.5"><Check className="w-3 h-3" /></div> Answered with care
-                </div>
-              </div>
-            </div>
-          </form>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AskChamber() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-pg-parch-50">
+        <QuillWriting text="Entering the chamber..." />
+      </div>
+    }>
+      <AskChamberContent />
+    </Suspense>
   );
 }

@@ -41,28 +41,28 @@ export default function FollowUpChat({ questionTitle, categoryName }: FollowUpCh
       setMessages(prev => [...prev, { role: 'ai', content: data.answer }]);
     } catch (err) {
       console.error(err);
-      setMessages(prev => [...prev, { role: 'ai', content: "Oops! I'm having trouble connecting right now. 💜 Give me a moment and try again!" }]);
+      setMessages(prev => [...prev, { role: 'ai', content: "The ink has run dry. Please try your whisper again later. 💜" }]);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="bg-white border border-purple-100 rounded-3xl p-6 md:p-8 shadow-sm mb-16 overflow-hidden">
-      <div className="flex items-center gap-3 mb-6 border-b border-purple-50 pb-4">
-        <div className="bg-purple-100 p-2 rounded-full">
-          <Sparkles className="w-5 h-5 text-purple-primary" />
+    <div className="bg-[var(--abyss)] border border-[rgba(140,26,26,0.1)] rounded-2xl p-6 md:p-8 shadow-sm mb-16 overflow-hidden">
+      <div className="flex items-center gap-3 mb-6 border-b border-[rgba(201,168,76,0.05)] pb-4">
+        <div className="bg-[var(--crimson)] p-2 rounded-full opacity-80">
+          <Sparkles className="w-5 h-5 text-[var(--void)]" />
         </div>
         <div>
-          <h2 className="font-bold text-xl text-text-primary">Follow-up with AI Sister</h2>
-          <p className="text-xs text-text-secondary">Ask for clarification or deeper advice</p>
+          <h2 className="font-cinzel font-bold text-sm tracking-widest text-[var(--ink)] uppercase">Whisper Again</h2>
+          <p className="text-[10px] font-im-fell italic text-[var(--ink-dim)]">Deepen your understanding of the cipher</p>
         </div>
       </div>
 
-      <div className="space-y-4 mb-6 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+      <div className="space-y-6 mb-8 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
         {messages.length === 0 ? (
-          <div className="text-center p-6 text-gray-400 text-sm">
-            Still confused? Ask me anything related to this topic anonymously!
+          <div className="text-center p-6 text-[var(--ink-dim)] italic font-im-fell text-lg">
+            "Every question is a key to a door you haven't opened yet."
           </div>
         ) : (
           <AnimatePresence>
@@ -73,10 +73,10 @@ export default function FollowUpChat({ questionTitle, categoryName }: FollowUpCh
                 key={i} 
                 className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                <div className={`max-w-[85%] p-4 rounded-2xl text-sm ${
+                <div className={`max-w-[85%] p-4 rounded-xl font-im-fell text-lg leading-relaxed ${
                   msg.role === 'user' 
-                    ? 'bg-purple-primary text-white rounded-tr-sm' 
-                    : 'bg-[#FAF5FF] text-text-primary rounded-tl-sm border border-purple-50'
+                    ? 'bg-[var(--crimson)] text-[var(--void)] rounded-tr-sm border border-[rgba(140,26,26,0.4)] shadow-lg shadow-[rgba(0,0,0,0.1)]' 
+                    : 'bg-[var(--chamber)] text-[var(--ink)] rounded-tl-sm border border-[rgba(140,26,26,0.08)]'
                 }`}>
                   {msg.content}
                 </div>
@@ -87,27 +87,28 @@ export default function FollowUpChat({ questionTitle, categoryName }: FollowUpCh
         
         {loading && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
-            <div className="bg-[#FAF5FF] text-text-primary p-4 rounded-2xl rounded-tl-sm border border-purple-50 flex items-center gap-2">
-               <Loader2 className="w-4 h-4 text-purple-primary animate-spin" />
-               <span className="text-sm font-medium italic text-gray-500">Thinking...</span>
+            <div className="bg-[var(--chamber)] text-[var(--ink)] p-4 rounded-xl rounded-tl-sm border border-[rgba(140,26,26,0.08)] flex items-center gap-3">
+               <div className="dots"><span></span><span></span><span></span></div>
+               <span className="text-sm font-cinzel font-bold italic text-[var(--ink-dim)] uppercase tracking-widest">Consulting</span>
             </div>
           </motion.div>
         )}
       </div>
 
       <form onSubmit={sendMessage} className="relative flex items-center">
+        <div className="absolute left-4 font-im-fell text-[var(--crimson)] opacity-60 text-xl">¶</div>
         <input 
           type="text" 
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="E.g. What if I can't afford that?"
-          className="w-full bg-[#FAF5FF] border border-purple-100 rounded-full py-3 pl-5 pr-14 text-sm focus:outline-none focus:ring-2 focus:ring-purple-primary/50 placeholder:text-gray-400"
+          placeholder="Type your follow-up whisper..."
+          className="w-full bg-[var(--void)] border border-[rgba(140,26,26,0.15)] rounded-sm py-4 pl-10 pr-14 text-lg font-im-fell text-[var(--ink)] focus:outline-none focus:border-[var(--crimson)] placeholder:text-[var(--ink-dim)] placeholder:italic"
           disabled={loading}
         />
         <button 
           type="submit" 
           disabled={!input.trim() || loading}
-          className="absolute right-2 p-2 bg-purple-primary hover:bg-purple-700 text-white rounded-full transition-colors disabled:opacity-50"
+          className="absolute right-3 p-3 bg-[var(--crimson)] hover:bg-[var(--crimson-mid)] text-[var(--void)] rounded-sm transition-all disabled:opacity-50 shadow-md"
         >
           <Send className="w-4 h-4" />
         </button>

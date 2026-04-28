@@ -8,6 +8,7 @@ import { motion } from 'motion/react';
 
 export default function AnswerWaiter({ questionId }: { questionId: string }) {
   const router = useRouter();
+  const [found, setFound] = useState(false);
   const [dots, setDots] = useState('');
 
   // Animate dots for loading
@@ -21,6 +22,7 @@ export default function AnswerWaiter({ questionId }: { questionId: string }) {
   // Poll for the answer
   useEffect(() => {
     let timeout: NodeJS.Timeout;
+    if (found) return;
     
     const checkAnswer = async () => {
       try {
@@ -31,7 +33,8 @@ export default function AnswerWaiter({ questionId }: { questionId: string }) {
           .single();
           
         if (data) {
-          // Answer found! Refresh the page data.
+          // Answer found! Stop polling and refresh.
+          setFound(true);
           router.refresh();
         } else {
           // Not found yet, schedule another check.

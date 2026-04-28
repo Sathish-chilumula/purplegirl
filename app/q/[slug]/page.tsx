@@ -1,18 +1,14 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Clock, Eye, Heart, ArrowLeft, ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react';
 import { supabaseAdmin } from '@/lib/supabase-admin';
-import { buildFAQSchema, buildBreadcrumbSchema } from '@/lib/schema';
-import QuestionClient from '@/components/question/QuestionClient';
-import CommunityValidation from '@/components/question/CommunityValidation';
-import FollowUpChat from '@/components/question/FollowUpChat';
-import MeTooButton from '@/components/question/MeTooButton';
-import AnswerWaiter from '@/components/question/AnswerWaiter';
-import EmotionBar from '@/components/question/EmotionBar';
-import LanguageSwitcher from '@/components/question/LanguageSwitcher';
-import EmotionPageTheme from '@/components/question/EmotionPageTheme';
-import { SITE_NAME } from '@/lib/constants';
+import QASchema from '@/components/seo/QASchema';
+import { SITE_NAME, SITE_URL } from '@/lib/constants';
+import { GlyphAvatar } from '@/components/GlyphAvatar';
+import { IlluminatedDropCap } from '@/components/IlluminatedDropCap';
+import { OrnDivider } from '@/components/OrnDivider';
+import { PageBackground } from '@/components/PageBackground';
+import { DustMotes } from '@/components/DustMotes';
 
 export const runtime = 'edge';
 
@@ -26,7 +22,7 @@ async function getQuestionData(slug: string) {
     .select(`
       id, slug, title, description, created_at, view_count, metoo_count, category_id,
       categories (name, slug),
-      answers (chat_log, products, summary, detailed, bullet_points, faqs, disclaimer, chat_log_hi, chat_log_te)
+      answers (id, chat_log, products, summary, detailed, bullet_points, faqs, disclaimer)
     `)
     .eq('slug', slug)
     .single();
@@ -44,15 +40,16 @@ export async function generateMetadata({ params }: QuestionPageProps): Promise<M
   const { slug } = await params;
   const question = await getQuestionData(slug);
 
-  if (!question) return { title: 'Question Not Found' };
+  if (!question) return { title: 'Folio Not Found' };
 
   return {
     title: `${question.title} | ${SITE_NAME}`,
-    description: question.answers?.summary || `Read the conversation for: ${question.title}`,
+    description: question.answers?.summary || `Deciphering the cipher: ${question.title}`,
     openGraph: {
       title: question.title,
-      description: question.answers?.summary || `Read the conversation for: ${question.title}`,
+      description: question.answers?.summary || `Deciphering the cipher: ${question.title}`,
       type: 'article',
+      url: `${SITE_URL}/q/${slug}`
     }
   };
 }
@@ -63,271 +60,178 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
 
   if (!question) notFound();
 
-  const faqSchema = buildFAQSchema({
-    title: question.title,
-    slug: question.slug,
-    created_at: question.created_at,
-    answers: question.answers,
-    categories: question.categories,
-  });
-  const breadcrumbSchema = buildBreadcrumbSchema({
-    title: question.title,
-    slug: question.slug,
-    categories: question.categories,
-  });
-
   const { data: related } = await supabaseAdmin
     .from('questions')
     .select('slug, title')
     .eq('category_id', question.category_id)
     .neq('id', question.id)
     .eq('status', 'approved')
-    .limit(4);
+    .limit(3);
 
-  const timeAgo = question.created_at ? new Date(question.created_at).toLocaleDateString() : 'Recently';
-
-  // Default to Hopeful for now as we don't have emotion in DB yet.
-  const pageEmotion = 'Hopeful';
+  const isBotanical = question.categories?.name?.toLowerCase().includes('botanical');
+  const volumeName = question.categories?.name || 'VOL. I: THE BOTANICAL CODEX';
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-white mood-bg transition-colors duration-1000">
-      <EmotionPageTheme emotion={pageEmotion} />
-      
-      {faqSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />}
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+    <div className="relative min-h-screen bg-pg-parch-50 text-pg-ink-900 pb-32">
+      <PageBackground />
+      <DustMotes />
 
-      <div className="orb orb-purple w-[500px] h-[500px] top-[-100px] right-[-100px] opacity-25" />
-      <div className="orb orb-pink w-[400px] h-[400px] bottom-[200px] left-[-80px] opacity-20" />
+      <QASchema 
+        question={{
+          title: question.title,
+          description: question.description || '',
+          created_at: question.created_at,
+          upvote_count: question.metoo_count
+        }}
+        answer={question.answers ? {
+          text: question.answers.summary || (question.answers.chat_log && Array.isArray(question.answers.chat_log) ? question.answers.chat_log[0] : ''),
+          created_at: question.created_at,
+          upvote_count: 0
+        } : undefined}
+        url={`${SITE_URL}/q/${question.slug}`}
+      />
 
-      <div className="max-w-2xl mx-auto px-4 py-8 pb-40 relative z-10">
-        <div className="flex items-center text-sm font-medium text-gray-400 mb-8 gap-2 overflow-x-auto whitespace-nowrap hide-scrollbar animate-slide-up">
-          <Link href="/" className="hover:text-purple-600 transition-colors">Home</Link>
-          <span>›</span>
-          <Link href={`/category/${question.categories?.slug}`} className="hover:text-purple-600 transition-colors">{question.categories?.name}</Link>
-          <span>›</span>
-          <span className="text-[#1F1235] truncate max-w-[200px]">{question.title}</span>
-        </div>
-
-        {/* Editorial Quote Header */}
-        <div className="mb-10 animate-slide-up relative">
-          <div className="absolute -top-6 -left-4 text-7xl text-purple-200 font-playfair opacity-50">"</div>
-          <h1 className="font-playfair font-black text-3xl md:text-5xl text-[#1F1235] tracking-tight leading-tight relative z-10 mood-accent">
-            {question.title}
-          </h1>
-          {question.description && (
-            <p className="mt-4 text-lg text-gray-600 italic border-l-4 border-purple-200 pl-4">{question.description}</p>
-          )}
-        </div>
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-12 pt-12 lg:pt-24 relative z-10">
         
-        <MeTooButton questionId={question.id} initialCount={question.metoo_count || 0} variant="prominent" />
+        {/* The 12-col Grid Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          
+          {/* ── LEFT SIDEBAR (Cols 1-3) ── */}
+          <aside className="lg:col-span-3 flex flex-col gap-8 lg:sticky lg:top-24 h-max">
+            <div>
+              <Link href="/" className="font-cinzel text-[10px] tracking-widest text-pg-ink-400 hover:text-pg-crimson-600 transition-colors uppercase flex items-center gap-2">
+                ← Return to Archives
+              </Link>
+            </div>
 
-        <div className="mb-6 animate-slide-up mt-6">
-          <LanguageSwitcher
-            slug={question.slug}
-            hasHindi={!!(question.answers?.chat_log_hi && (question.answers.chat_log_hi as any[]).length > 0)}
-            hasTelugu={!!(question.answers?.chat_log_te && (question.answers.chat_log_te as any[]).length > 0)}
-          />
-        </div>
-
-        <div className="glass rounded-2xl px-5 py-3.5 flex flex-wrap items-center gap-3 mb-12 shadow-sm animate-slide-up stagger-1">
-          <span className="font-bold text-purple-700 bg-purple-100 px-3 py-1 rounded-full text-xs uppercase tracking-widest">
-            {question.categories?.name}
-          </span>
-          <span className="flex items-center gap-1.5 text-sm text-gray-400">
-            <Clock className="w-3.5 h-3.5" /> {timeAgo}
-          </span>
-          <span className="flex items-center gap-1.5 text-sm text-gray-400">
-            <Eye className="w-3.5 h-3.5" /> {(question.view_count || 0).toLocaleString()}
-          </span>
-          <span className="flex items-center gap-1.5 text-sm text-gray-400">
-            <Heart className="w-3.5 h-3.5 text-pink-400" /> {(question.metoo_count || 0).toLocaleString()}
-          </span>
-        </div>
-
-        <div className="animate-slide-up stagger-1">
-          <EmotionBar questionText={question.title} />
-        </div>
-
-        {question.answers ? (
-          <div className="flex flex-col gap-10 animate-slide-up stagger-2 mt-8">
-            
-            {/* The Bottom Line (Summary) */}
-            {question.answers?.summary && (
-              <div className="shimmer-card card-premium p-8 bg-gradient-to-br from-purple-50 to-pink-50 border-none shadow-md">
-                <h2 className="font-playfair font-bold text-xl text-purple-800 mb-3 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5" /> The Bottom Line
-                </h2>
-                <p className="text-gray-800 font-medium leading-relaxed">{question.answers.summary}</p>
+            <div className="surface-card p-6 border-t border-t-pg-gold-500">
+              <div className="font-cinzel text-[9px] tracking-[0.2em] text-pg-crimson-600 mb-2 animate-pulse">
+                CURRENT VOLUME
               </div>
-            )}
-
-            {/* Sister Bubbles (The Answer) */}
-            {question.answers.chat_log && Array.isArray(question.answers.chat_log) ? (
-              <div className="space-y-6 bg-gray-50/50 p-6 md:p-8 rounded-[2rem] border border-gray-100">
-                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest text-center mb-6">Conversation</h3>
-                {question.answers.chat_log.map((msg: string, i: number) => (
-                  <div key={i} className="flex justify-start animate-slide-up" style={{ animationDelay: `${(i + 1) * 150}ms`, animationFillMode: 'both' }}>
-                    <div className="flex items-end gap-3 max-w-[95%] md:max-w-[85%]">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-200 to-pink-200 flex items-center justify-center shrink-0 border-2 border-white shadow-sm z-10">
-                        <span className="text-xl">💜</span>
-                      </div>
-                      <div className="bubble-sister rounded-[2rem] rounded-tl-sm px-6 py-4 text-[#1F1235] text-base leading-relaxed border border-purple-50">
-                        {String(msg).split('\n').map((line: string, lineIndex: number) => (
-                          <p key={lineIndex} className={lineIndex > 0 ? "mt-3" : ""}>{line}</p>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ))}
+              <h3 className="font-im-fell text-xl text-pg-ink-900 mb-4">{volumeName}</h3>
+              <div className="w-12 h-12 rounded-full border border-pg-crimson-600 flex items-center justify-center opacity-70">
+                <GlyphAvatar userId={question.id} className="scale-75" />
               </div>
-            ) : (
-              <p className="text-center text-gray-400 italic">Asking our elders for the best advice...</p>
-            )}
+            </div>
 
-            {/* Practical Tips */}
+            <div className="font-cinzel text-[8px] tracking-[0.3em] text-pg-ink-400 uppercase space-y-2">
+              <p>RECORDED: {new Date(question.created_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+              <p>CIPHER KEY: {question.id.substring(0, 8)}</p>
+              <p>VIEWS: {question.view_count || 0}</p>
+            </div>
+          </aside>
+
+          {/* ── MAIN CONTENT (Cols 4-10) ── */}
+          <main className="lg:col-span-7">
+            <header className="relative mb-16 animate-slide-up">
+              <IlluminatedDropCap letter="Q" variant="crimson" className="-left-12 -top-10" />
+              <div className="font-cinzel text-[10px] tracking-[0.3em] text-pg-crimson-600 mb-6 uppercase opacity-80 pl-2">
+                The Seekers Whisper
+              </div>
+              <h1 className="font-im-fell text-4xl lg:text-5xl text-pg-ink-900 leading-[1.15] italic pl-2 relative z-10">
+                {question.title}
+              </h1>
+              {question.description && (
+                <p className="mt-8 text-xl text-pg-ink-600 font-crimson pl-6 border-l border-pg-crimson-600/30">
+                  {question.description}
+                </p>
+              )}
+            </header>
+
+            <OrnDivider variant="both" className="my-16" />
+
+            <section className="prose prose-purplegirl max-w-none font-crimson text-lg text-pg-ink-800 leading-[1.8] animate-slide-up stagger-2">
+              <div className="font-cinzel text-[10px] tracking-[0.3em] text-pg-gold-600 mb-8 uppercase opacity-80 text-center">
+                The Oracle's Decipherment
+              </div>
+
+              {/* Apply inkSeep manually to paragraphs if they are in chat_log */}
+              <style>{`
+                .oracle-answer p { animation: inkSeep 0.8s var(--ease-out) both; margin-bottom: 1.5rem; }
+                .oracle-answer p:nth-child(1) { animation-delay: 0.1s; }
+                .oracle-answer p:nth-child(2) { animation-delay: 0.2s; }
+                .oracle-answer p:nth-child(3) { animation-delay: 0.3s; }
+                .oracle-answer p:nth-child(4) { animation-delay: 0.4s; }
+                .oracle-answer em { color: var(--pg-crimson-600); font-style: italic; }
+                .oracle-answer strong { color: var(--pg-gold-700); font-weight: normal; }
+                .oracle-answer blockquote { border-left: 2px solid var(--pg-crimson-600); padding-left: 1.5rem; color: var(--pg-ink-600); font-style: italic; }
+              `}</style>
+
+              <div className="oracle-answer">
+                {question.answers?.chat_log ? (
+                  Array.isArray(question.answers.chat_log) ? (
+                    question.answers.chat_log.map((msg: string, i: number) => (
+                      <p key={i} dangerouslySetInnerHTML={{ __html: msg }} />
+                    ))
+                  ) : (
+                    <div dangerouslySetInnerHTML={{ __html: question.answers.chat_log }} />
+                  )
+                ) : (
+                  <p className="italic text-center text-pg-ink-400">The ink has not yet dried on this response...</p>
+                )}
+              </div>
+            </section>
+
             {question.answers?.bullet_points && question.answers.bullet_points.length > 0 && (
-              <section className="animate-slide-up">
-                <h2 className="font-playfair font-bold text-2xl text-[#1F1235] mb-6 flex items-center gap-2">
-                  <CheckCircle2 className="w-6 h-6 text-purple-500" /> Action Plan
-                </h2>
-                <ul className="grid grid-cols-1 gap-3">
-                  {question.answers.bullet_points.map((tip: string, i: number) => (
-                    <li key={i} className="flex items-start gap-4 bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:border-purple-200 hover:shadow-md transition-all">
-                      <div className="w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center shrink-0 font-bold text-xs mt-0.5">{i+1}</div>
-                      <span className="text-gray-700 font-medium leading-relaxed">{tip}</span>
+              <section className="mt-16 bg-pg-parch-100 border border-pg-parch-200 p-8 rounded-sm animate-slide-up stagger-3">
+                <h3 className="font-cinzel text-sm tracking-widest text-pg-ink-900 uppercase mb-6 text-center">
+                  The Sacred Precepts
+                </h3>
+                <ul className="space-y-4">
+                  {question.answers.bullet_points.map((pt: string, i: number) => (
+                    <li key={i} className="flex gap-4 items-start font-crimson text-pg-ink-700 text-lg">
+                      <span className="font-cinzel text-pg-crimson-600 text-sm mt-1">✦</span>
+                      <span>{pt}</span>
                     </li>
                   ))}
                 </ul>
               </section>
             )}
 
-            {/* Community Validation */}
-            {question.answers?.bullet_points && question.answers.bullet_points.length > 0 && (
-              <CommunityValidation 
-                answerId={question.answers.id}
-                bulletPoints={question.answers.bullet_points}
-                initialTips={question.answers.helpful_tips}
-              />
-            )}
+            <OrnDivider variant="simple" className="my-16" />
 
-            {/* Affiliated Products */}
-            {question.answers.products && question.answers.products.length > 0 && (
-              <div className="animate-slide-up w-full">
-                <div className="glass rounded-[2rem] p-8 border border-pink-100 shadow-sm relative overflow-hidden">
-                  <div className="orb orb-pink w-40 h-40 top-0 right-0 opacity-20" />
-                  <p className="text-xs font-bold text-pink-500 uppercase tracking-widest mb-6 flex items-center gap-2 relative z-10">
-                    <Sparkles className="w-4 h-4" /> Recommended for you
-                  </p>
-                  <div className="flex overflow-x-auto gap-4 pb-2 hide-scrollbar relative z-10">
-                    {question.answers.products.map((p: any, i: number) => (
-                      <a key={i} href={p.link} target="_blank" rel="noopener noreferrer"
-                        className="card-premium min-w-[180px] p-3 hover:translate-y-[-4px] transition-transform bg-white">
-                        <img src={p.image} alt={p.title} className="w-full aspect-square object-cover rounded-xl mb-3 bg-gray-50" />
-                        <p className="font-bold text-sm text-[#1F1235] line-clamp-2">{p.title}</p>
-                        <p className="text-xs font-bold text-pink-500 mt-2 bg-pink-50 inline-block px-2 py-1 rounded-md">{p.price}</p>
-                      </a>
+            {/* Share & Follow Up */}
+            <div className="flex flex-col items-center justify-center gap-6 animate-slide-up stagger-4">
+              <p className="font-cinzel text-[10px] tracking-widest text-pg-ink-500 uppercase">
+                Does this cipher resonate with you?
+              </p>
+              <div className="flex gap-4">
+                <button className="bg-pg-parch-100 hover:bg-pg-parch-200 border border-pg-parch-300 px-6 py-3 font-cinzel text-[10px] tracking-widest uppercase transition-colors">
+                  Share Whisper
+                </button>
+                <Link href={`/ask?q=${encodeURIComponent('I saw a similar question: ' + question.title)}`} className="bg-pg-crimson-600 hover:bg-pg-crimson-500 text-white px-6 py-3 font-cinzel text-[10px] tracking-widest uppercase shadow-sm transition-colors">
+                  Ask Follow-up
+                </Link>
+              </div>
+            </div>
+
+          </main>
+
+          {/* ── RIGHT MARGIN (Cols 11-12) ── */}
+          <aside className="hidden lg:block lg:col-span-2">
+             <div className="sticky top-24 pt-12 flex flex-col items-center gap-12 border-l border-pg-parch-200 pl-8 h-max">
+                {/* Visual anchor point */}
+                <div className="w-1 h-16 bg-pg-parch-300" />
+                
+                {related && related.length > 0 && (
+                  <div className="space-y-6 w-full">
+                    <div className="font-cinzel text-[8px] tracking-[0.2em] text-pg-ink-400 uppercase text-center mb-4">
+                      Related Folios
+                    </div>
+                    {related.map(r => (
+                      <Link key={r.slug} href={`/q/${r.slug}`} className="block group">
+                        <h4 className="font-im-fell italic text-pg-ink-700 group-hover:text-pg-crimson-600 transition-colors leading-tight text-sm text-center">
+                          {r.title}
+                        </h4>
+                      </Link>
                     ))}
                   </div>
-                </div>
-              </div>
-            )}
-
-            {/* FAQs */}
-            {question.answers?.faqs && question.answers.faqs.length > 0 && (
-              <section className="animate-slide-up">
-                <h2 className="font-playfair font-bold text-2xl text-[#1F1235] mb-6">Frequently Asked</h2>
-                <div className="space-y-3">
-                  {question.answers.faqs.map((faq: any, i: number) => (
-                    <details key={i} className="group bg-white rounded-2xl border border-gray-100 overflow-hidden transition-all duration-300 shadow-sm hover:border-purple-200">
-                      <summary className="flex items-center justify-between p-5 font-bold text-[#1F1235] cursor-pointer hover:bg-purple-50/30 transition-colors list-none">
-                        {faq.q}
-                        <span className="transition-transform group-open:rotate-180 w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center shrink-0">
-                          <svg fill="none" height="16" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="16"><path d="M6 9l6 6 6-6"></path></svg>
-                        </span>
-                      </summary>
-                      <div className="p-5 pt-0 text-gray-600 leading-relaxed text-sm bg-white">
-                        {faq.a}
-                      </div>
-                    </details>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* Disclaimer */}
-            {question.answers?.disclaimer && (
-              <div className="mt-8 text-center animate-slide-up">
-                <p className="text-xs text-gray-500 italic bg-gray-50 px-6 py-4 rounded-2xl inline-block max-w-md border border-gray-100">
-                  ⚠️ {question.answers.disclaimer}
-                </p>
-              </div>
-            )}
-
-            {/* Share / Interaction Block */}
-            <div className="animate-slide-up mt-8">
-              <QuestionClient
-                questionId={question.id}
-                initialMeToo={question.metoo_count}
-                questionTitle={question.title}
-                questionSlug={question.slug}
-                bulletPoints={question.answers?.bullet_points}
-                summary={question.answers?.summary}
-                categoryName={question.categories?.name}
-                categorySlug={question.categories?.slug}
-              />
-            </div>
-
-            {/* Follow-up Chat */}
-            <div className="mt-12 pt-12 border-t border-purple-100/60 animate-slide-up">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-200 to-pink-200 flex items-center justify-center text-lg border-2 border-white shadow-sm">💜</div>
-                <div>
-                  <p className="font-bold text-[#1F1235]">Still curious?</p>
-                  <p className="text-sm text-gray-500">Ask a follow-up question anonymously.</p>
-                </div>
-              </div>
-              <FollowUpChat questionTitle={question.title} categoryName={question.categories?.name || 'General'} />
-            </div>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center gap-6 py-32 animate-slide-up">
-            <div className="relative">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-200 to-pink-200 flex items-center justify-center text-4xl border-4 border-white shadow-xl animate-pulse">💜</div>
-              <div className="absolute -top-1 -right-1 w-6 h-6 bg-pink-500 rounded-full border-2 border-white flex items-center justify-center">
-                <Sparkles className="w-3.5 h-3.5 text-white animate-spin-slow" />
-              </div>
-            </div>
-            <div className="text-center">
-              <p className="text-[#1F1235] font-bold text-xl mb-2">PurpleGirl is thinking…</p>
-              <p className="text-gray-500 text-sm max-w-xs mx-auto">We're gathering the best guidance just for you. This usually takes less than 30 seconds.</p>
-            </div>
-            <div className="flex gap-2">
-              <div className="w-3 h-3 rounded-full bg-purple-400 animate-typing" style={{ animationDelay: '0ms' }} />
-              <div className="w-3 h-3 rounded-full bg-purple-400 animate-typing" style={{ animationDelay: '200ms' }} />
-              <div className="w-3 h-3 rounded-full bg-purple-400 animate-typing" style={{ animationDelay: '400ms' }} />
-            </div>
-            <AnswerWaiter questionId={question.id} />
-          </div>
-        )}
-
-        {/* Related Questions */}
-        {related && related.length > 0 && (
-          <section className="mt-24 pt-12 border-t border-purple-100 animate-slide-up">
-            <h2 className="font-playfair font-bold text-2xl text-[#1F1235] mb-8">More conversations you might like…</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {related.map((q: any, i: number) => (
-                <Link key={i} href={`/q/${q.slug}`} className="card-premium p-6 group hover:translate-y-[-4px] transition-all">
-                  <h3 className="font-bold text-[#1F1235] text-lg line-clamp-2 group-hover:text-purple-600 transition-colors leading-tight">{q.title}</h3>
-                  <div className="text-purple-600 text-sm font-bold mt-4 flex items-center gap-1 group-hover:gap-2 transition-all">
-                    Read answer <ArrowRight className="w-4 h-4" />
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </section>
-        )}
+                )}
+             </div>
+          </aside>
+          
+        </div>
       </div>
     </div>
   );
 }
-

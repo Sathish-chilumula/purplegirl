@@ -37,7 +37,7 @@ ${customContext || ''}
 
 Return ONLY valid JSON:
 {
-  "chat_bubbles": [
+  "chat_log": [
     "Bubble 1: Pure emotional validation — make her feel understood and completely safe (2-3 warm sentences)",
     "Bubble 2: Practical step-by-step guidance specific to Indian women (3-4 sentences)",
     "Bubble 3: Warm encouragement or follow-up question (1-2 sentences)"
@@ -119,7 +119,7 @@ Return ONLY valid JSON:
       .from('answers')
       .insert({
         question_id: question.id,
-        chat_log: answerData.chat_bubbles || [],
+        chat_log: answerData.chat_log || [],
         summary: answerData.summary || null,
         bullet_points: answerData.bullet_points || [],
         faqs: answerData.faqs || [],

@@ -1,10 +1,12 @@
 import { MetadataRoute } from 'next';
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { FOLIOS } from '@/lib/folios';
+import { SITE_URL } from '@/lib/constants';
 
 export const runtime = 'edge';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://purplegirl.in';
+  const baseUrl = SITE_URL;
 
   // Helper to format date for strict Google compliance (no milliseconds)
   const formatDate = (date: Date) => date.toISOString().split('.')[0] + 'Z';
@@ -13,9 +15,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = [
     '',
     '/ask',
-    '/search',
-    '/trending',
-    '/whisper',
+    '/search'
   ].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: formatDate(new Date()),
@@ -23,15 +23,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: route === '' ? 1 : 0.8,
   }));
 
-  // 2. Fetch all approved questions
+  // 2. Volume routes (from FOLIOS)
+  const volumeRoutes = FOLIOS.map((folio) => ({
+    url: `${baseUrl}/volumes/${folio.id}`,
+    lastModified: formatDate(new Date()),
+    changeFrequency: 'weekly' as const,
+    priority: 0.9,
+  }));
+
+  // 3. Fetch all approved questions
   const { data: questions } = await supabaseAdmin
     .from('questions')
     .select('id, slug, updated_at')
-    .in('status', ['approved', 'featured']);
+    .in('status', ['approved', 'published']);
 
   const questionIds = (questions || []).map((q) => q.id).filter(Boolean);
 
-  // 3. Fetch translation availability
+  // 4. Fetch translation availability
   let translationMap = new Map<string, { hasHindi: boolean; hasTelugu: boolean }>();
   if (questionIds.length > 0) {
     const { data: answers } = await supabaseAdmin
@@ -49,10 +57,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  // 4. Build question routes
+  // 5. Build question routes
   const questionRoutes: MetadataRoute.Sitemap = [];
   for (const q of questions || []) {
-    const lastMod = formatDate(new Date(q.updated_at));
+    const lastMod = formatDate(new Date(q.updated_at || Date.now()));
     const trans = translationMap.get(q.id);
 
     questionRoutes.push({
@@ -81,17 +89,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  // 5. Fetch all categories
-  const { data: categories } = await supabaseAdmin
-    .from('categories')
-    .select('slug');
-
-  const categoryRoutes = (categories || []).map((c) => ({
-    url: `${baseUrl}/category/${c.slug}`,
-    lastModified: formatDate(new Date()),
-    changeFrequency: 'weekly' as const,
-    priority: 0.7,
-  }));
-
-  return [...staticRoutes, ...categoryRoutes, ...questionRoutes];
+  return [...staticRoutes, ...volumeRoutes, ...questionRoutes];
 }
