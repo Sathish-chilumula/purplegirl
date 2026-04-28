@@ -1,8 +1,10 @@
 import Link from 'next/link';
-import { ArrowRight, Sparkles, Shield, Zap, TrendingUp, Heart, Star } from 'lucide-react';
+import { ArrowRight, Sparkles, Shield, Zap, Star, Heart } from 'lucide-react';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { PageBackground } from '@/components/PageBackground';
 import { CategoryCard } from '@/components/CategoryCard';
+import { TickerBar } from '@/components/TickerBar';
+import { CTAButton } from '@/components/CTAButton';
 
 export const runtime = 'edge';
 
@@ -138,33 +140,7 @@ export default async function Home() {
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           2. TRENDING TICKER
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      {recentQuestions.length > 0 && (
-        <div className="ticker-wrap" style={{ marginBottom: '6rem' }}>
-          <div className="ticker-move">
-            {[...recentQuestions, ...recentQuestions].map((q, i) => (
-              <Link
-                key={i}
-                href={`/q/${q.slug}`}
-                className="flex items-center gap-3 px-10"
-                style={{
-                  fontSize: '0.75rem',
-                  fontWeight: 700,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  color: 'var(--text-muted)',
-                  borderRight: '1px solid var(--border)',
-                  transition: 'color 0.2s',
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--purple-mid)')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
-              >
-                <Heart size={12} style={{ color: 'var(--pink-hot)', fill: 'var(--pink-hot)' }} />
-                {q.title}
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
+      <TickerBar questions={recentQuestions} />
 
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           3. CATEGORY GRID
@@ -288,28 +264,9 @@ export default async function Home() {
               <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '1.1rem', marginBottom: '2.5rem', maxWidth: '480px', margin: '0 auto 2.5rem', lineHeight: 1.7 }}>
                 No topic is too taboo. No question is too small. Anonymous, safe, and always here.
               </p>
-              <Link
-                href="/ask"
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-                  background: 'white', color: 'var(--purple-mid)',
-                  padding: '1rem 2.5rem', borderRadius: '9999px',
-                  fontFamily: 'var(--font-accent)', fontWeight: 800, fontSize: '0.9rem',
-                  letterSpacing: '0.05em', textTransform: 'uppercase',
-                  boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
-                  transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.transform = 'scale(1.05) translateY(-2px)';
-                  (e.currentTarget as HTMLElement).style.boxShadow = '0 16px 50px rgba(0,0,0,0.3)';
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.transform = '';
-                  (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 30px rgba(0,0,0,0.2)';
-                }}
-              >
+              <CTAButton href="/ask">
                 <Shield size={18} /> Ask Your Question
-              </Link>
+              </CTAButton>
             </div>
           </div>
         </div>
