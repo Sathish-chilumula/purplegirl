@@ -1,13 +1,12 @@
 import { MetadataRoute } from 'next';
-import { SITE_URL } from '@/lib/constants';
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/api/', '/admin/', '/_next/'],
+      disallow: ['/api/', '/admin/'],
     },
-    sitemap: `${SITE_URL}/sitemap.xml`,
+    sitemap: 'https://purplegirl.in/sitemap.xml',
   };
 }

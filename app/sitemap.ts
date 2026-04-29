@@ -1,51 +1,37 @@
 import { MetadataRoute } from 'next';
 import { supabaseAdmin } from '@/lib/supabase-admin';
-import { SITE_URL } from '@/lib/constants';
-
-export const runtime = 'edge';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = SITE_URL;
+  const baseUrl = 'https://purplegirl.in';
 
-  // Helper to format date for strict Google compliance (no milliseconds)
-  const formatDate = (date: Date) => date.toISOString().split('.')[0] + 'Z';
-
-  // 1. Static routes
+  // 1. Static Routes
   const staticRoutes = [
-    '',
-    '/ask',
-    '/search'
-  ].map((route) => ({
-    url: `${baseUrl}${route}`,
-    lastModified: formatDate(new Date()),
-    changeFrequency: 'daily' as const,
-    priority: route === '' ? 1 : 0.8,
-  }));
+    { url: baseUrl, lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
+    { url: `${baseUrl}/quizzes`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/ask`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
+  ] as MetadataRoute.Sitemap;
 
-  // 2. Fetch all categories
-  const { data: categories } = await supabaseAdmin
-    .from('categories')
-    .select('slug');
-
+  // 2. Dynamic Categories
+  const { data: categories } = await supabaseAdmin.from('categories').select('slug');
   const categoryRoutes = (categories || []).map((cat) => ({
     url: `${baseUrl}/category/${cat.slug}`,
-    lastModified: formatDate(new Date()),
-    changeFrequency: 'weekly' as const,
+    lastModified: new Date(),
+    changeFrequency: 'daily',
     priority: 0.9,
-  }));
+  })) as MetadataRoute.Sitemap;
 
-  // 3. Fetch all approved questions
-  const { data: questions } = await supabaseAdmin
-    .from('questions')
-    .select('id, slug, updated_at')
-    .in('status', ['approved', 'published']);
+  // 3. Dynamic Articles
+  const { data: articles } = await supabaseAdmin
+    .from('articles')
+    .select('slug, updated_at, published_at, created_at')
+    .eq('is_published', true);
+    
+  const articleRoutes = (articles || []).map((article) => ({
+    url: `${baseUrl}/how-to/${article.slug}`,
+    lastModified: new Date(article.updated_at || article.published_at || article.created_at || Date.now()),
+    changeFrequency: 'weekly',
+    priority: 0.7,
+  })) as MetadataRoute.Sitemap;
 
-  const questionRoutes = (questions || []).map((q) => ({
-    url: `${baseUrl}/q/${q.slug}`,
-    lastModified: formatDate(new Date(q.updated_at || Date.now())),
-    changeFrequency: 'weekly' as const,
-    priority: 0.9,
-  }));
-
-  return [...staticRoutes, ...categoryRoutes, ...questionRoutes];
+  return [...staticRoutes, ...categoryRoutes, ...articleRoutes];
 }

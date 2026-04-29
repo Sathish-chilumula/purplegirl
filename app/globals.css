@@ -1,372 +1,73 @@
-@import "tailwindcss";
-@import "./animations.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* ══════════════════════════════════════════════════════
-   PURPLEGIRL.IN — PREMIUM WOMEN'S PLATFORM
-   "Velvet Editorial" Design System v3.0
-   ══════════════════════════════════════════════════════ */
-
-@theme {
-  --font-display: var(--font-playfair), serif;
-  --font-body: var(--font-inter), sans-serif;
-  --font-accent: var(--font-syne), sans-serif;
-}
-
-/* ─────────────────────────────────────────────────────
-   CSS CUSTOM PROPERTIES (DESIGN TOKENS)
-───────────────────────────────────────────────────── */
-:root {
-  /* Core Brand */
-  --purple-deep:   #3b0764;
-  --purple-rich:   #6d28d9;
-  --purple-mid:    #7c3aed;
-  --purple-soft:   #a78bfa;
-  --purple-light:  #ede9fe;
-  --purple-mist:   #f5f3ff;
-
-  --pink-hot:      #ec4899;
-  --pink-soft:     #f9a8d4;
-  --pink-mist:     #fdf2f8;
-
-  /* Editorial Neutrals */
-  --ink:           #0a0a0f;
-  --ink-soft:      #1e1b2e;
-  --text-primary:  #1a1a2e;
-  --text-secondary:#4a4560;
-  --text-muted:    #8b7fa8;
-  --surface:       #ffffff;
-  --surface-soft:  #fafafa;
-  --surface-warm:  #faf8ff;
-  --border:        #e8e4f3;
-  --border-soft:   #f0eefb;
-
-  /* Gradients */
-  --grad-brand:    linear-gradient(135deg, #6d28d9 0%, #ec4899 100%);
-  --grad-purple:   linear-gradient(135deg, #3b0764 0%, #7c3aed 100%);
-  --grad-warm:     linear-gradient(135deg, #7c3aed 0%, #f472b6 50%, #fb923c 100%);
-  --grad-glow:     radial-gradient(ellipse at top, rgba(139, 92, 246, 0.15), transparent 60%);
-  --grad-heart:    conic-gradient(from 180deg, #f06, #7c3aed, #06b6d4, #ec4899, #f06);
-
-  /* Shadows */
-  --shadow-sm:     0 1px 3px rgba(109, 40, 217, 0.08), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md:     0 4px 16px rgba(109, 40, 217, 0.12), 0 2px 4px rgba(0,0,0,0.06);
-  --shadow-lg:     0 12px 40px rgba(109, 40, 217, 0.18), 0 4px 12px rgba(0,0,0,0.08);
-  --shadow-glow:   0 0 60px rgba(124, 58, 237, 0.25);
-  --shadow-pink:   0 8px 30px rgba(236, 72, 153, 0.3);
-}
-
-/* ─────────────────────────────────────────────────────
-   BASE STYLES
-───────────────────────────────────────────────────── */
 @layer base {
-  * { box-sizing: border-box; }
-
-  html { scroll-behavior: smooth; }
+  :root {
+    --pg-rose: #E91E8C;
+    --pg-rose-light: #FCE4F3;
+    --pg-rose-dark: #B5146A;
+    --pg-plum: #6B21A8;
+    --pg-plum-light: #F3E8FF;
+    --pg-cream: #FFF9FB;
+    --pg-white: #FFFFFF;
+    --pg-gray-100: #F5F5F5;
+    --pg-gray-300: #D1D5DB;
+    --pg-gray-500: #6B7280;
+    --pg-gray-700: #374151;
+    --pg-gray-900: #111827;
+    --pg-success: #059669;
+    --pg-warning: #D97706;
+  }
 
   body {
-    font-family: var(--font-body);
-    background: var(--surface);
-    color: var(--text-primary);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden;
+    background-color: var(--pg-cream);
+    color: var(--pg-gray-900);
+    @apply font-sans antialiased;
   }
 
-  h1, h2, h3 {
-    font-family: var(--font-display);
-    font-weight: 700;
-    line-height: 1.1;
-    color: var(--ink);
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight text-pg-gray-900;
   }
-
-  h4, h5, h6 {
-    font-family: var(--font-accent);
-    font-weight: 700;
-    color: var(--text-primary);
-  }
-
-  ::selection {
-    background: rgba(124, 58, 237, 0.2);
-    color: var(--purple-deep);
-  }
-
-  /* Smooth scrollbar */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--surface-soft); }
-  ::-webkit-scrollbar-thumb { background: var(--purple-soft); border-radius: 999px; }
 }
 
-/* ─────────────────────────────────────────────────────
-   REUSABLE COMPONENTS
-───────────────────────────────────────────────────── */
 @layer components {
-
-  /* ── Buttons ── */
+  /* Clean White Cards */
+  .card-base {
+    @apply bg-white border border-pg-gray-100 rounded-[12px] p-6 transition-colors;
+    box-shadow: none;
+  }
+  
+  /* Buttons */
   .btn-primary {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem 2.5rem;
-    border-radius: 9999px;
-    font-family: var(--font-accent);
-    font-weight: 700;
-    font-size: 0.9rem;
-    letter-spacing: 0.05em;
-    color: white;
-    background: var(--grad-brand);
-    box-shadow: var(--shadow-pink);
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    position: relative;
-    overflow: hidden;
+    @apply inline-flex items-center justify-center bg-pg-rose text-white font-bold rounded-xl px-6 py-3 transition-colors hover:bg-pg-rose-dark active:scale-[0.98];
   }
-  .btn-primary::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: white;
-    opacity: 0;
-    transition: opacity 0.3s;
+  
+  .btn-secondary {
+    @apply inline-flex items-center justify-center bg-white text-pg-rose border-2 border-pg-rose font-bold rounded-xl px-6 py-3 transition-colors hover:bg-pg-rose-light active:scale-[0.98];
   }
-  .btn-primary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 20px 50px rgba(236, 72, 153, 0.4);
-  }
-  .btn-primary:hover::before { opacity: 0.1; }
-  .btn-primary:active { transform: scale(0.97); }
 
   .btn-ghost {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem 2.5rem;
-    border-radius: 9999px;
-    font-family: var(--font-accent);
-    font-weight: 700;
-    font-size: 0.9rem;
-    letter-spacing: 0.05em;
-    color: var(--purple-mid);
-    background: transparent;
-    border: 2px solid var(--border);
-    transition: all 0.3s ease;
-  }
-  .btn-ghost:hover {
-    border-color: var(--purple-mid);
-    background: var(--purple-mist);
-    transform: translateY(-2px);
+    @apply inline-flex items-center justify-center text-pg-gray-500 font-bold rounded-xl px-6 py-3 transition-colors hover:bg-pg-gray-100 hover:text-pg-gray-900 active:scale-[0.98];
   }
 
-  /* Keep backwards compat */
-  .btn-premium {
-    @apply btn-primary;
-  }
-
-  /* ── Text Gradient ── */
-  .text-gradient {
-    background: var(--grad-brand);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .text-gradient-warm {
-    background: var(--grad-warm);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  /* ── Cards ── */
-  .card-glass {
-    background: rgba(255,255,255,0.8);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255,255,255,0.5);
-    border-radius: 1.5rem;
-    box-shadow: var(--shadow-lg);
-  }
-
-  .card-elevated {
-    background: white;
-    border: 1px solid var(--border-soft);
-    border-radius: 1.5rem;
-    box-shadow: var(--shadow-sm);
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-  .card-elevated:hover {
-    box-shadow: var(--shadow-lg);
-    transform: translateY(-6px);
-    border-color: var(--purple-light);
-  }
-
-  /* ── Badge / Pill ── */
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    padding: 0.375rem 1rem;
-    border-radius: 9999px;
-    font-family: var(--font-accent);
-    font-size: 0.65rem;
-    font-weight: 800;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-  .badge-purple {
-    background: var(--purple-mist);
-    color: var(--purple-mid);
-    border: 1px solid var(--purple-light);
-  }
-  .badge-pink {
-    background: var(--pink-mist);
-    color: #be185d;
-    border: 1px solid #fbcfe8;
-  }
-
-  /* ── Section Label ── */
-  .section-label {
-    font-family: var(--font-accent);
-    font-size: 0.65rem;
-    font-weight: 800;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--purple-mid);
-  }
-
-  /* ─────────────────── TICKER ─────────────────── */
-  .ticker-wrap {
-    width: 100%;
-    overflow: hidden;
-    position: relative;
-    padding: 0.75rem 0;
-    background: linear-gradient(90deg, var(--purple-mist), white 20%, white 80%, var(--purple-mist));
-    border-top: 1px solid var(--border-soft);
-    border-bottom: 1px solid var(--border-soft);
-  }
-  .ticker-wrap::before, .ticker-wrap::after {
-    content: '';
-    position: absolute;
-    top: 0; bottom: 0;
-    width: 80px;
-    z-index: 2;
-  }
-  .ticker-wrap::before {
-    left: 0;
-    background: linear-gradient(to right, var(--purple-mist), transparent);
-  }
-  .ticker-wrap::after {
-    right: 0;
-    background: linear-gradient(to left, var(--purple-mist), transparent);
-  }
-  .ticker-move {
-    display: flex;
-    white-space: nowrap;
-    animation: ticker 40s linear infinite;
-  }
-  .ticker-move:hover { animation-play-state: paused; }
-  @keyframes ticker {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
-
-  /* ─────────────────── HEART CHAT FAB ─────────────────── */
-  .heart-fab {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    z-index: 50;
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-    animation: heartbeat 3s ease-in-out infinite;
-  }
-  .heart-fab::before {
-    content: '';
-    position: absolute;
-    inset: -4px;
-    border-radius: 50%;
-    background: var(--grad-heart);
-    animation: spin 4s linear infinite;
-    z-index: -1;
-    opacity: 0.7;
-  }
-  .heart-fab::after {
-    content: '';
-    position: absolute;
-    inset: -8px;
-    border-radius: 50%;
-    background: var(--grad-heart);
-    animation: spin 6s linear infinite reverse;
-    z-index: -2;
-    opacity: 0.3;
-    filter: blur(4px);
-  }
-  .heart-fab:hover { transform: scale(1.15); }
-
-  @keyframes heartbeat {
-    0%, 100% { transform: scale(1); }
-    14% { transform: scale(1.08); }
-    28% { transform: scale(1); }
-    42% { transform: scale(1.05); }
-    56% { transform: scale(1); }
-  }
-  @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-
-  /* ─────────────────── PAGE ANIMATIONS ─────────────────── */
-  .fade-up {
-    opacity: 0;
-    transform: translateY(30px);
-    animation: fadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-  @keyframes fadeUp {
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .fade-in {
-    opacity: 0;
-    animation: fadeIn 0.6s ease forwards;
-  }
-  @keyframes fadeIn {
-    to { opacity: 1; }
-  }
-
-  .stagger-1 { animation-delay: 0.1s; }
-  .stagger-2 { animation-delay: 0.2s; }
-  .stagger-3 { animation-delay: 0.35s; }
-  .stagger-4 { animation-delay: 0.5s; }
-  .stagger-5 { animation-delay: 0.65s; }
-
-  /* Backwards compat for animate-slide-up */
-  .animate-slide-up { @apply fade-up; }
-  .animate-fade-in  { @apply fade-in; }
-
-  /* ─────────────────── HERO GLOW ─────────────────── */
-  .hero-glow {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(80px);
-    pointer-events: none;
-    will-change: transform;
-  }
-
-  /* ─────────────────── FLOATING ORBS ─────────────────── */
-  .orb {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(60px);
-    animation: floatOrb 8s ease-in-out infinite;
-    pointer-events: none;
-  }
-  @keyframes floatOrb {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    33% { transform: translate(20px, -30px) scale(1.05); }
-    66% { transform: translate(-15px, 20px) scale(0.95); }
+  /* Badge */
+  .badge-rose {
+    @apply inline-flex items-center justify-center bg-pg-rose-light text-pg-rose text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full;
   }
 }
+
+/* Animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-up {
+  opacity: 0;
+  animation: fadeUp 0.6s ease-out forwards;
+}
+
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }

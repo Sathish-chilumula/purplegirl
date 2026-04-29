@@ -1,88 +1,37 @@
-import type { Metadata } from 'next';
-import { Inter, Syne, Playfair_Display, Outfit } from 'next/font/google';
-import './globals.css';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-import { FloatingChat } from '@/components/FloatingChat';
-import { SEO_CONFIG } from '@/lib/constants';
-import Script from 'next/script';
-
-/* ── Google Fonts ───────────────────────────────────── */
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
-});
-const syne = Syne({
-  subsets: ['latin'],
-  variable: '--font-syne',
-  display: 'swap',
-});
-const playfair = Playfair_Display({
-  subsets: ['latin'],
-  variable: '--font-playfair',
-  display: 'swap',
-  style: ['normal', 'italic'],
-});
-const outfit = Outfit({
-  subsets: ['latin'],
-  variable: '--font-outfit',
-  display: 'swap',
-});
+import type { Metadata } from "next";
+import "./globals.css";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: SEO_CONFIG.title,
-  description: SEO_CONFIG.description,
-  metadataBase: new URL(SEO_CONFIG.url),
-  openGraph: {
-    title: SEO_CONFIG.title,
-    description: SEO_CONFIG.description,
-    url: SEO_CONFIG.url,
-    siteName: 'PurpleGirl.in',
-    locale: 'en_IN',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: SEO_CONFIG.title,
-    description: SEO_CONFIG.description,
-  },
-  icons: {
-    icon: '/favicon.ico',
-    apple: '/favicon.ico',
-  },
+  title: "PurpleGirl.in | Anonymous Advice & Guides for Indian Women",
+  description: "Find your answer safely and anonymously. Expert advice, how-to guides, and quizzes on relationships, health, beauty, and more.",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
-    <html
-      lang="en"
-      className={`${inter.variable} ${syne.variable} ${playfair.variable} ${outfit.variable}`}
-    >
-      <body suppressHydrationWarning>
-        {/* Google Analytics */}
-        <Script
-          async
-          src="https://www.googletagmanager.com/gtag/js?id=G-ECLMKP650Q"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-ECLMKP650Q');
-          `}
-        </Script>
-
+    <html lang="en">
+      <head>
+        {/* Ezoic Head Script */}
+        <script dangerouslySetInnerHTML={{
+          __html: `(function() {
+            var script = document.createElement('script');
+            script.src = '//www.ezojs.com/ezoic/sa.min.js';
+            script.async = true;
+            document.head.appendChild(script);
+          })();`
+        }} />
+      </head>
+      <body>
         <Header />
-
-        <main style={{ position: 'relative', zIndex: 1 }}>
+        <main className="min-h-screen">
           {children}
         </main>
-
         <Footer />
-        <FloatingChat />
       </body>
     </html>
   );

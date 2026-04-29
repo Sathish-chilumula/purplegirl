@@ -1,166 +1,163 @@
-import { Metadata } from 'next';
-import Link from 'next/link';
+import React from 'react';
 import { notFound } from 'next/navigation';
-import { ArrowLeft, Sparkles, Heart, ArrowRight, Zap } from 'lucide-react';
+import Link from 'next/link';
 import { supabaseAdmin } from '@/lib/supabase-admin';
-import { buildItemListSchema } from '@/lib/schema';
-import { SITE_NAME, SITE_URL } from '@/lib/constants';
-import { PageBackground } from '@/components/PageBackground';
+import { Badge } from '@/components/ui/Badge';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { ChevronRight } from 'lucide-react';
+import { Metadata } from 'next';
 
 export const runtime = 'edge';
 
-interface CategoryPageProps {
-  params: Promise<{ slug: string }>;
-}
-
-interface CategoryData {
-  id: string;
-  name: string;
-  slug: string;
-  description: string;
-  icon: string;
-}
-
-interface QuestionSummary {
-  slug: string;
-  title: string;
-  description: string;
-  metoo_count: number;
-}
-
 async function getCategoryData(slug: string) {
-  const { data, error } = await supabaseAdmin
+  const { data } = await supabaseAdmin
     .from('categories')
     .select('*')
     .eq('slug', slug)
     .single();
-
-  if (error || !data) return null;
-  return data as CategoryData;
+  return data;
 }
 
-async function getCategoryQuestions(categoryId: string) {
+async function getCategoryArticles(categorySlug: string) {
   const { data } = await supabaseAdmin
-    .from('questions')
-    .select('slug, title, description, metoo_count')
-    .eq('category_id', categoryId)
-    .eq('status', 'approved')
-    .order('created_at', { ascending: false });
-
-  return (data || []) as QuestionSummary[];
+    .from('articles')
+    .select('slug, title, intro, reading_time_mins')
+    .eq('category', categorySlug)
+    .eq('is_published', true)
+    .order('view_count', { ascending: false });
+  return data || [];
 }
 
-export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const category = await getCategoryData(slug);
-
-  if (!category) return { title: 'Topic Not Found' };
-
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const category = await getCategoryData(params.slug);
+  if (!category) return { title: 'Category Not Found' };
+  
   return {
-    title: `${category.name} | ${SITE_NAME}`,
-    description: category.description || `Explore honest questions and sisterly guidance about ${category.name}.`,
+    title: `${category.name} Problems & Advice for Indian Women | PurpleGirl`,
+    description: `How-to guides for Indian women facing ${category.name.toLowerCase()} problems. Honest, anonymous advice.`,
     openGraph: {
-      title: `${category.name} | ${SITE_NAME}`,
+      title: `${category.name} Advice | PurpleGirl`,
       description: category.description,
       type: 'website',
-      url: `${SITE_URL}/category/${slug}`
-    },
+    }
   };
 }
 
-export default async function CategoryPage({ params }: CategoryPageProps) {
-  const { slug } = await params;
-  const category = await getCategoryData(slug);
+const AdPlaceholder = ({ text = "Advertisement" }) => (
+  <div className="w-full my-8 bg-pg-gray-100 border border-pg-gray-300 border-dashed rounded-lg h-[250px] flex items-center justify-center text-pg-gray-400 text-sm">
+    {text} (Google AdSense)
+  </div>
+);
 
-  if (!category) notFound();
+export default async function CategoryPage({ params }: { params: { slug: string } }) {
+  const category = await getCategoryData(params.slug);
 
-  const questions = await getCategoryQuestions(category.id);
-  const itemListSchema = buildItemListSchema(category, questions);
+  if (!category) {
+    notFound();
+  }
+
+  const articles = await getCategoryArticles(category.slug);
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
-      <PageBackground />
-
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
-      />
-
-      <div className="max-w-6xl mx-auto px-6 py-20 relative z-10">
-        <Link href="/" className="inline-flex items-center text-slate-500 hover:text-purple-600 mb-12 transition-colors font-bold text-xs uppercase tracking-[0.2em] group animate-slide-up">
-          <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" /> Back to library
-        </Link>
-        
-        {/* Category Header */}
-        <div className="bg-white rounded-[2rem] p-10 md:p-16 mb-20 shadow-2xl border border-slate-100 relative overflow-hidden animate-slide-up stagger-1">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-purple-50/50 rounded-full blur-3xl -mr-48 -mt-48 pointer-events-none" />
-          
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-12 text-center md:text-left relative z-10">
-            <div className="bg-purple-100 w-32 h-32 rounded-3xl shadow-lg border border-white flex items-center justify-center text-6xl transform -rotate-6">
-              {category.icon || '💜'}
-            </div>
-            <div className="flex-1">
-              <div className="inline-flex items-center gap-2 bg-purple-50 text-purple-600 px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest mb-6">
-                <Zap size={14} className="fill-purple-600" /> Topic Archive
-              </div>
-              <h1 className="font-syne text-5xl md:text-7xl font-extrabold text-slate-900 mb-6 tracking-tighter leading-none">
-                {category.name}
-              </h1>
-              <p className="text-slate-500 text-xl leading-relaxed max-w-2xl font-medium">
-                {category.description || `Explore honest questions and sisterly guidance about ${category.name}. No filters, no judgment.`}
-              </p>
-            </div>
+    <div className="bg-pg-cream min-h-screen pb-24">
+      
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━
+          1. CATEGORY HERO
+          ━━━━━━━━━━━━━━━━━━━━━━━ */}
+      <header className="bg-pg-rose-light pt-20 pb-16 px-6 border-b border-pg-rose/10">
+        <div className="max-w-content mx-auto flex flex-col md:flex-row items-center gap-8 text-center md:text-left">
+          <div className="text-[64px] bg-white w-24 h-24 rounded-full flex items-center justify-center shadow-sm shrink-0">
+            {category.icon_emoji || '✨'}
+          </div>
+          <div>
+            <h1 className="font-display text-4xl md:text-5xl font-extrabold text-pg-gray-900 mb-3">
+              {category.name}
+            </h1>
+            <p className="text-lg text-pg-gray-700 max-w-2xl mb-4">
+              {category.description || `Honest advice and step-by-step guides for everything related to ${category.name.toLowerCase()}.`}
+            </p>
+            <Badge>{category.article_count || articles.length} Guides</Badge>
           </div>
         </div>
+      </header>
+
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━
+          MAIN CONTENT GRID
+          ━━━━━━━━━━━━━━━━━━━━━━━ */}
+      <div className="max-w-content mx-auto px-6 mt-12 flex flex-col lg:flex-row gap-12">
         
-        {/* Question List */}
-        {questions.length > 0 ? (
-          <div>
-            <div className="flex items-center justify-between mb-12 animate-slide-up stagger-2">
-              <div className="flex items-center gap-3">
-                <Sparkles className="w-6 h-6 text-purple-600" />
-                <h2 className="font-syne text-3xl font-bold text-slate-900">The Vault</h2>
-              </div>
-              <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                {questions.length} Questions Answered
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {questions.map((q, i) => (
-                <Link 
-                  key={q.slug}
-                  href={`/q/${q.slug}`}
-                  className="bg-white rounded-3xl p-8 flex flex-col group hover:-translate-y-2 hover:shadow-2xl hover:border-purple-200 border border-slate-100 transition-all duration-500 animate-slide-up"
-                  style={{ animationDelay: `${(i % 10) * 0.1}s` }}
-                >
-                  <h2 className="font-syne text-2xl font-bold text-slate-900 mb-6 group-hover:text-purple-600 transition-colors leading-tight">
-                    {q.title}
-                  </h2>
-                  
-                  <div className="flex items-center justify-between text-sm mt-auto pt-6 border-t border-slate-50">
-                    <span className="flex items-center text-slate-400 font-bold text-[10px] uppercase tracking-widest">
-                      <Heart className="w-4 h-4 mr-2 group-hover:text-pink-500 group-hover:fill-pink-500 transition-colors" />
-                      {q.metoo_count || 0} Relate
-                    </span>
-                    <span className="text-purple-600 font-bold tracking-widest text-[10px] flex items-center gap-2 group-hover:gap-4 transition-all uppercase">
-                      Open Whisper <ArrowRight className="w-4 h-4" />
-                    </span>
-                  </div>
-                </Link>
-              ))}
-            </div>
+        <div className="lg:w-[70%]">
+          
+          {/* 2. Subcategory Filter Pills (Static for now) */}
+          <div className="flex gap-3 overflow-x-auto pb-4 mb-8 hide-scrollbar">
+            <button className="shrink-0 px-4 py-2 rounded-full bg-pg-gray-900 text-white font-bold text-sm">
+              All Guides
+            </button>
+            {['Most Popular', 'Recent', 'Toxic Patterns', 'Communication'].map(sub => (
+              <button key={sub} className="shrink-0 px-4 py-2 rounded-full bg-white border border-pg-gray-300 text-pg-gray-700 hover:border-pg-rose hover:text-pg-rose font-bold text-sm transition-colors">
+                {sub}
+              </button>
+            ))}
           </div>
-        ) : (
-          <div className="text-center py-32 bg-white rounded-[2rem] border-2 border-dashed border-slate-200 animate-slide-up stagger-2">
-            <div className="text-6xl mb-8">🤫</div>
-            <h3 className="font-syne text-2xl font-bold text-slate-900 mb-4 tracking-tight">The Vault is Silent... for now.</h3>
-            <p className="text-slate-500 max-w-md mx-auto mb-12">Be the first to break the silence. Ask your elder sisters anything about {category.name}.</p>
-            <Link href="/ask" className="btn-premium px-12 py-5 text-lg">
-              Ask A Question
+
+          {/* 3. Article Grid */}
+          <div className="grid md:grid-cols-2 gap-6">
+            {articles.length > 0 ? articles.map((article) => (
+              <Link key={article.slug} href={`/how-to/${article.slug}`}>
+                <Card className="h-full hover:border-pg-rose transition-colors flex flex-col p-6">
+                  <h3 className="font-display text-[20px] font-bold text-pg-gray-900 mb-3 leading-snug group-hover:text-pg-rose">
+                    {article.title}
+                  </h3>
+                  <p className="text-pg-gray-500 text-sm line-clamp-3 mb-6 flex-grow">
+                    {article.intro?.substring(0, 120)}...
+                  </p>
+                  <div className="text-xs font-bold text-pg-gray-400 uppercase tracking-widest mt-auto">
+                    ⏱ {article.reading_time_mins || 6} min read
+                  </div>
+                </Card>
+              </Link>
+            )) : (
+              <div className="col-span-2 py-16 text-center border border-dashed border-pg-gray-300 rounded-2xl">
+                <p className="text-pg-gray-500 mb-4">Our editors are currently writing guides for this category.</p>
+                <Link href="/ask">
+                  <Button variant="secondary">Ask a Question Meanwhile</Button>
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Load More Button */}
+          {articles.length > 12 && (
+            <div className="mt-12 text-center">
+              <Button variant="ghost" className="w-full sm:w-auto">
+                Load More Guides
+              </Button>
+            </div>
+          )}
+
+        </div>
+
+        {/* ━━━━━━━━━━━━━━━━━━━━━━━
+            4. SIDEBAR
+            ━━━━━━━━━━━━━━━━━━━━━━━ */}
+        <aside className="lg:w-[30%] space-y-10 lg:sticky lg:top-28 self-start">
+          
+          {/* Quizzes Widget */}
+          <div className="bg-pg-plum text-white rounded-2xl p-8">
+            <h3 className="font-display font-bold text-2xl mb-3">Learn More About Yourself</h3>
+            <p className="text-sm text-pg-plum-light mb-6">
+              Take our completely private, anonymous quizzes related to {category.name.toLowerCase()}.
+            </p>
+            <Link href="/quizzes" className="inline-block bg-white text-pg-plum font-bold py-3 px-6 rounded-xl hover:bg-pg-plum-light transition-colors text-sm w-full text-center">
+              Explore Quizzes <ChevronRight size={16} className="inline ml-1" />
             </Link>
           </div>
-        )}
+
+          <AdPlaceholder text="Sidebar Ad Slot" />
+
+        </aside>
+
       </div>
     </div>
   );

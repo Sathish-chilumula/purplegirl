@@ -4,13 +4,12 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Search, Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import { Button } from '@/components/ui/Button';
 
 const navLinks = [
-  { href: '/category/beauty-skincare',   label: 'Beauty' },
-  { href: '/category/fashion-style',     label: 'Fashion' },
-  { href: '/category/relationships-love',label: 'Love' },
-  { href: '/category/mental-wellness',   label: 'Wellness' },
-  { href: '/ask',                        label: 'Ask' },
+  { href: '/', label: 'Home' },
+  { href: '/categories', label: 'Categories' },
+  { href: '/quizzes', label: 'Quizzes' },
 ];
 
 export default function Header() {
@@ -18,132 +17,81 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header
-      style={{
-        position: 'sticky', top: 0, zIndex: 100,
-        background: 'rgba(255,255,255,0.85)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        borderBottom: '1px solid var(--border-soft)',
-      }}
-    >
-      <div
-        style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem', height: '72px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}
-      >
+    <header className="sticky top-0 z-[100] bg-white/90 backdrop-blur-md border-b border-pg-gray-100">
+      <div className="max-w-content mx-auto px-6 h-20 flex items-center justify-between gap-8">
+        
         {/* Logo */}
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', textDecoration: 'none', flexShrink: 0 }}>
-          <div
-            style={{
-              width: 40, height: 40, borderRadius: '12px',
-              background: 'var(--grad-brand)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 4px 16px rgba(124,58,237,0.35)',
-              fontSize: '1.25rem', fontWeight: 900,
-              fontFamily: 'var(--font-display)',
-              color: 'white',
-              transition: 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.transform = 'rotate(10deg) scale(1.05)')}
-            onMouseLeave={(e) => (e.currentTarget.style.transform = '')}
-          >
+        <Link href="/" className="flex items-center gap-3 shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-pg-rose flex items-center justify-center shadow-lg shadow-pg-rose/20 text-white font-display font-black text-xl italic">
             P
           </div>
-          <span
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontWeight: 900,
-              fontSize: '1.4rem',
-              color: 'var(--ink)',
-              letterSpacing: '-0.03em',
-            }}
-          >
-            PurpleGirl<span style={{ color: 'var(--purple-mid)' }}>.</span>
+          <span className="font-display font-black text-2xl text-pg-gray-900 tracking-tight">
+            PurpleGirl<span className="text-pg-rose">.</span>
           </span>
         </Link>
 
         {/* Desktop Nav */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }} className="hidden md:flex">
-          {navLinks.filter(l => l.label !== 'Ask').map(({ href, label }) => (
+        <nav className="hidden lg:flex items-center gap-1">
+          {navLinks.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
-              style={{
-                padding: '0.5rem 1rem',
-                borderRadius: '9999px',
-                fontSize: '0.875rem',
-                fontWeight: 600,
-                color: pathname === href ? 'var(--purple-mid)' : 'var(--text-secondary)',
-                background: pathname === href ? 'var(--purple-mist)' : 'transparent',
-                transition: 'all 0.2s',
-                textDecoration: 'none',
-              }}
-              onMouseEnter={(e) => { if (pathname !== href) (e.currentTarget as HTMLElement).style.color = 'var(--purple-mid)'; }}
-              onMouseLeave={(e) => { if (pathname !== href) (e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)'; }}
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                pathname === href 
+                  ? 'bg-pg-rose-light text-pg-rose' 
+                  : 'text-pg-gray-500 hover:text-pg-rose hover:bg-pg-gray-100'
+              }`}
             >
               {label}
             </Link>
           ))}
         </nav>
 
-        {/* Right side */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
-          <button
-            style={{ padding: '0.5rem', borderRadius: '9999px', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', transition: 'color 0.2s' }}
-            className="hidden sm:flex"
-            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--purple-mid)')}
-            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
-          >
+        {/* Actions */}
+        <div className="flex items-center gap-4 shrink-0">
+          <button className="hidden sm:flex p-2 text-pg-gray-400 hover:text-pg-rose transition-colors">
             <Search size={20} />
           </button>
-          <Link
-            href="/ask"
-            className="hidden md:inline-flex btn-primary"
-            style={{ padding: '0.625rem 1.5rem', fontSize: '0.85rem' }}
-          >
-            Ask Anything
+          <Link href="/ask" className="hidden md:block">
+            <Button variant="primary" className="py-2 px-6 text-sm shadow-sm">
+              Ask Anonymously
+            </Button>
           </Link>
-          {/* Mobile menu toggle */}
+          
+          {/* Mobile Menu Toggle */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden"
-            style={{ padding: '0.5rem', border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text-primary)' }}
+            className="lg:hidden p-2 text-pg-gray-900"
           >
-            {menuOpen ? <X size={24} /> : <Menu size={24} />}
+            {menuOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
         </div>
       </div>
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div
-          style={{
-            padding: '1rem 1.5rem 2rem',
-            borderTop: '1px solid var(--border-soft)',
-            background: 'white',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.25rem',
-          }}
-          className="md:hidden"
-        >
+        <div className="lg:hidden absolute top-full left-0 w-full bg-white border-b border-pg-gray-100 p-6 flex flex-col gap-2 shadow-xl fade-in">
           {navLinks.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
               onClick={() => setMenuOpen(false)}
-              style={{
-                padding: '0.875rem 1rem',
-                borderRadius: '0.75rem',
-                fontSize: '1rem',
-                fontWeight: 600,
-                color: pathname === href ? 'var(--purple-mid)' : 'var(--text-primary)',
-                background: pathname === href ? 'var(--purple-mist)' : 'transparent',
-                textDecoration: 'none',
-              }}
+              className={`px-6 py-4 rounded-2xl text-lg font-bold transition-all ${
+                pathname === href 
+                  ? 'bg-pg-rose-light text-pg-rose' 
+                  : 'text-pg-gray-700 active:bg-pg-gray-100'
+              }`}
             >
               {label}
             </Link>
           ))}
+          <div className="pt-4 mt-2 border-t border-pg-gray-100">
+            <Link href="/ask" onClick={() => setMenuOpen(false)}>
+              <Button variant="primary" className="w-full py-4 text-lg">
+                Ask Anonymously
+              </Button>
+            </Link>
+          </div>
         </div>
       )}
     </header>
