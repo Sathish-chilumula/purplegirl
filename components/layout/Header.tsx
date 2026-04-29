@@ -5,7 +5,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Search, Menu, X, ChevronDown, ChevronRight, Zap, TrendingUp, Flame, HelpCircle, Calendar } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
-import { FloatingChat } from '@/components/FloatingChat';
 
 const topLinks = [
   { label: 'Random Article', icon: Zap, href: '/search' },
@@ -405,7 +404,6 @@ export default function Header() {
           </div>
         </div>
       )}
-      <FloatingChat />
     </header>
   );
 }
