@@ -52,8 +52,8 @@ export default async function Home() {
 
           {/* Visual headline — shown to users */}
           <p className="font-display text-4xl md:text-[42px] font-bold text-pg-gray-900 leading-tight mb-4">
-            She Googled It Alone At Midnight.
-            <span className="text-pg-rose block">This Is For Her.</span>
+            The Safe Space for Indian Women.
+            <span className="text-pg-rose block">Honest Advice & How-To Guides.</span>
           </p>
           <p className="font-sans text-lg md:text-[18px] text-pg-gray-700 mb-10">
             Pain-first guides, honest quizzes, and anonymous Q&A — written for Indian women who can't ask anyone else.

@@ -44,11 +44,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-const AdPlaceholder = ({ text = "Advertisement" }) => (
-  <div className="w-full my-8 bg-pg-gray-100 border border-pg-gray-300 border-dashed rounded-lg h-[250px] flex items-center justify-center text-pg-gray-400 text-sm">
-    {text} (Google AdSense)
-  </div>
-);
+import AdSenseUnit from '@/components/ads/AdSenseUnit';
 
 export default async function CategoryPage({ params }: { params: { slug: string } }) {
   const category = await getCategoryData(params.slug);
@@ -149,12 +145,12 @@ export default async function CategoryPage({ params }: { params: { slug: string 
             <p className="text-sm text-pg-plum-light mb-6">
               Take our completely private, anonymous quizzes related to {category.name.toLowerCase()}.
             </p>
-            <Link href="/quizzes" className="inline-block bg-white text-pg-plum font-bold py-3 px-6 rounded-xl hover:bg-pg-plum-light transition-colors text-sm w-full text-center">
+            <Link href="/quiz/relationship-health-check" className="inline-block bg-white text-pg-plum font-bold py-3 px-6 rounded-xl hover:bg-pg-plum-light transition-colors text-sm w-full text-center">
               Explore Quizzes <ChevronRight size={16} className="inline ml-1" />
             </Link>
           </div>
 
-          <AdPlaceholder text="Sidebar Ad Slot" />
+          <AdSenseUnit slot="sidebar" className="mt-8" />
 
         </aside>
 
