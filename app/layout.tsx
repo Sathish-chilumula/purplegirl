@@ -15,8 +15,12 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "PurpleGirl.in | Anonymous Advice & Guides for Indian Women",
-  description: "Find your answer safely and anonymously. Expert advice, how-to guides, and quizzes on relationships, health, beauty, and more.",
+  title: {
+    default: "PurpleGirl — How-To Guides & Advice for Indian Women",
+    template: "%s | PurpleGirl",
+  },
+  description: "Honest how-to guides on relationships, health, career, and more — made for Indian women. 100% anonymous Q&A, no login required.",
+  metadataBase: new URL("https://purplegirl.in"),
 };
 
 export default function RootLayout({

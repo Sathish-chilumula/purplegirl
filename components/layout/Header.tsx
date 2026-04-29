@@ -26,7 +26,7 @@ export default function Header() {
             P
           </div>
           <span className="font-display font-black text-2xl text-pg-gray-900 tracking-tight">
-            PurpleGirl<span className="text-pg-rose">.</span>
+            PurpleGirl
           </span>
         </Link>
 

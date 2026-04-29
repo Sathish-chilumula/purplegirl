@@ -1,27 +1,27 @@
 import Link from 'next/link';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { AskBox } from '@/components/home/AskBox';
-import { Search, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import type { Metadata } from 'next';
 
 export const runtime = 'edge';
 
-// Add AdSense placeholder component
-const AdPlaceholder = () => (
-  <div className="w-full my-8">
-    {/* ezoic-ad placeholder replacing logic, now using Google AdSense */}
-    <div className="bg-pg-gray-100 border border-pg-gray-300 border-dashed rounded-lg h-[90px] flex items-center justify-center text-pg-gray-400 text-sm">
-      Advertisement
-    </div>
-  </div>
-);
+export const metadata: Metadata = {
+  title: "How-To Guides & Anonymous Advice for Indian Women",
+  description: "Honest how-to guides on relationships, health, career, skin, and more — written for Indian women. 100% anonymous Q&A, no login required.",
+};
 
 async function getHomeData() {
   const [categoriesRes, articlesRes] = await Promise.all([
-    supabaseAdmin.from('categories').select('*').order('display_order', { ascending: true }),
-    supabaseAdmin.from('articles')
+    supabaseAdmin
+      .from('categories')
+      .select('*')
+      .lt('display_order', 99)          // exclude sex-intimacy (display_order = 99)
+      .order('display_order', { ascending: true }),
+    supabaseAdmin
+      .from('articles')
       .select('slug, title, intro, reading_time_mins, category')
       .eq('is_published', true)
       .order('view_count', { ascending: false })
@@ -47,10 +47,14 @@ export default async function Home() {
         <div className="absolute inset-0 bg-[radial-gradient(#E91E8C_1px,transparent_1px)] [background-size:24px_24px] opacity-10" />
         
         <div className="max-w-3xl mx-auto text-center relative z-10 fade-up">
-          <h1 className="font-display text-4xl md:text-[42px] font-bold text-pg-gray-900 leading-tight mb-4">
+          {/* SEO: screen-reader only H1 */}
+          <h1 className="sr-only">How-To Guides & Anonymous Advice for Indian Women</h1>
+
+          {/* Visual headline — shown to users */}
+          <p className="font-display text-4xl md:text-[42px] font-bold text-pg-gray-900 leading-tight mb-4">
             She Googled It Alone At Midnight.
             <span className="text-pg-rose block">This Is For Her.</span>
-          </h1>
+          </p>
           <p className="font-sans text-lg md:text-[18px] text-pg-gray-700 mb-10">
             Pain-first guides, honest quizzes, and anonymous Q&A — written for Indian women who can't ask anyone else.
           </p>
@@ -93,7 +97,7 @@ export default async function Home() {
       {/* ━━━━━━━━━━━━━━━━━━━━━━━
           SECTION 2 — Category Grid
           ━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section id="categories" className="py-20 px-6 max-w-content mx-auto fade-up stagger-1">
+      <section id="categories" className="py-20 px-6 max-w-content mx-auto">
         <h2 className="font-sans text-[22px] font-bold text-pg-gray-900 mb-8 text-center md:text-left">
           Browse by Category
         </h2>
@@ -102,33 +106,35 @@ export default async function Home() {
           {categories.map((cat) => (
             <Link key={cat.id} href={`/category/${cat.slug}`}>
               <Card className="flex flex-col items-center text-center hover:border-pg-rose hover:bg-pg-rose-light/30 transition-all h-full p-6">
-                <div className="text-[40px] mb-4 group-hover:scale-110 transition-transform">
+                <div className="text-[40px] mb-4">
                   {cat.icon_emoji || '✨'}
                 </div>
                 <h3 className="font-sans text-[16px] font-bold text-pg-gray-900 mb-1 leading-tight">
                   {cat.name}
                 </h3>
-                <span className="text-sm text-pg-gray-500">
-                  {cat.article_count} articles
-                </span>
+                {/* Only show count if there are articles */}
+                {cat.article_count > 0 ? (
+                  <span className="text-sm text-pg-gray-500">{cat.article_count} guides</span>
+                ) : (
+                  <span className="text-xs text-pg-gray-400 italic">Coming soon</span>
+                )}
               </Card>
             </Link>
           ))}
         </div>
       </section>
 
-      <div className="max-w-content mx-auto px-6">
-        <AdPlaceholder />
-      </div>
-
       {/* ━━━━━━━━━━━━━━━━━━━━━━━
           SECTION 3 — Featured "How To" Articles
           ━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section className="py-16 px-6 max-w-content mx-auto fade-up stagger-2">
+      <section className="py-16 px-6 max-w-content mx-auto">
         <div className="flex items-center justify-between mb-8">
           <h2 className="font-sans text-[22px] font-bold text-pg-gray-900">
             Popular How-To Guides
           </h2>
+          <Link href="/how-to" className="text-pg-rose text-sm font-bold hover:underline hidden md:block">
+            View all →
+          </Link>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
@@ -160,7 +166,7 @@ export default async function Home() {
       {/* ━━━━━━━━━━━━━━━━━━━━━━━
           SECTION 4 — Quizzes Strip
           ━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section id="quizzes" className="my-16 bg-pg-plum text-white py-16 px-6 overflow-hidden relative fade-up">
+      <section id="quizzes" className="my-16 bg-pg-plum text-white py-16 px-6 overflow-hidden relative">
         <div className="max-w-content mx-auto">
           <div className="mb-10 text-center md:text-left">
             <h2 className="font-display text-[32px] font-bold mb-2">
@@ -196,7 +202,7 @@ export default async function Home() {
       {/* ━━━━━━━━━━━━━━━━━━━━━━━
           SECTION 5 — Anonymous Ask Box
           ━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section className="py-16 px-6 max-w-content mx-auto fade-up">
+      <section className="py-16 px-6 max-w-content mx-auto">
         <AskBox />
       </section>
 

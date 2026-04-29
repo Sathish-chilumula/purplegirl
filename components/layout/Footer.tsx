@@ -24,7 +24,7 @@ export default function Footer() {
                 P
               </div>
               <span className="font-display font-black text-xl text-white tracking-tight">
-                PurpleGirl<span className="text-pg-rose">.</span>
+                PurpleGirl
               </span>
             </Link>
             <p className="text-sm leading-relaxed mb-6 text-white/60">
