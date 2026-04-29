@@ -71,13 +71,19 @@ export default async function Home() {
           </form>
 
           <div className="flex flex-wrap justify-center gap-2 text-sm">
-            {['Period Pain', 'Toxic Relationship', 'Career Change', 'Skin Care', 'Pregnancy'].map((tag) => (
+            {[
+              { label: 'Period Pain', href: '/category/womens-health' },
+              { label: 'Toxic Relationship', href: '/category/relationships-marriage' },
+              { label: 'Career Change', href: '/category/career-workplace' },
+              { label: 'Skin Care', href: '/category/skin-beauty' },
+              { label: 'Pregnancy', href: '/category/pregnancy-fertility' },
+            ].map((tag) => (
               <Link 
-                key={tag} 
-                href={`/search?q=${encodeURIComponent(tag)}`}
+                key={tag.label} 
+                href={tag.href}
                 className="bg-white/60 hover:bg-white text-pg-gray-700 px-4 py-1.5 rounded-full transition-colors border border-pg-rose/10"
               >
-                {tag}
+                {tag.label}
               </Link>
             ))}
           </div>

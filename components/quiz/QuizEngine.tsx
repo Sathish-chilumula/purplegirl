@@ -16,23 +16,44 @@ const triggerConfetti = () => {
   }
 };
 
+interface QuizQuestion {
+  id: number;
+  question: string;
+  options: { text: string; score: number }[];
+}
+
+interface QuizResult {
+  minScore: number;
+  maxScore: number;
+  title: string;
+  description: string;
+}
+
 interface QuizEngineProps {
   quiz: {
     title: string;
     description: string;
     category: string;
-    questions_json: { questions: any[] };
-    result_types_json: { results: any[], scoring: string };
+    questions_json: QuizQuestion[] | { questions: QuizQuestion[] };
+    result_types_json: QuizResult[] | { results: QuizResult[] };
   };
 }
 
 export const QuizEngine = ({ quiz }: QuizEngineProps) => {
   const [state, setState] = useState<'intro' | 'playing' | 'result'>('intro');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<number, string>>({});
-  const [result, setResult] = useState<any>(null);
-  
-  const questions = quiz.questions_json?.questions || [];
+  const [scores, setScores] = useState<number[]>([]);
+  const [result, setResult] = useState<QuizResult | null>(null);
+
+  // Normalize both possible data shapes
+  const questions: QuizQuestion[] = Array.isArray(quiz.questions_json)
+    ? quiz.questions_json
+    : (quiz.questions_json as any)?.questions || [];
+
+  const resultTypes: QuizResult[] = Array.isArray(quiz.result_types_json)
+    ? quiz.result_types_json
+    : (quiz.result_types_json as any)?.results || [];
+
   const totalQuestions = questions.length;
 
   useEffect(() => {
@@ -48,11 +69,13 @@ export const QuizEngine = ({ quiz }: QuizEngineProps) => {
   const handleStart = () => {
     setState('playing');
     setCurrentQuestionIndex(0);
-    setAnswers({});
+    setScores([]);
   };
 
-  const handleAnswerSelect = (value: string) => {
-    setAnswers(prev => ({ ...prev, [currentQuestionIndex]: value }));
+  const handleAnswerSelect = (score: number) => {
+    const newScores = [...scores];
+    newScores[currentQuestionIndex] = score;
+    setScores(newScores);
   };
 
   const handleNext = () => {
@@ -64,25 +87,10 @@ export const QuizEngine = ({ quiz }: QuizEngineProps) => {
   };
 
   const calculateResult = () => {
-    // Basic "most frequent" scoring logic
-    const counts: Record<string, number> = {};
-    Object.values(answers).forEach(val => {
-      counts[val] = (counts[val] || 0) + 1;
-    });
-
-    let topType = '';
-    let maxCount = 0;
-    Object.entries(counts).forEach(([type, count]) => {
-      if (count > maxCount) {
-        maxCount = count;
-        topType = type;
-      }
-    });
-
-    const results = quiz.result_types_json?.results || [];
-    const matchedResult = results.find(r => r.type === topType) || results[0];
-    
-    setResult(matchedResult);
+    const totalScore = scores.reduce((sum, s) => sum + (s || 0), 0);
+    const matched = resultTypes.find(r => totalScore >= r.minScore && totalScore <= r.maxScore)
+      || resultTypes[resultTypes.length - 1];
+    setResult(matched);
     setState('result');
     setTimeout(triggerConfetti, 300);
   };
@@ -113,11 +121,12 @@ export const QuizEngine = ({ quiz }: QuizEngineProps) => {
 
   if (state === 'playing') {
     const currentQ = questions[currentQuestionIndex];
-    const progress = ((currentQuestionIndex) / totalQuestions) * 100;
-    const hasSelected = !!answers[currentQuestionIndex];
+    const progress = (currentQuestionIndex / totalQuestions) * 100;
+    const selectedScore = scores[currentQuestionIndex];
+    const hasSelected = selectedScore !== undefined;
 
     return (
-      <div className="max-w-2xl mx-auto fade-in">
+      <div className="max-w-2xl mx-auto">
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between text-xs font-bold text-pg-gray-500 uppercase tracking-widest mb-2">
@@ -135,36 +144,38 @@ export const QuizEngine = ({ quiz }: QuizEngineProps) => {
         {/* Question Card */}
         <div className="bg-white rounded-[24px] p-8 md:p-12 shadow-sm border border-pg-gray-100">
           <h2 className="font-sans text-2xl md:text-3xl font-bold text-pg-gray-900 mb-10 text-center leading-tight">
-            {currentQ.text}
+            {currentQ.question}
           </h2>
 
           <div className="space-y-4">
-            {currentQ.options?.map((opt: any, i: number) => {
-              const isSelected = answers[currentQuestionIndex] === opt.value;
+            {currentQ.options?.map((opt, i) => {
+              const isSelected = selectedScore === opt.score;
               return (
                 <button
                   key={i}
-                  onClick={() => handleAnswerSelect(opt.value)}
+                  onClick={() => handleAnswerSelect(opt.score)}
                   className={`w-full text-left px-6 py-5 rounded-2xl border-2 font-bold text-lg transition-all ${
                     isSelected 
                       ? 'border-pg-rose bg-pg-rose-light text-pg-rose' 
                       : 'border-pg-gray-100 bg-white hover:bg-pg-gray-100 text-pg-gray-700'
                   }`}
                 >
-                  {opt.label}
+                  {opt.text}
                 </button>
               );
             })}
           </div>
 
           <div className="mt-12 flex justify-end">
-            <Button 
-              onClick={handleNext} 
+            <button
+              onClick={handleNext}
               disabled={!hasSelected}
-              className={`px-8 transition-opacity ${!hasSelected ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`inline-flex items-center gap-2 bg-pg-rose text-white font-bold rounded-xl px-8 py-3 transition-all ${
+                !hasSelected ? 'opacity-40 cursor-not-allowed' : 'hover:bg-pg-rose-dark'
+              }`}
             >
-              {currentQuestionIndex === totalQuestions - 1 ? 'See Results' : 'Next'} <ChevronRight size={20} className="ml-1" />
-            </Button>
+              {currentQuestionIndex === totalQuestions - 1 ? 'See My Result' : 'Next'} <ChevronRight size={20} />
+            </button>
           </div>
         </div>
       </div>
@@ -172,11 +183,8 @@ export const QuizEngine = ({ quiz }: QuizEngineProps) => {
   }
 
   if (state === 'result' && result) {
-    const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
-    const shareText = encodeURIComponent(`${result.share_text || 'I took this quiz!'} ${shareUrl}`);
-
     return (
-      <div className="bg-white rounded-[24px] p-8 md:p-12 max-w-3xl mx-auto shadow-sm border border-pg-rose-light text-center fade-up">
+      <div className="bg-white rounded-[24px] p-8 md:p-12 max-w-3xl mx-auto shadow-sm border border-pg-rose-light text-center">
         <div className="text-xs font-bold text-pg-gray-400 uppercase tracking-widest mb-6">
           Your Result
         </div>
@@ -189,29 +197,18 @@ export const QuizEngine = ({ quiz }: QuizEngineProps) => {
           {result.description}
         </p>
 
-        {result.advice && (
-          <div className="bg-pg-rose-light border-l-4 border-pg-rose p-6 rounded-r-2xl mb-12 text-left">
-            <div className="flex items-center gap-2 text-pg-rose font-bold uppercase text-xs tracking-widest mb-3">
-              <Sparkles size={16} /> Insight
-            </div>
-            <p className="text-pg-gray-900 leading-relaxed font-medium">
-              {result.advice}
-            </p>
-          </div>
-        )}
-
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a 
-            href={`https://api.whatsapp.com/send?text=${shareText}`}
+            href={`https://api.whatsapp.com/send?text=${encodeURIComponent(result.title + ' - purplegirl.in')}`}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full sm:w-auto inline-flex items-center justify-center bg-[#25D366] text-white font-bold rounded-xl px-8 py-4 transition-colors hover:bg-[#1ebd5a]"
           >
             <Share2 size={20} className="mr-2" /> Share on WhatsApp
           </a>
-          <Button variant="ghost" onClick={handleStart} className="w-full sm:w-auto py-4">
+          <button onClick={handleStart} className="w-full sm:w-auto inline-flex items-center justify-center border-2 border-pg-gray-300 text-pg-gray-700 font-bold rounded-xl px-8 py-4 hover:bg-pg-gray-100 transition-colors">
             <RefreshCw size={18} className="mr-2" /> Retake Quiz
-          </Button>
+          </button>
         </div>
       </div>
     );
