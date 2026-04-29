@@ -7,6 +7,9 @@ on:
     - cron: '0 13 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   # ── Job 1: Populate the titles bank from trending topics ─────────────────────
   populate-titles:
