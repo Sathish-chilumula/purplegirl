@@ -1,7 +1,18 @@
 import type { Metadata } from "next";
+import { DM_Sans, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-display",
+});
 
 export const metadata: Metadata = {
   title: "PurpleGirl.in | Anonymous Advice & Guides for Indian Women",
@@ -14,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${dmSans.variable} ${playfair.variable}`}>
       <head>
         {/* Ezoic Head Script */}
         <script dangerouslySetInnerHTML={{
@@ -26,7 +37,7 @@ export default function RootLayout({
           })();`
         }} />
       </head>
-      <body>
+      <body className="antialiased font-sans">
         <Header />
         <main className="min-h-screen">
           {children}

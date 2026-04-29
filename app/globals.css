@@ -1,28 +1,29 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-pg-rose: #E91E8C;
+  --color-pg-rose-light: #FCE4F3;
+  --color-pg-rose-dark: #B5146A;
+  --color-pg-plum: #6B21A8;
+  --color-pg-plum-light: #F3E8FF;
+  --color-pg-cream: #FFF9FB;
+  --color-pg-white: #FFFFFF;
+  --color-pg-gray-100: #F5F5F5;
+  --color-pg-gray-300: #D1D5DB;
+  --color-pg-gray-500: #6B7280;
+  --color-pg-gray-700: #374151;
+  --color-pg-gray-900: #111827;
+  --color-pg-success: #059669;
+  --color-pg-warning: #D97706;
+
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Playfair Display", ui-serif, Georgia, serif;
+}
 
 @layer base {
-  :root {
-    --pg-rose: #E91E8C;
-    --pg-rose-light: #FCE4F3;
-    --pg-rose-dark: #B5146A;
-    --pg-plum: #6B21A8;
-    --pg-plum-light: #F3E8FF;
-    --pg-cream: #FFF9FB;
-    --pg-white: #FFFFFF;
-    --pg-gray-100: #F5F5F5;
-    --pg-gray-300: #D1D5DB;
-    --pg-gray-500: #6B7280;
-    --pg-gray-700: #374151;
-    --pg-gray-900: #111827;
-    --pg-success: #059669;
-    --pg-warning: #D97706;
-  }
-
   body {
-    background-color: var(--pg-cream);
-    color: var(--pg-gray-900);
+    background-color: var(--color-pg-cream);
+    color: var(--color-pg-gray-900);
     @apply font-sans antialiased;
   }
 
