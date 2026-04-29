@@ -4,6 +4,7 @@ import { AskBox } from '@/components/home/AskBox';
 import { ChevronRight } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
+import { HeroIllustration } from '@/components/home/HeroIllustration';
 import type { Metadata } from 'next';
 
 export const runtime = 'edge';
@@ -40,9 +41,6 @@ export default async function Home() {
   return (
     <div className="bg-pg-cream min-h-screen pb-20">
       
-import { HeroIllustration } from '@/components/home/HeroIllustration';
-
-// ... (in Home component)
       {/* ━━━━━━━━━━━━━━━━━━━━━━━
           SECTION 1 — Hero Search Bar
           ━━━━━━━━━━━━━━━━━━━━━━━ */}
