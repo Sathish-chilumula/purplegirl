@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { supabaseAdmin } from '@/lib/supabase-admin';
-import { AskBox } from '@/components/Home/AskBox';
+import { AskBox } from '@/components/home/AskBox';
 import { Search, ChevronRight } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
