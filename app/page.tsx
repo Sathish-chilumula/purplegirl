@@ -48,10 +48,11 @@ export default async function Home() {
         
         <div className="max-w-3xl mx-auto text-center relative z-10 fade-up">
           <h1 className="font-display text-4xl md:text-[42px] font-bold text-pg-gray-900 leading-tight mb-4">
-            Find Your Answer. Safely. Anonymously.
+            She Googled It Alone At Midnight.
+            <span className="text-pg-rose block">This Is For Her.</span>
           </h1>
           <p className="font-sans text-lg md:text-[18px] text-pg-gray-700 mb-10">
-            How-to guides, quizzes, and honest advice — made for Indian women
+            Pain-first guides, honest quizzes, and anonymous Q&A — written for Indian women who can't ask anyone else.
           </p>
 
           <form action="/search" className="relative max-w-2xl mx-auto mb-6">
@@ -86,7 +87,7 @@ export default async function Home() {
       {/* ━━━━━━━━━━━━━━━━━━━━━━━
           SECTION 2 — Category Grid
           ━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section className="py-20 px-6 max-w-content mx-auto fade-up stagger-1">
+      <section id="categories" className="py-20 px-6 max-w-content mx-auto fade-up stagger-1">
         <h2 className="font-sans text-[22px] font-bold text-pg-gray-900 mb-8 text-center md:text-left">
           Browse by Category
         </h2>
@@ -153,7 +154,7 @@ export default async function Home() {
       {/* ━━━━━━━━━━━━━━━━━━━━━━━
           SECTION 4 — Quizzes Strip
           ━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section className="my-16 bg-pg-plum text-white py-16 px-6 overflow-hidden relative fade-up">
+      <section id="quizzes" className="my-16 bg-pg-plum text-white py-16 px-6 overflow-hidden relative fade-up">
         <div className="max-w-content mx-auto">
           <div className="mb-10 text-center md:text-left">
             <h2 className="font-display text-[32px] font-bold mb-2">
@@ -165,23 +166,22 @@ export default async function Home() {
           </div>
 
           <div className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory hide-scrollbar">
-            {/* Hardcoded placeholders until we hook up DB quizzes */}
             {[
-              { title: "Is Your Relationship Healthy or Toxic?", category: "relationships" },
-              { title: "How Much Are You Sacrificing for Others?", category: "mental-health" },
-              { title: "Are Your In-Laws Crossing the Line?", category: "family" }
+              { title: "Is Your Relationship Healthy or Toxic?", slug: "relationship-health-check", category: "Relationships" },
+              { title: "How Much Are You Sacrificing for Others?", slug: "sacrifice-level-quiz", category: "Mental Health" },
+              { title: "Are Your In-Laws Crossing the Line?", slug: "inlaw-boundary-quiz", category: "Family" }
             ].map((quiz, i) => (
-              <div key={i} className="min-w-[280px] md:min-w-[320px] bg-white rounded-[12px] p-6 text-pg-gray-900 snap-center shrink-0">
+              <Link key={i} href={`/quiz/${quiz.slug}`} className="min-w-[280px] md:min-w-[320px] bg-white rounded-[12px] p-6 text-pg-gray-900 snap-center shrink-0 block hover:scale-[1.02] transition-transform">
                 <span className="inline-block px-3 py-1 bg-pg-plum-light text-pg-plum text-[10px] font-bold uppercase tracking-widest rounded-full mb-4">
                   {quiz.category}
                 </span>
-                <h3 className="font-sans font-bold text-lg mb-6 leading-tight h-12">
+                <h3 className="font-sans font-bold text-lg mb-6 leading-tight">
                   {quiz.title}
                 </h3>
-                <Button variant="secondary" className="w-full py-2">
+                <div className="inline-flex items-center justify-center w-full bg-pg-rose text-white font-bold rounded-xl px-6 py-2.5 text-sm hover:bg-pg-rose-dark transition-colors">
                   Start Quiz <ChevronRight size={16} className="ml-1" />
-                </Button>
-              </div>
+                </div>
+              </Link>
             ))}
           </div>
         </div>

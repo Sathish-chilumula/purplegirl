@@ -10,76 +10,84 @@ She is asking a private, painful question anonymously because she has no one els
 - Structure: Start by acknowledging her pain so she feels seen. Then give 3 practical, actionable steps. End with a supportive sentence.
 Limit your answer to 150-200 words.`;
 
+const CATEGORY_SLUGS = [
+  'relationships-marriage', 'womens-health', 'mental-health-emotions', 'skin-beauty',
+  'family-parenting', 'baby-care-motherhood', 'fashion-style', 'career-workplace',
+  'pregnancy-fertility', 'weight-fitness', 'food-indian-cooking', 'legal-rights',
+  'sex-intimacy', 'finance-money', 'hair-care', 'home-household',
+  'festivals-traditions', 'self-growth-confidence'
+];
+
+const CATEGORY_PROMPT = `You are a content classifier. Given a question, return ONLY the single most relevant category slug from this list:
+${CATEGORY_SLUGS.join(', ')}
+Return just the slug, nothing else. No explanation. No punctuation.`;
+
+async function callAI(systemPrompt: string, userMessage: string): Promise<string> {
+  try {
+    const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userMessage }],
+        temperature: 0.4, max_tokens: 400
+      })
+    });
+    if (!groqRes.ok) throw new Error('Groq failed');
+    const data = await groqRes.json();
+    return data.choices[0].message.content;
+  } catch {
+    const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: 'user', parts: [{ text: userMessage }] }],
+        generationConfig: { temperature: 0.4, maxOutputTokens: 400 }
+      })
+    });
+    if (!geminiRes.ok) throw new Error('Gemini fallback failed');
+    const data = await geminiRes.json();
+    return data.candidates[0].content.parts[0].text;
+  }
+}
+
 export async function POST(req: Request) {
   try {
-    const { question, category } = await req.json();
+    const { question } = await req.json();
 
     if (!question) {
       return NextResponse.json({ error: 'Question is required' }, { status: 400 });
     }
 
-    // Attempt Groq API first
-    let aiAnswer = '';
-    try {
-      const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
-          messages: [
-            { role: 'system', content: DIDI_PROMPT },
-            { role: 'user', content: question }
-          ],
-          temperature: 0.7,
-          max_tokens: 300
-        })
-      });
+    // Run answer generation and categorization in parallel
+    const [aiAnswer, rawCategory] = await Promise.all([
+      callAI(DIDI_PROMPT, question),
+      callAI(CATEGORY_PROMPT, question),
+    ]);
 
-      if (!groqResponse.ok) throw new Error('Groq failed');
-      const data = await groqResponse.json();
-      aiAnswer = data.choices[0].message.content;
-    } catch (e) {
-      console.warn('Groq failed, falling back to Gemini Flash 2.5 Lite', e);
-      
-      // Fallback to Gemini API
-      const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${process.env.GEMINI_API_KEY}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: DIDI_PROMPT }] },
-          contents: [{ role: 'user', parts: [{ text: question }] }],
-          generationConfig: { temperature: 0.7, maxOutputTokens: 300 }
-        })
-      });
+    // Validate category against our known list
+    const detectedCategory = CATEGORY_SLUGS.find(s => rawCategory.trim().toLowerCase().includes(s)) || 'self-growth-confidence';
 
-      if (!geminiResponse.ok) throw new Error('Gemini fallback failed');
-      const data = await geminiResponse.json();
-      aiAnswer = data.candidates[0].content.parts[0].text;
-    }
-
-    // Save to Supabase (is_published defaults to false for safety review)
+    // Save to Supabase with auto-detected category
     const { error: dbError } = await supabaseAdmin
       .from('questions')
-      .insert([
-        {
-          question_text: question,
-          category: category || 'general',
-          ai_answer: aiAnswer
-        }
-      ]);
+      .insert([{
+        question_text: question,
+        category: detectedCategory,
+        ai_answer: aiAnswer,
+        is_published: false, // Safety: review before publishing
+      }]);
 
     if (dbError) {
       console.error('DB Insert Error:', dbError);
-      // We still return the answer to the user even if DB fails
     }
 
-    return NextResponse.json({ answer: aiAnswer });
+    return NextResponse.json({ answer: aiAnswer, category: detectedCategory });
 
   } catch (error) {
     console.error('API Error:', error);
     return NextResponse.json({ error: 'Failed to process question' }, { status: 500 });
   }
 }
+
