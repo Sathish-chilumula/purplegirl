@@ -40,57 +40,70 @@ export default async function Home() {
   return (
     <div className="bg-pg-cream min-h-screen pb-20">
       
+import { HeroIllustration } from '@/components/home/HeroIllustration';
+
+// ... (in Home component)
       {/* ━━━━━━━━━━━━━━━━━━━━━━━
           SECTION 1 — Hero Search Bar
           ━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section className="pt-24 pb-20 px-6 relative bg-pg-rose-light">
+      <section className="pt-12 pb-16 md:pt-24 md:pb-20 px-6 relative bg-pg-rose-light overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(#E91E8C_1px,transparent_1px)] [background-size:24px_24px] opacity-10" />
         
-        <div className="max-w-3xl mx-auto text-center relative z-10 fade-up">
-          {/* SEO: screen-reader only H1 */}
-          <h1 className="sr-only">How-To Guides & Anonymous Advice for Indian Women</h1>
-
-          {/* Visual headline — shown to users */}
-          <p className="font-display text-4xl md:text-[42px] font-bold text-pg-gray-900 leading-tight mb-4">
-            The Safe Space for Indian Women.
-            <span className="text-pg-rose block">Honest Advice & How-To Guides.</span>
-          </p>
-          <p className="font-sans text-lg md:text-[18px] text-pg-gray-700 mb-10">
-            Pain-first guides, honest quizzes, and anonymous Q&A — written for Indian women who can't ask anyone else.
-          </p>
-
-          <form action="/search" className="relative max-w-2xl mx-auto mb-6">
-            <input
-              type="text"
-              name="q"
-              placeholder="Search... 'how to deal with mother-in-law' or 'PCOS diet'"
-              className="w-full h-[54px] pl-6 pr-32 rounded-[24px] border-2 border-white focus:border-pg-rose outline-none text-lg shadow-sm"
-            />
-            <button
-              type="submit"
-              className="absolute right-2 top-2 bottom-2 bg-pg-rose text-white px-6 rounded-full font-bold hover:bg-pg-rose-dark transition-colors"
-            >
-              Search
-            </button>
-          </form>
-
-          <div className="flex flex-wrap justify-center gap-2 text-sm">
-            {[
-              { label: 'Period Pain', href: '/category/womens-health' },
-              { label: 'Toxic Relationship', href: '/category/relationships-marriage' },
-              { label: 'Career Change', href: '/category/career-workplace' },
-              { label: 'Skin Care', href: '/category/skin-beauty' },
-              { label: 'Pregnancy', href: '/category/pregnancy-fertility' },
-            ].map((tag) => (
-              <Link 
-                key={tag.label} 
-                href={tag.href}
-                className="bg-white/60 hover:bg-white text-pg-gray-700 px-4 py-1.5 rounded-full transition-colors border border-pg-rose/10"
-              >
-                {tag.label}
-              </Link>
-            ))}
+        <div className="max-w-[1100px] mx-auto relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-12 fade-up">
+          
+          {/* Mobile: Illustration comes first (order-1), Desktop: Illustration goes right (order-2) */}
+          <div className="w-full md:w-[45%] order-1 md:order-2 flex justify-center shrink-0">
+            <HeroIllustration />
           </div>
+
+          {/* Mobile: Text comes second (order-2), Desktop: Text goes left (order-1) */}
+          <div className="w-full md:w-[55%] order-2 md:order-1 text-center md:text-left">
+            {/* SEO: screen-reader only H1 */}
+            <h1 className="sr-only">How-To Guides & Anonymous Advice for Indian Women</h1>
+
+            {/* Visual headline — shown to users */}
+            <p className="font-display text-[28px] md:text-[42px] font-bold text-pg-gray-900 leading-tight mb-4">
+              The Safe Space for Indian Women.
+              <span className="text-pg-rose block">Honest Advice & How-To Guides.</span>
+            </p>
+            <p className="font-sans text-[16px] md:text-[18px] text-pg-gray-700 mb-8 max-w-lg mx-auto md:mx-0">
+              Pain-first guides, honest quizzes, and anonymous Q&A — written for Indian women who can't ask anyone else.
+            </p>
+
+            <form action="/search" className="relative w-full max-w-xl mx-auto md:mx-0 mb-6">
+              <input
+                type="text"
+                name="q"
+                placeholder="Search... 'mother-in-law' or 'PCOS diet'"
+                className="w-full h-[54px] pl-6 pr-32 rounded-[24px] border-2 border-white focus:border-pg-rose outline-none text-[16px] shadow-sm"
+              />
+              <button
+                type="submit"
+                className="absolute right-2 top-2 bottom-2 bg-pg-rose text-white px-6 rounded-full font-bold hover:bg-pg-rose-dark transition-colors"
+              >
+                Search
+              </button>
+            </form>
+
+            <div className="flex overflow-x-auto md:flex-wrap justify-start gap-2 text-sm pb-2 hide-scrollbar w-full">
+              {[
+                { label: 'Period Pain', href: '/category/womens-health' },
+                { label: 'Toxic Relationship', href: '/category/relationships-marriage' },
+                { label: 'Career Change', href: '/category/career-workplace' },
+                { label: 'Skin Care', href: '/category/skin-beauty' },
+                { label: 'Pregnancy', href: '/category/pregnancy-fertility' },
+              ].map((tag) => (
+                <Link 
+                  key={tag.label} 
+                  href={tag.href}
+                  className="bg-white/60 hover:bg-white text-pg-gray-700 px-4 py-1.5 rounded-full transition-colors border border-pg-rose/10 shrink-0"
+                >
+                  {tag.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+
         </div>
       </section>
 

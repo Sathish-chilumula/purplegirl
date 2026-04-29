@@ -23,6 +23,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   return {
     title: `${quiz.title} | PurpleGirl Quiz`,
     description: quiz.description,
+    alternates: {
+      canonical: `/quiz/${params.slug}`
+    },
     openGraph: {
       title: `${quiz.title} | PurpleGirl Quiz`,
       description: quiz.description,

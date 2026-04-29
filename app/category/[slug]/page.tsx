@@ -36,6 +36,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   return {
     title: `${category.name} Problems & Advice for Indian Women | PurpleGirl`,
     description: `How-to guides for Indian women facing ${category.name.toLowerCase()} problems. Honest, anonymous advice.`,
+    alternates: {
+      canonical: `/category/${params.slug}`
+    },
     openGraph: {
       title: `${category.name} Advice | PurpleGirl`,
       description: category.description,

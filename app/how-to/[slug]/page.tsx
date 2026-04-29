@@ -23,9 +23,21 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const article = await getArticleData(params.slug);
   if (!article) return { title: 'Not Found' };
   
+  const isHindi = article.language === 'hi' || article.slug.endsWith('-hi');
+  const baseSlug = article.slug.replace('-hi', '');
+
   return {
     title: `${article.title} | PurpleGirl`,
     description: article.meta_description || article.intro,
+    alternates: isHindi ? {
+      canonical: `/how-to/${baseSlug}`,
+      languages: {
+        'en': `/how-to/${baseSlug}`,
+        'hi': `/how-to/${article.slug}`,
+      }
+    } : {
+      canonical: `/how-to/${article.slug}`,
+    },
     openGraph: {
       title: article.title,
       description: article.meta_description || article.intro,

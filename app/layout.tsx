@@ -21,6 +21,9 @@ export const metadata: Metadata = {
   },
   description: "Honest how-to guides on relationships, health, career, and more — made for Indian women. 100% anonymous Q&A, no login required.",
   metadataBase: new URL("https://purplegirl.in"),
+  alternates: {
+    canonical: '/',
+  },
 };
 
 export default function RootLayout({

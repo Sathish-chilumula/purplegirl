@@ -44,6 +44,13 @@ You MUST return the output ONLY as a valid JSON object with the following schema
 }
 Do not include markdown blocks like \`\`\`json. Return strictly the raw JSON.`;
 
+function isTooSimilar(newTitle, existingTitle) {
+  const a = newTitle.toLowerCase().replace(/[^a-z0-9 ]/g, '').split(' ')
+  const b = existingTitle.toLowerCase().replace(/[^a-z0-9 ]/g, '').split(' ')
+  const common = a.filter(word => b.includes(word) && word.length > 3)
+  return common.length / Math.max(a.length, b.length) > 0.8
+}
+
 async function generateArticle() {
   console.log('--- PurpleGirl Article Generator Started ---');
   const isDryRun = process.argv.includes('--dry-run');
@@ -65,8 +72,30 @@ async function generateArticle() {
   const articlesToProcess = bank.splice(0, BATCH_SIZE);
   console.log(`Picked ${articlesToProcess.length} titles for this run.`);
 
+  // PRE-LOAD: fetch all existing titles to prevent semantic duplicates
+  const { data: allExisting } = await supabase.from('articles').select('title, slug');
+  const existingTitles = allExisting ? allExisting.map(a => a.title) : [];
+
   for (const articleDef of articlesToProcess) {
     console.log(`\nGenerating article: "${articleDef.title}"`);
+
+    // DEDUPLICATION 1: Check title similarity against all existing
+    const isDuplicateTitle = existingTitles.some(extTitle => isTooSimilar(articleDef.title, extTitle));
+    if (isDuplicateTitle) {
+      console.log(`SKIPPED DUPLICATE (Title similarity): ${articleDef.title}`);
+      continue;
+    }
+
+    // DEDUPLICATION 2: Check for exact slug match
+    const { data: existingSlugs } = await supabase
+      .from('articles')
+      .select('slug, title')
+      .ilike('slug', `%${articleDef.slug}%`);
+    
+    if (existingSlugs && existingSlugs.length > 0) {
+      console.log(`SKIPPED DUPLICATE (Slug match): ${articleDef.slug}`);
+      continue;
+    }
 
     // 3. Call Groq API (Primary)
     let resultJsonStr = null;
@@ -166,3 +195,18 @@ async function generateArticle() {
 }
 
 generateArticle();
+
+/*
+-- Find and review duplicate articles in Supabase:
+-- SELECT title, slug, COUNT(*) 
+-- FROM articles 
+-- GROUP BY title, slug 
+-- HAVING COUNT(*) > 1
+-- ORDER BY COUNT(*) DESC;
+
+-- Delete older duplicates keeping highest view_count:
+-- DELETE FROM articles a USING articles b
+-- WHERE a.title = b.title 
+-- AND a.view_count < b.view_count 
+-- AND a.id != b.id;
+*/
