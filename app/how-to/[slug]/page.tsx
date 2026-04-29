@@ -5,6 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 import { ArticleSchemas } from '@/components/seo/ArticleSchemas';
 import { ChevronRight, Lock, AlertTriangle, Sparkles, ChevronDown } from 'lucide-react';
 import { Metadata } from 'next';
+import AdSenseUnit from '@/components/ads/AdSenseUnit';
 
 export const runtime = 'edge';
 
@@ -32,12 +33,6 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     }
   };
 }
-
-const AdPlaceholder = ({ text = "Advertisement" }) => (
-  <div className="w-full my-8 bg-pg-gray-100 border border-pg-gray-300 border-dashed rounded-lg h-[250px] flex items-center justify-center text-pg-gray-400 text-sm">
-    {text} (Google AdSense)
-  </div>
-);
 
 export default async function HowToArticlePage({ params }: { params: { slug: string } }) {
   const article = await getArticleData(params.slug);
@@ -93,8 +88,8 @@ export default async function HowToArticlePage({ params }: { params: { slug: str
               {article.intro}
             </p>
 
-            {/* 4. Ad Slot 1 */}
-            <AdPlaceholder text="High viewability Ad Slot 1" />
+            {/* 4. Ad Slot 1 — hidden until AdSense approved */}
+            <AdSenseUnit slot="top-article" className="my-8" />
 
             {/* 8. Things You'll Need (Moved up for WikiHow style if exists) */}
             {article.content_json?.things_needed && article.content_json.things_needed.length > 0 && (
@@ -161,8 +156,8 @@ export default async function HowToArticlePage({ params }: { params: { slug: str
                       </div>
                     )}
 
-                    {/* Ad Slot 2 (after step 3) */}
-                    {index === 2 && <AdPlaceholder text="Mid-article Ad Slot 2" />}
+                    {/* Ad Slot 2 (after step 3) — hidden until AdSense approved */}
+                    {index === 2 && <AdSenseUnit slot="mid-article" className="my-8" />}
                   </div>
                 </div>
               ))}
@@ -204,8 +199,8 @@ export default async function HowToArticlePage({ params }: { params: { slug: str
               </div>
             )}
 
-            {/* 11. Ad Slot 3 */}
-            <AdPlaceholder text="End of article Ad Slot 3" />
+            {/* 11. Ad Slot 3 — hidden until AdSense approved */}
+            <AdSenseUnit slot="end-article" className="my-8" />
 
           </article>
 
@@ -237,12 +232,13 @@ export default async function HowToArticlePage({ params }: { params: { slug: str
             <div className="bg-pg-plum text-white rounded-2xl p-8 text-center">
               <h3 className="font-display font-bold text-2xl mb-3">Is Your Relationship Healthy or Toxic?</h3>
               <p className="text-sm text-pg-plum-light mb-6">Take our 3-minute quiz to find out anonymously.</p>
-              <Link href="/quizzes" className="inline-block bg-white text-pg-plum font-bold py-3 px-6 rounded-xl hover:bg-pg-plum-light transition-colors text-sm w-full">
+              <Link href="/quiz/relationship-health-check" className="inline-block bg-white text-pg-plum font-bold py-3 px-6 rounded-xl hover:bg-pg-plum-light transition-colors text-sm w-full">
                 Take the Quiz →
               </Link>
             </div>
 
-            <AdPlaceholder text="Sidebar Ad" />
+            {/* Sidebar Ad — hidden until AdSense approved */}
+            <AdSenseUnit slot="sidebar" className="mt-4" />
 
           </aside>
         </div>

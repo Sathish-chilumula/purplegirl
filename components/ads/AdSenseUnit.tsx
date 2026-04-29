@@ -9,26 +9,19 @@ interface AdSenseUnitProps {
 }
 
 export default function AdSenseUnit({ slot, format = 'auto', className = '', responsive = true }: AdSenseUnitProps) {
+  const client = process.env.NEXT_PUBLIC_ADSENSE_ID || '';
+
   useEffect(() => {
+    if (!client) return;
     try {
       // @ts-ignore
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch (err) {
       console.error('AdSense Error:', err);
     }
-  }, []);
+  }, [client]);
 
-  const client = process.env.NEXT_PUBLIC_ADSENSE_ID || '';
-
-  if (!client && process.env.NODE_ENV === 'development') {
-    return (
-      <div className={`bg-[#FDF2F8]/50 border-2 border-dashed border-pink-200 text-pink-400 flex items-center justify-center p-4 text-sm font-bold tracking-wide uppercase rounded-xl ${className} min-h-[100px]`}>
-        [ Advertisement Slot ]
-      </div>
-    );
-  }
-
-  // If no client ID in prod, don't show the div at all to prevent layout shifts
+  // No AdSense ID configured yet — render nothing (no blank space)
   if (!client) return null;
 
   return (

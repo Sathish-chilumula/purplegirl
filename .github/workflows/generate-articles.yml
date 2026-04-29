@@ -2,27 +2,60 @@ name: Daily Generate Articles
 
 on:
   schedule:
-    # Runs at 1 AM IST daily (19:30 UTC)
-    - cron: '30 19 * * *'
+    # Step 1: Populate titles at 6:30 PM IST (13:00 UTC)
+    # Step 2: Generate articles at 7:30 PM IST (14:00 UTC) — triggered by separate job
+    - cron: '0 13 * * *'
   workflow_dispatch:
 
 jobs:
-  generate:
+  # ── Job 1: Populate the titles bank from trending topics ─────────────────────
+  populate-titles:
     runs-on: ubuntu-latest
-    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          
+
       - name: Install dependencies
         run: npm install
-        
-      - name: Run generation script
+
+      - name: Run title population script
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node scripts/populate-titles.js
+
+      - name: Commit updated titles-bank.json
+        run: |
+          git config --global user.name "PurpleGirl Bot"
+          git config --global user.email "bot@purplegirl.in"
+          git add scripts/titles-bank.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: add trending article titles [$(date +'%Y-%m-%d')]" && git push)
+
+  # ── Job 2: Generate articles from the titles bank ────────────────────────────
+  generate-articles:
+    runs-on: ubuntu-latest
+    needs: populate-titles   # Wait for titles to be committed first
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main   # Always pull latest (with freshly committed titles)
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run article generation script
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -31,10 +64,10 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           CLOUDFLARE_DEPLOY_HOOK_URL: ${{ secrets.CLOUDFLARE_DEPLOY_HOOK_URL }}
         run: node scripts/generate-articles.js
-        
-      - name: Commit updated titles-bank.json
+
+      - name: Commit updated titles-bank.json (after consumption)
         run: |
           git config --global user.name "PurpleGirl Bot"
           git config --global user.email "bot@purplegirl.in"
           git add scripts/titles-bank.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: update titles bank after daily generation" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: update titles bank after generation [$(date +'%Y-%m-%d')]" && git push)

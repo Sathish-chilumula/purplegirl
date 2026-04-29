@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { Search, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
+import { FloatingChat } from '@/components/FloatingChat';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -49,9 +50,9 @@ export default function Header() {
 
         {/* Actions */}
         <div className="flex items-center gap-4 shrink-0">
-          <button className="hidden sm:flex p-2 text-pg-gray-400 hover:text-pg-rose transition-colors">
+          <Link href="/search" className="hidden sm:flex p-2 text-pg-gray-400 hover:text-pg-rose transition-colors" aria-label="Search">
             <Search size={20} />
-          </button>
+          </Link>
           <Link href="/ask" className="hidden md:block">
             <Button variant="primary" className="py-2 px-6 text-sm shadow-sm">
               Ask Anonymously
@@ -94,6 +95,7 @@ export default function Header() {
           </div>
         </div>
       )}
+      <FloatingChat />
     </header>
   );
 }
