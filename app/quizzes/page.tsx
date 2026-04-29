@@ -4,7 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 import { Card } from '@/components/ui/Card';
 import { ChevronRight } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
-import { AdSenseUnit } from '@/components/ads/AdSenseUnit';
+import AdSenseUnit from '@/components/ads/AdSenseUnit';
 
 export const runtime = 'edge';
 
