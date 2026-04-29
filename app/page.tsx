@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 async function getHomeData() {
-  const [categoriesRes, articlesRes] = await Promise.all([
+  const [categoriesRes, articlesRes, quizzesRes] = await Promise.all([
     supabaseAdmin
       .from('categories')
       .select('*')
@@ -27,16 +27,23 @@ async function getHomeData() {
       .eq('is_published', true)
       .order('view_count', { ascending: false })
       .limit(6),
+    supabaseAdmin
+      .from('quizzes')
+      .select('slug, title, category, thumbnail_emoji')
+      .eq('is_published', true)
+      .order('created_at', { ascending: false })
+      .limit(6),
   ]);
 
   return {
     categories: categoriesRes.data || [],
     featuredArticles: articlesRes.data || [],
+    latestQuizzes: quizzesRes.data || [],
   };
 }
 
 export default async function Home() {
-  const { categories, featuredArticles } = await getHomeData();
+  const { categories, featuredArticles, latestQuizzes } = await getHomeData();
 
   return (
     <div className="bg-pg-cream min-h-screen pb-20">
@@ -179,33 +186,41 @@ export default async function Home() {
           ━━━━━━━━━━━━━━━━━━━━━━━ */}
       <section id="quizzes" className="my-16 bg-pg-plum text-white py-16 px-6 overflow-hidden relative">
         <div className="max-w-content mx-auto">
-          <div className="mb-10 text-center md:text-left">
-            <h2 className="font-display text-[32px] font-bold mb-2">
-              Take a Quiz — Know Yourself Better
-            </h2>
-            <p className="text-pg-plum-light/80">
-              Fun, insightful quizzes about relationships, health, and personality
-            </p>
+          <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div className="text-center md:text-left">
+              <h2 className="font-display text-[32px] font-bold mb-2">
+                Take a Quiz — Know Yourself Better
+              </h2>
+              <p className="text-pg-plum-light/80">
+                Fun, insightful quizzes about relationships, health, and personality
+              </p>
+            </div>
+            <Link href="/quizzes" className="text-white hover:text-pg-rose-light font-bold text-sm underline md:no-underline md:hover:underline">
+              View all quizzes →
+            </Link>
           </div>
 
           <div className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory hide-scrollbar">
-            {[
-              { title: "Is Your Relationship Healthy or Toxic?", slug: "relationship-health-check", category: "Relationships" },
-              { title: "How Much Are You Sacrificing for Others?", slug: "sacrifice-level-quiz", category: "Mental Health" },
-              { title: "Are Your In-Laws Crossing the Line?", slug: "inlaw-boundary-quiz", category: "Family" }
-            ].map((quiz, i) => (
-              <Link key={i} href={`/quiz/${quiz.slug}`} className="min-w-[280px] md:min-w-[320px] bg-white rounded-[12px] p-6 text-pg-gray-900 snap-center shrink-0 block hover:scale-[1.02] transition-transform">
+            {latestQuizzes.length > 0 ? latestQuizzes.map((quiz, i) => (
+              <Link key={i} href={`/quiz/${quiz.slug}`} className="min-w-[280px] md:min-w-[320px] bg-white rounded-[16px] p-8 text-pg-gray-900 snap-center shrink-0 block hover:scale-[1.03] transition-all duration-300 shadow-xl border border-white/10 group">
+                <div className="text-5xl mb-6 bg-pg-rose-light/50 w-20 h-20 flex items-center justify-center rounded-2xl group-hover:bg-pg-rose-light transition-colors">
+                  {quiz.thumbnail_emoji || '✨'}
+                </div>
                 <span className="inline-block px-3 py-1 bg-pg-plum-light text-pg-plum text-[10px] font-bold uppercase tracking-widest rounded-full mb-4">
-                  {quiz.category}
+                  {quiz.category.replace(/-/g, ' ')}
                 </span>
-                <h3 className="font-sans font-bold text-lg mb-6 leading-tight">
+                <h3 className="font-sans font-bold text-xl mb-8 leading-tight group-hover:text-pg-rose transition-colors">
                   {quiz.title}
                 </h3>
-                <div className="inline-flex items-center justify-center w-full bg-pg-rose text-white font-bold rounded-xl px-6 py-2.5 text-sm hover:bg-pg-rose-dark transition-colors">
-                  Start Quiz <ChevronRight size={16} className="ml-1" />
+                <div className="inline-flex items-center justify-center w-full bg-pg-rose text-white font-bold rounded-xl px-6 py-3 text-sm hover:bg-pg-rose-dark transition-all shadow-md shadow-pg-rose/20">
+                  Start Quiz <ChevronRight size={18} className="ml-1 group-hover:translate-x-1 transition-transform" />
                 </div>
               </Link>
-            ))}
+            )) : (
+              <div className="w-full text-center py-12 text-pg-plum-light">
+                Quizzes are coming soon!
+              </div>
+            )}
           </div>
         </div>
       </section>

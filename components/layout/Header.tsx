@@ -243,9 +243,9 @@ export default function Header() {
           </button>
 
           <Link
-            href="/#quizzes"
+            href="/quizzes"
             className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
-              pathname === '/#quizzes' 
+              pathname === '/quizzes' 
                 ? 'bg-pg-rose-light text-pg-rose' 
                 : 'text-pg-gray-500 hover:text-pg-rose hover:bg-pg-gray-100'
             }`}
