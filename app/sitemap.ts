@@ -33,5 +33,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   })) as MetadataRoute.Sitemap;
 
-  return [...staticRoutes, ...categoryRoutes, ...articleRoutes];
+  // 4. Dynamic Quizzes
+  const { data: quizzes } = await supabaseAdmin
+    .from('quizzes')
+    .select('slug, created_at');
+
+  const quizRoutes = (quizzes || []).map((quiz) => ({
+    url: `${baseUrl}/quiz/${quiz.slug}`,
+    lastModified: new Date(quiz.created_at || Date.now()),
+    changeFrequency: 'monthly',
+    priority: 0.8,
+  })) as MetadataRoute.Sitemap;
+
+  return [...staticRoutes, ...categoryRoutes, ...articleRoutes, ...quizRoutes];
 }
