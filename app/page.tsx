@@ -145,36 +145,36 @@ export default async function Home() {
       {/* ━━━━━━━━━━━━━━━━━━━━━━━
           SECTION 3 — Featured "How To" Articles
           ━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section className="py-16 px-6 max-w-content mx-auto">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="font-sans text-[22px] font-bold text-pg-gray-900">
+      <section className="py-12 px-4 max-w-content mx-auto">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="font-sans text-[20px] md:text-[22px] font-bold text-pg-gray-900">
             Popular How-To Guides
           </h2>
-          <Link href="/how-to" className="text-pg-rose text-sm font-bold hover:underline hidden md:block">
+          <Link href="/how-to" className="text-pg-rose text-sm font-bold hover:underline">
             View all →
           </Link>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
           {featuredArticles.length > 0 ? featuredArticles.map((article) => (
             <Link key={article.slug} href={`/how-to/${article.slug}`}>
-              <Card className="h-full hover:border-pg-rose transition-colors flex flex-col p-6">
-                <div className="mb-4">
-                  <Badge>{article.category.replace(/-/g, ' ')}</Badge>
+              <Card className="h-full hover:border-pg-rose transition-colors flex flex-col p-3 md:p-6">
+                <div className="mb-2 md:mb-4">
+                  <Badge className="text-[9px] md:text-[10px]">{article.category.replace(/-/g, ' ')}</Badge>
                 </div>
-                <h3 className="font-display text-[18px] font-bold text-pg-gray-900 mb-3 line-clamp-2 leading-snug">
+                <h3 className="font-display text-[13px] md:text-[18px] font-bold text-pg-gray-900 mb-2 md:mb-3 line-clamp-3 leading-snug">
                   {article.title}
                 </h3>
-                <p className="text-pg-gray-500 text-sm line-clamp-3 mb-6 flex-grow">
+                <p className="hidden md:block text-pg-gray-500 text-sm line-clamp-3 mb-6 flex-grow">
                   {article.intro?.substring(0, 100)}...
                 </p>
-                <div className="text-xs font-bold text-pg-gray-400 uppercase tracking-widest mt-auto">
-                  ⏱ {article.reading_time_mins || 5} min read
+                <div className="text-[10px] md:text-xs font-bold text-pg-gray-400 uppercase tracking-widest mt-auto">
+                  ⏱ {article.reading_time_mins || 5} min
                 </div>
               </Card>
             </Link>
           )) : (
-            <div className="col-span-3 text-center py-12 text-pg-gray-500 border border-dashed rounded-xl">
+            <div className="col-span-2 md:col-span-3 text-center py-12 text-pg-gray-500 border border-dashed rounded-xl">
               Guides are currently being written. Check back soon!
             </div>
           )}
@@ -184,41 +184,42 @@ export default async function Home() {
       {/* ━━━━━━━━━━━━━━━━━━━━━━━
           SECTION 4 — Quizzes Strip
           ━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section id="quizzes" className="my-12 bg-pg-plum text-white py-10 md:py-14 px-6 overflow-hidden relative">
+      <section id="quizzes" className="my-12 bg-pg-plum text-white py-10 md:py-14 px-4 overflow-hidden relative">
         <div className="max-w-content mx-auto">
-          <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-3">
+          <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-2">
             <div className="text-center md:text-left">
-              <h2 className="font-display text-[24px] md:text-[28px] font-bold mb-1">
+              <h2 className="font-display text-[22px] md:text-[28px] font-bold mb-1">
                 Take a Quiz — Know Yourself Better
               </h2>
-              <p className="text-pg-plum-light/80 text-sm md:text-base">
+              <p className="text-pg-plum-light/80 text-sm">
                 Fun, insightful quizzes about relationships, health, and personality
               </p>
             </div>
-            <Link href="/quizzes" className="text-white hover:text-pg-rose-light font-bold text-sm underline md:no-underline md:hover:underline text-center md:text-right">
-              View all quizzes →
+            <Link href="/quizzes" className="text-white hover:text-pg-rose-light font-bold text-sm underline text-center md:text-right">
+              View all →
             </Link>
           </div>
 
-          {/* Mobile: horizontal scroll | Desktop: 3-col grid */}
-          <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory hide-scrollbar md:grid md:grid-cols-3 md:overflow-visible md:pb-0">
+          {/* 2-col on mobile, 3-col on desktop */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
             {latestQuizzes.length > 0 ? latestQuizzes.map((quiz, i) => (
-              <Link key={i} href={`/quiz/${quiz.slug}`} className="min-w-[200px] md:min-w-0 bg-white rounded-[14px] p-5 md:p-6 text-pg-gray-900 snap-center shrink-0 md:shrink block hover:scale-[1.03] transition-all duration-300 shadow-lg border border-white/10 group">
-                <div className="text-3xl md:text-4xl mb-4 bg-pg-rose-light/50 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-xl group-hover:bg-pg-rose-light transition-colors">
+              <Link key={i} href={`/quiz/${quiz.slug}`}
+                className="bg-white rounded-[14px] p-4 md:p-6 text-pg-gray-900 block hover:scale-[1.03] transition-all duration-300 shadow-lg border border-white/10 group">
+                <div className="text-2xl md:text-3xl mb-3 bg-pg-rose-light/50 w-10 h-10 md:w-14 md:h-14 flex items-center justify-center rounded-xl group-hover:bg-pg-rose-light transition-colors">
                   {quiz.thumbnail_emoji || '✨'}
                 </div>
-                <span className="inline-block px-2 py-1 bg-pg-plum-light text-pg-plum text-[9px] md:text-[10px] font-bold uppercase tracking-widest rounded-full mb-3">
+                <span className="inline-block px-2 py-0.5 bg-pg-plum-light text-pg-plum text-[8px] md:text-[10px] font-bold uppercase tracking-widest rounded-full mb-2">
                   {quiz.category.replace(/-/g, ' ')}
                 </span>
-                <h3 className="font-sans font-bold text-[14px] md:text-[17px] mb-4 leading-tight group-hover:text-pg-rose transition-colors line-clamp-2">
+                <h3 className="font-sans font-bold text-[13px] md:text-[16px] mb-3 leading-tight group-hover:text-pg-rose transition-colors line-clamp-2">
                   {quiz.title}
                 </h3>
-                <div className="inline-flex items-center justify-center w-full bg-pg-rose text-white font-bold rounded-xl px-4 py-2.5 text-xs md:text-sm hover:bg-pg-rose-dark transition-all shadow-md shadow-pg-rose/20">
-                  Start Quiz <ChevronRight size={14} className="ml-1 group-hover:translate-x-1 transition-transform" />
+                <div className="inline-flex items-center justify-center w-full bg-pg-rose text-white font-bold rounded-xl px-3 py-2 text-[11px] md:text-sm hover:bg-pg-rose-dark transition-all">
+                  Start Quiz <ChevronRight size={12} className="ml-1 group-hover:translate-x-1 transition-transform" />
                 </div>
               </Link>
             )) : (
-              <div className="w-full text-center py-12 text-pg-plum-light">
+              <div className="col-span-2 md:col-span-3 text-center py-12 text-pg-plum-light">
                 Quizzes are coming soon!
               </div>
             )}
