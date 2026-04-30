@@ -184,36 +184,37 @@ export default async function Home() {
       {/* ━━━━━━━━━━━━━━━━━━━━━━━
           SECTION 4 — Quizzes Strip
           ━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section id="quizzes" className="my-16 bg-pg-plum text-white py-16 px-6 overflow-hidden relative">
+      <section id="quizzes" className="my-12 bg-pg-plum text-white py-10 md:py-14 px-6 overflow-hidden relative">
         <div className="max-w-content mx-auto">
-          <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-3">
             <div className="text-center md:text-left">
-              <h2 className="font-display text-[32px] font-bold mb-2">
+              <h2 className="font-display text-[24px] md:text-[28px] font-bold mb-1">
                 Take a Quiz — Know Yourself Better
               </h2>
-              <p className="text-pg-plum-light/80">
+              <p className="text-pg-plum-light/80 text-sm md:text-base">
                 Fun, insightful quizzes about relationships, health, and personality
               </p>
             </div>
-            <Link href="/quizzes" className="text-white hover:text-pg-rose-light font-bold text-sm underline md:no-underline md:hover:underline">
+            <Link href="/quizzes" className="text-white hover:text-pg-rose-light font-bold text-sm underline md:no-underline md:hover:underline text-center md:text-right">
               View all quizzes →
             </Link>
           </div>
 
-          <div className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory hide-scrollbar">
+          {/* Mobile: horizontal scroll | Desktop: 3-col grid */}
+          <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory hide-scrollbar md:grid md:grid-cols-3 md:overflow-visible md:pb-0">
             {latestQuizzes.length > 0 ? latestQuizzes.map((quiz, i) => (
-              <Link key={i} href={`/quiz/${quiz.slug}`} className="min-w-[280px] md:min-w-[320px] bg-white rounded-[16px] p-8 text-pg-gray-900 snap-center shrink-0 block hover:scale-[1.03] transition-all duration-300 shadow-xl border border-white/10 group">
-                <div className="text-5xl mb-6 bg-pg-rose-light/50 w-20 h-20 flex items-center justify-center rounded-2xl group-hover:bg-pg-rose-light transition-colors">
+              <Link key={i} href={`/quiz/${quiz.slug}`} className="min-w-[200px] md:min-w-0 bg-white rounded-[14px] p-5 md:p-6 text-pg-gray-900 snap-center shrink-0 md:shrink block hover:scale-[1.03] transition-all duration-300 shadow-lg border border-white/10 group">
+                <div className="text-3xl md:text-4xl mb-4 bg-pg-rose-light/50 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-xl group-hover:bg-pg-rose-light transition-colors">
                   {quiz.thumbnail_emoji || '✨'}
                 </div>
-                <span className="inline-block px-3 py-1 bg-pg-plum-light text-pg-plum text-[10px] font-bold uppercase tracking-widest rounded-full mb-4">
+                <span className="inline-block px-2 py-1 bg-pg-plum-light text-pg-plum text-[9px] md:text-[10px] font-bold uppercase tracking-widest rounded-full mb-3">
                   {quiz.category.replace(/-/g, ' ')}
                 </span>
-                <h3 className="font-sans font-bold text-xl mb-8 leading-tight group-hover:text-pg-rose transition-colors">
+                <h3 className="font-sans font-bold text-[14px] md:text-[17px] mb-4 leading-tight group-hover:text-pg-rose transition-colors line-clamp-2">
                   {quiz.title}
                 </h3>
-                <div className="inline-flex items-center justify-center w-full bg-pg-rose text-white font-bold rounded-xl px-6 py-3 text-sm hover:bg-pg-rose-dark transition-all shadow-md shadow-pg-rose/20">
-                  Start Quiz <ChevronRight size={18} className="ml-1 group-hover:translate-x-1 transition-transform" />
+                <div className="inline-flex items-center justify-center w-full bg-pg-rose text-white font-bold rounded-xl px-4 py-2.5 text-xs md:text-sm hover:bg-pg-rose-dark transition-all shadow-md shadow-pg-rose/20">
+                  Start Quiz <ChevronRight size={14} className="ml-1 group-hover:translate-x-1 transition-transform" />
                 </div>
               </Link>
             )) : (

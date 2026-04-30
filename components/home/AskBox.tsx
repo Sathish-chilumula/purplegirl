@@ -72,18 +72,19 @@ export const AskBox = () => {
           </button>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="relative group max-w-2xl mx-auto">
+        <form onSubmit={handleSubmit} className="max-w-2xl mx-auto flex flex-col gap-3">
           <textarea
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Type your question here... you can be completely honest."
-            className="w-full px-6 py-5 rounded-2xl bg-white border-2 border-white focus:border-pg-rose outline-none text-pg-gray-900 text-lg shadow-sm transition-all resize-none h-32 pr-16"
+            className="w-full px-5 py-4 rounded-2xl bg-white border-2 border-white focus:border-pg-rose outline-none text-pg-gray-900 text-base shadow-sm transition-all resize-none"
+            style={{ minHeight: '100px' }}
             disabled={state === 'loading'}
           />
           <button
             type="submit"
             disabled={!query.trim() || state === 'loading'}
-            className="absolute right-3 bottom-3 bg-pg-rose hover:bg-pg-rose-dark disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold px-6 py-3 rounded-xl transition-colors shadow-md active:scale-95 flex items-center gap-2"
+            className="w-full md:w-auto md:self-end bg-pg-rose hover:bg-pg-rose-dark disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold px-8 py-3 rounded-xl transition-colors shadow-md active:scale-95 flex items-center justify-center gap-2"
           >
             {state === 'loading' ? (
               <><Loader2 size={16} className="animate-spin" /> Getting answer...</>
@@ -93,7 +94,7 @@ export const AskBox = () => {
           </button>
 
           {state === 'error' && (
-            <p className="mt-3 text-sm text-red-500 text-center">
+            <p className="text-sm text-red-500 text-center">
               Something went wrong. Please try again in a moment. 💜
             </p>
           )}

@@ -34,8 +34,8 @@ const categoryColumns = [
     ],
   },
   {
-    title: '🤱 Baby Care & Motherhood',
-    slug: 'baby-care',
+    title: '🫴 Baby Care & Motherhood',
+    slug: 'baby-care-motherhood',
     links: [
       { label: 'Newborn Sleep Tips', filter: 'sleep' },
       { label: 'Breastfeeding Help', filter: 'breastfeeding' },

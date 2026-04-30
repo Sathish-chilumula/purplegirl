@@ -48,24 +48,24 @@ export default async function QuizzesPage() {
           2. QUIZZES GRID
           ━━━━━━━━━━━━━━━━━━━━━━━ */}
       <div className="max-w-content mx-auto py-16 px-6">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
           {quizzes.map((quiz) => (
             <Link key={quiz.slug} href={`/quiz/${quiz.slug}`}>
-              <Card className="h-full hover:border-pg-rose hover:-translate-y-1 transition-all duration-300 flex flex-col p-8 group border-2">
-                <div className="text-5xl mb-6 bg-pg-rose-light/50 w-20 h-20 flex items-center justify-center rounded-3xl group-hover:bg-pg-rose-light transition-colors transform group-hover:scale-110 duration-300">
+              <Card className="h-full hover:border-pg-rose hover:-translate-y-1 transition-all duration-300 flex flex-col p-4 md:p-8 group border-2">
+                <div className="text-3xl md:text-5xl mb-3 md:mb-6 bg-pg-rose-light/50 w-12 h-12 md:w-20 md:h-20 flex items-center justify-center rounded-2xl md:rounded-3xl group-hover:bg-pg-rose-light transition-colors transform group-hover:scale-110 duration-300">
                   {quiz.thumbnail_emoji || '✨'}
                 </div>
-                <div className="mb-4">
-                  <Badge>{quiz.category.replace(/-/g, ' ')}</Badge>
+                <div className="mb-2 md:mb-4">
+                  <Badge className="text-[9px] md:text-[10px]">{quiz.category.replace(/-/g, ' ')}</Badge>
                 </div>
-                <h3 className="font-display text-[22px] font-bold text-pg-gray-900 mb-3 leading-snug group-hover:text-pg-rose transition-colors">
+                <h3 className="font-display text-[14px] md:text-[22px] font-bold text-pg-gray-900 mb-2 md:mb-3 leading-snug group-hover:text-pg-rose transition-colors line-clamp-3">
                   {quiz.title}
                 </h3>
-                <p className="text-pg-gray-500 text-sm line-clamp-3 mb-8 flex-grow">
+                <p className="hidden md:block text-pg-gray-500 text-sm line-clamp-3 mb-8 flex-grow">
                   {quiz.description}
                 </p>
-                <div className="flex items-center text-pg-rose font-bold text-sm mt-auto">
-                  Take Quiz <ChevronRight size={16} className="ml-1 group-hover:translate-x-1 transition-transform" />
+                <div className="flex items-center text-pg-rose font-bold text-xs md:text-sm mt-auto pt-2">
+                  Take Quiz <ChevronRight size={14} className="ml-1 group-hover:translate-x-1 transition-transform" />
                 </div>
               </Card>
             </Link>

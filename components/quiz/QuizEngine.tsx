@@ -140,17 +140,26 @@ export const QuizEngine = ({ quiz }: QuizEngineProps) => {
     const progress = (currentQuestionIndex / totalQuestions) * 100;
     const selectedScore = scores[currentQuestionIndex];
 
+    // Guard: if options are missing, show error
+    if (!currentQ?.options || currentQ.options.length === 0) {
+      return (
+        <div className="max-w-2xl mx-auto text-center py-20">
+          <p style={{ color: '#6B7280', fontSize: '16px' }}>Oops! This question has no options. Please try another quiz.</p>
+        </div>
+      );
+    }
+
     return (
       <div className="max-w-2xl mx-auto overflow-hidden pb-10">
         {/* Progress Bar */}
-        <div className="mb-8 px-4">
-          <div className="flex justify-between text-xs font-bold text-pg-gray-500 uppercase tracking-widest mb-2">
+        <div className="mb-6 px-2">
+          <div className="flex justify-between text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#6B7280' }}>
             <span>Question {currentQuestionIndex + 1} of {totalQuestions}</span>
             <span>{Math.round(progress)}%</span>
           </div>
-          <div className="h-2 bg-pg-gray-100 rounded-full overflow-hidden">
+          <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: '#F5F5F5' }}>
             <motion.div 
-              className="h-full bg-pg-rose"
+              style={{ height: '100%', backgroundColor: '#E91E8C' }}
               initial={{ width: `${((currentQuestionIndex - 1) / totalQuestions) * 100}%` }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.5, ease: "easeOut" }}
@@ -166,17 +175,30 @@ export const QuizEngine = ({ quiz }: QuizEngineProps) => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -50 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="bg-white rounded-[24px] p-8 md:p-12 shadow-sm border border-pg-gray-100"
+            style={{ backgroundColor: '#FFFFFF', borderRadius: '24px', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.08)', border: '1px solid #F5F5F5' }}
           >
-            <h2 className="font-sans text-2xl md:text-3xl font-bold text-pg-gray-900 mb-10 text-center leading-tight">
+            <h2 style={{ fontFamily: 'var(--font-sans, sans-serif)', fontSize: 'clamp(18px, 4vw, 26px)', fontWeight: '700', color: '#111827', marginBottom: '24px', textAlign: 'center', lineHeight: '1.4' }}>
               {currentQ.question}
             </h2>
 
-            <div className="space-y-4">
-              {currentQ.options?.map((opt, i) => {
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {currentQ.options.map((opt, i) => {
                 const isSelected = selectedScore === opt.score;
                 const hasSelection = selectedScore !== undefined;
-                
+
+                let bgColor = '#FFFFFF';
+                let borderColor = '#E5E7EB';
+                let textColor = '#374151';
+                let opacity = '1';
+
+                if (isSelected) {
+                  bgColor = '#FCE4F3';
+                  borderColor = '#E91E8C';
+                  textColor = '#E91E8C';
+                } else if (hasSelection) {
+                  opacity = '0.45';
+                }
+
                 return (
                   <motion.button
                     key={i}
@@ -184,13 +206,21 @@ export const QuizEngine = ({ quiz }: QuizEngineProps) => {
                     disabled={hasSelection}
                     whileHover={!hasSelection ? { scale: 1.02 } : {}}
                     whileTap={!hasSelection ? { scale: 0.98 } : {}}
-                    className={`w-full text-left px-6 py-5 rounded-2xl border-2 font-bold text-lg transition-all duration-300 ${
-                      isSelected 
-                        ? 'border-pg-rose bg-pg-rose-light text-pg-rose scale-[1.02] shadow-sm' 
-                        : hasSelection
-                          ? 'border-pg-gray-100 bg-white text-pg-gray-400 opacity-50'
-                          : 'border-pg-gray-100 bg-white hover:border-pg-rose/50 hover:bg-pg-gray-50 text-pg-gray-700'
-                    }`}
+                    style={{
+                      width: '100%',
+                      textAlign: 'left',
+                      padding: '14px 20px',
+                      borderRadius: '16px',
+                      border: `2px solid ${borderColor}`,
+                      backgroundColor: bgColor,
+                      color: textColor,
+                      fontWeight: '600',
+                      fontSize: '15px',
+                      opacity,
+                      cursor: hasSelection ? 'default' : 'pointer',
+                      transition: 'all 0.25s ease',
+                      lineHeight: '1.5',
+                    }}
                   >
                     {opt.text}
                   </motion.button>
