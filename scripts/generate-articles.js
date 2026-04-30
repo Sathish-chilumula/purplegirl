@@ -67,8 +67,10 @@ async function generateArticle() {
     return;
   }
 
-  // 2. Pick up to 30 titles from the bank
-  const BATCH_SIZE = 30;
+  // 2. Pick up to 15 titles from the bank
+  // NOTE: Gemini free tier = 20 req/day. Groq free tier ~14,400 req/day.
+  // Keeping batch at 15 ensures we stay within Gemini quota if Groq falls back.
+  const BATCH_SIZE = 15;
   const articlesToProcess = bank.splice(0, BATCH_SIZE);
   console.log(`Picked ${articlesToProcess.length} titles for this run.`);
 
@@ -97,8 +99,9 @@ async function generateArticle() {
       continue;
     }
 
-    // 3. Call Groq API (Primary)
+    // 3. Call Groq API (Primary) with Gemini fallback
     let resultJsonStr = null;
+    let usedFallback = false;
     
     try {
       const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -117,29 +120,63 @@ async function generateArticle() {
         })
       });
 
-      if (!groqRes.ok) throw new Error(`Groq Error: ${groqRes.statusText}`);
+      if (!groqRes.ok) {
+        const errBody = await groqRes.json().catch(() => ({}));
+        const errMsg = errBody?.error?.message || groqRes.statusText || `HTTP ${groqRes.status}`;
+        throw new Error(`Groq ${groqRes.status}: ${errMsg}`);
+      }
       const data = await groqRes.json();
       resultJsonStr = data.choices[0].message.content;
       
     } catch (e) {
-      console.warn('Groq failed. Attempting Gemini Flash 2.5 Lite fallback...', e.message);
-      // Fallback logic
-      const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${process.env.GEMINI_API_KEY}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-          contents: [{ role: 'user', parts: [{ text: `Write the guide for the title: "${articleDef.title}"` }] }],
-          generationConfig: { temperature: 0.7 }
-        })
-      });
-      
-      if (!geminiRes.ok) {
-        console.error('Gemini fallback failed. Skipping this article.');
+      console.warn(`Groq failed. Attempting Gemini fallback... (${e.message})`);
+      usedFallback = true;
+
+      if (!process.env.GEMINI_API_KEY) {
+        console.error('GEMINI_API_KEY is not set. Cannot fall back. Skipping.');
         continue;
       }
-      const data = await geminiRes.json();
-      resultJsonStr = data.candidates[0].content.parts[0].text;
+
+      const geminiBody = JSON.stringify({
+        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        contents: [{ role: 'user', parts: [{ text: `Write the guide for the title: "${articleDef.title}"` }] }],
+        generationConfig: { temperature: 0.7 }
+      });
+
+      // Cascade: try gemini-3.1-flash-lite-preview first, then gemini-2.5-flash-lite on 503
+      const GEMINI_MODELS = ['gemini-3.1-flash-lite-preview', 'gemini-2.5-flash-lite'];
+      let geminiSuccess = false;
+
+      for (const model of GEMINI_MODELS) {
+        console.log(`  Trying Gemini model: ${model}`);
+        const geminiRes = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`,
+          { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: geminiBody }
+        );
+
+        if (geminiRes.ok) {
+          const data = await geminiRes.json();
+          resultJsonStr = data.candidates[0].content.parts[0].text;
+          geminiSuccess = true;
+          console.log(`  ✅ Gemini success with ${model}`);
+          break;
+        }
+
+        const geminiErr = await geminiRes.json().catch(() => ({}));
+        const geminiMsg = geminiErr?.error?.message || `HTTP ${geminiRes.status}`;
+        console.warn(`  ❌ ${model} failed (${geminiRes.status}): ${geminiMsg.substring(0, 100)}`);
+
+        if (geminiRes.status === 429) {
+          console.error('Gemini daily quota exhausted. Stopping batch early.');
+          break; // exit the for-loop; outer loop will see geminiSuccess=false
+        }
+        // 503 = overloaded preview model, fall through to next model in cascade
+      }
+
+      if (!geminiSuccess) {
+        console.error('All Gemini models failed. Skipping this article.');
+        continue;
+      }
     }
 
     // 4. Parse and Validate
@@ -177,9 +214,12 @@ async function generateArticle() {
       }
     }
 
-    // Small delay between API calls to avoid rate limits
+    // Delay between API calls to avoid rate limits
+    // Use longer delay when using Gemini (free tier: 20 req/day, 2 req/min)
     if (!isDryRun) {
-      await new Promise(r => setTimeout(r, 2000));
+      const delay = usedFallback ? 35000 : 2000; // 35s for Gemini (2 rpm limit), 2s for Groq
+      if (usedFallback) console.log(`Using Gemini fallback — waiting ${delay/1000}s to respect rate limits...`);
+      await new Promise(r => setTimeout(r, delay));
     }
   }
 

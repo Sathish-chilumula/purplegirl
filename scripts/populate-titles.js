@@ -65,20 +65,29 @@ async function callGroq(prompt) {
 }
 
 async function callGemini(prompt) {
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.85, maxOutputTokens: 600 },
-      }),
+  const body = JSON.stringify({
+    contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    generationConfig: { temperature: 0.85, maxOutputTokens: 600 },
+  });
+
+  // Cascade: gemini-3.1-flash-lite-preview first, gemini-2.5-flash-lite as fallback
+  const GEMINI_MODELS = ['gemini-3.1-flash-lite-preview', 'gemini-2.5-flash-lite'];
+  for (const model of GEMINI_MODELS) {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
+      { method: 'POST', headers: { 'Content-Type': 'application/json' }, body }
+    );
+    if (res.ok) {
+      const data = await res.json();
+      return data.candidates[0].content.parts[0].text;
     }
-  );
-  if (!res.ok) throw new Error(`Gemini error: ${res.statusText}`);
-  const data = await res.json();
-  return data.candidates[0].content.parts[0].text;
+    const errBody = await res.json().catch(() => ({}));
+    const errMsg = errBody?.error?.message || `HTTP ${res.status}`;
+    console.warn(`Gemini ${model} failed (${res.status}): ${errMsg.substring(0, 100)}`);
+    if (res.status === 429) throw new Error(`Gemini quota exhausted (${res.status})`);
+    // 503 = overloaded preview model, fall through to next
+  }
+  throw new Error('All Gemini models failed');
 }
 
 async function callAI(prompt) {
