@@ -37,7 +37,7 @@ jobs:
           git config --global user.name "PurpleGirl Bot"
           git config --global user.email "bot@purplegirl.in"
           git add scripts/titles-bank.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: add trending article titles [$(date +'%Y-%m-%d')]" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: add trending article titles [$(date +'%Y-%m-%d')] [skip ci]" && git push)
 
   # ── Job 2: Generate articles from the titles bank ────────────────────────────
   generate-articles:
@@ -73,4 +73,4 @@ jobs:
           git config --global user.name "PurpleGirl Bot"
           git config --global user.email "bot@purplegirl.in"
           git add scripts/titles-bank.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: update titles bank after generation [$(date +'%Y-%m-%d')]" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: update titles bank after generation [$(date +'%Y-%m-%d')] [skip ci]" && git push)
