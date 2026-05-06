@@ -9,9 +9,10 @@ interface SmartProductWidgetProps {
   title: string;
 }
 
-// A simple dictionary mapping categories or keywords to high-converting Indian products
-const PRODUCT_MAP: Record<string, { name: string; desc: string; url: string; price: string; brand: string; tag: string }> = {
-  'skin-beauty': {
+// A comprehensive dictionary mapping keywords to high-converting affiliate products
+const PRODUCT_MAP = [
+  {
+    keywords: ['acne', 'pimple', 'dark spot', 'pigment', 'glowing'],
     name: 'Minimalist 10% Vitamin C Face Serum',
     desc: 'Brightens skin, reduces dark spots and hyperpigmentation for glowing skin.',
     url: 'https://www.nykaa.com/search/result/?q=minimalist+vitamin+c+serum',
@@ -19,54 +20,110 @@ const PRODUCT_MAP: Record<string, { name: string; desc: string; url: string; pri
     brand: 'Minimalist',
     tag: 'Dermatologist Recommended',
   },
-  'fashion-style': {
-    name: 'Biba Women Kurta Set',
-    desc: 'Elegant, comfortable ethnic wear perfect for daily office or casual outings.',
+  {
+    keywords: ['hair fall', 'dandruff', 'hair growth', 'split ends'],
+    name: 'Mamaearth Onion Hair Oil',
+    desc: 'Reduces hair fall and promotes hair growth with the goodness of onion and redendal.',
+    url: 'https://www.amazon.in/s?k=mamaearth+onion+hair+oil',
+    price: '₹399',
+    brand: 'Mamaearth',
+    tag: 'Best for Hair Fall',
+  },
+  {
+    keywords: ['pcos', 'hormone', 'weight', 'pcod'],
+    name: 'Oziva Plant Based HerBalance for PCOS',
+    desc: 'Ayurvedic herbs for hormonal balance, better cycles, and reduced PCOS symptoms.',
+    url: 'https://www.amazon.in/s?k=oziva+pcos+herbalance',
+    price: '₹899',
+    brand: 'OZiva',
+    tag: 'Women\'s Health',
+  },
+  {
+    keywords: ['period', 'cramp', 'pain'],
+    name: 'Nua Cramp Comfort Heat Patches',
+    desc: 'Soothes period cramps instantly with up to 8 hours of continuous, comforting heat.',
+    url: 'https://www.amazon.in/s?k=nua+heat+patch',
+    price: '₹299',
+    brand: 'Nua',
+    tag: 'Instant Relief',
+  },
+  {
+    keywords: ['stress', 'anxiety', 'in-law', 'toxic', 'sleep'],
+    name: 'Plum Goodness Sleep-a-holic Pillow Mist',
+    desc: 'Calming lavender mist to help you relax, de-stress, and sleep peacefully after a long day.',
+    url: 'https://www.nykaa.com/search/result/?q=plum+sleep+mist',
+    price: '₹350',
+    brand: 'Plum',
+    tag: 'Self Care',
+  },
+  {
+    keywords: ['career', 'interview', 'work', 'office', 'salary'],
+    name: 'Zouk Vegan Leather Work Tote',
+    desc: 'Spacious, stylish, and professional tote bag perfect for carrying your laptop and office essentials.',
+    url: 'https://www.amazon.in/s?k=zouk+laptop+bag',
+    price: '₹1,499',
+    brand: 'Zouk',
+    tag: 'Office Essential',
+  },
+  {
+    keywords: ['saree', 'kurta', 'wedding', 'festival', 'diwali'],
+    name: 'BIBA Women Elegant Kurta Set',
+    desc: 'Beautiful, comfortable ethnic wear perfect for festivals, office, or casual outings.',
     url: 'https://www.myntra.com/biba-kurta-sets',
     price: '₹1,599',
     brand: 'BIBA',
     tag: 'Bestseller',
   },
-  'health-wellness': {
-    name: 'Oziva Protein & Herbs for Women',
-    desc: 'Clean protein with Ayurvedic herbs for better metabolism and hormonal balance.',
-    url: 'https://www.amazon.in/s?k=oziva+protein+for+women',
-    price: '₹1,449',
-    brand: 'OZiva',
-    tag: 'Women\'s Health',
+  {
+    keywords: ['makeup', 'lipstick', 'beauty', 'look'],
+    name: 'Nykaa Matte to Last Liquid Lipstick',
+    desc: 'Long-lasting, transfer-proof matte lipstick that stays flawless all day.',
+    url: 'https://www.nykaa.com/search/result/?q=nykaa+matte+lipstick',
+    price: '₹599',
+    brand: 'Nykaa',
+    tag: 'Editor\'s Pick',
   },
-  'home-household': {
-    name: 'Pigeon by Stovekraft Chopper',
-    desc: 'Save time in the kitchen with this effortless manual vegetable chopper.',
+  {
+    keywords: ['kitchen', 'cooking', 'recipe', 'food', 'time saving'],
+    name: 'Pigeon by Stovekraft Manual Chopper',
+    desc: 'Save precious time in the kitchen with this effortless vegetable chopper.',
     url: 'https://www.amazon.in/s?k=pigeon+chopper',
     price: '₹249',
     brand: 'Pigeon',
     tag: 'Time Saver',
   },
-  'default': {
-    name: 'Nykaa Cosmetics Matte to Last Liquid Lipstick',
-    desc: 'Long-lasting, transfer-proof matte lipstick for everyday confidence.',
-    url: 'https://www.nykaa.com/search/result/?q=nykaa+matte+lipstick',
-    price: '₹599',
-    brand: 'Nykaa',
-    tag: 'Editor\'s Pick',
+  {
+    keywords: ['baby', 'pregnancy', 'motherhood', 'newborn'],
+    name: 'Sebamed Baby Lotion',
+    desc: 'Gentle, pH 5.5 balanced lotion to protect and nourish your baby\'s delicate skin.',
+    url: 'https://www.amazon.in/s?k=sebamed+baby+lotion',
+    price: '₹450',
+    brand: 'Sebamed',
+    tag: 'Pediatrician Recommended',
   }
-};
+];
 
 export default function SmartProductWidget({ category, title }: SmartProductWidgetProps) {
-  // Simple keyword matching, fallback to category, then fallback to default
-  const lowerTitle = title.toLowerCase();
+  const searchString = `${title.toLowerCase()} ${category.toLowerCase()}`;
   
-  let match = PRODUCT_MAP['default'];
-  
-  if (lowerTitle.includes('acne') || lowerTitle.includes('dark spot') || lowerTitle.includes('pigment')) {
-    match = PRODUCT_MAP['skin-beauty'];
-  } else if (lowerTitle.includes('saree') || lowerTitle.includes('kurta') || lowerTitle.includes('dress')) {
-    match = PRODUCT_MAP['fashion-style'];
-  } else if (lowerTitle.includes('kitchen') || lowerTitle.includes('chore')) {
-    match = PRODUCT_MAP['home-household'];
-  } else if (PRODUCT_MAP[category]) {
-    match = PRODUCT_MAP[category];
+  // Find the first product where any of its keywords exist in the title or category
+  let match = PRODUCT_MAP.find(product => 
+    product.keywords.some(kw => searchString.includes(kw))
+  );
+
+  // If no specific match, generate a dynamic Amazon search link based on the title
+  // and use a generic fallback layout
+  if (!match) {
+    const safeTitleSearch = encodeURIComponent(title.split(' ').slice(0, 3).join(' '));
+    match = {
+      keywords: [],
+      name: 'Explore products related to this topic',
+      desc: `Find highly-rated essentials and solutions for ${title.toLowerCase()}.`,
+      url: `https://www.amazon.in/s?k=${safeTitleSearch}`,
+      price: 'Shop Now',
+      brand: 'Amazon India',
+      tag: 'Trending',
+    };
   }
 
   return (
