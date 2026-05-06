@@ -206,6 +206,11 @@ async function generateArticle() {
             .substring(0, 100)
             .replace(/-$/, '');
 
+      // Calculate reading time based on total word count (approx 200 words per minute)
+      const contentText = JSON.stringify(parsedContent.content_json) + ' ' + (parsedContent.intro || '') + ' ' + (parsedContent.expert_tip || '');
+      const wordCount = contentText.split(/\s+/).length;
+      const readingTimeMins = Math.max(1, Math.ceil(wordCount / 200));
+
       const { error } = await supabase.from('articles').insert([{
         slug: cleanSlug,
         title: articleDef.title,
@@ -214,7 +219,7 @@ async function generateArticle() {
         intro: parsedContent.intro,
         expert_tip: parsedContent.expert_tip,
         content_json: parsedContent.content_json,
-        reading_time_mins: 5,
+        reading_time_mins: readingTimeMins,
         is_published: true, // Auto-publish for now
         published_at: new Date().toISOString()
       }]);

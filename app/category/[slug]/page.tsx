@@ -48,8 +48,14 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 import AdSenseUnit from '@/components/ads/AdSenseUnit';
+import { CategorySchema } from '@/components/seo/CategorySchema';
 
-export default async function CategoryPage({ params }: { params: { slug: string } }) {
+interface CategoryPageProps {
+  params: Promise<{ slug: string }>;
+}
+
+export default async function CategoryPage(props: CategoryPageProps) {
+  const params = await props.params;
   const category = await getCategoryData(params.slug);
 
   if (!category) {
@@ -59,8 +65,9 @@ export default async function CategoryPage({ params }: { params: { slug: string 
   const articles = await getCategoryArticles(category.slug);
 
   return (
-    <div className="bg-pg-cream min-h-screen pb-24">
-      
+    <>
+      <CategorySchema name={category.name} description={category.description} slug={category.slug} />
+      <div className="bg-pg-cream min-h-screen pb-24">
       {/* ━━━━━━━━━━━━━━━━━━━━━━━
           1. CATEGORY HERO
           ━━━━━━━━━━━━━━━━━━━━━━━ */}
@@ -112,7 +119,7 @@ export default async function CategoryPage({ params }: { params: { slug: string 
                     {article.intro?.substring(0, 120)}...
                   </p>
                   <div className="text-xs font-bold text-pg-gray-400 uppercase tracking-widest mt-auto">
-                    ⏱ {article.reading_time_mins || 6} min read
+                    ⏱ {article.reading_time_mins || 3} min read
                   </div>
                 </Card>
               </Link>
@@ -159,5 +166,6 @@ export default async function CategoryPage({ params }: { params: { slug: string 
 
       </div>
     </div>
+    </>
   );
 }

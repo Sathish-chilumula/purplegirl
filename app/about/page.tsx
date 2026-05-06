@@ -5,6 +5,9 @@ import { CheckCircle2, Shield, HeartHandshake, PenTool } from "lucide-react";
 export const metadata: Metadata = {
   title: "About PurpleGirl | Anonymous Advice for Indian Women",
   description: "PurpleGirl is India's trusted anonymous platform for women — honest how-to guides on relationships, health, career, and more. No login, no judgment.",
+  alternates: {
+    canonical: '/about',
+  },
 };
 
 export default function AboutPage() {

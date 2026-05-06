@@ -11,6 +11,9 @@ export const runtime = 'edge';
 export const metadata: Metadata = {
   title: 'Personality & Advice Quizzes for Indian Women | PurpleGirl',
   description: 'Take fun, insightful, and completely anonymous quizzes about relationships, health, and personality tailored for Indian women.',
+  alternates: {
+    canonical: '/quizzes',
+  },
 };
 
 async function getQuizzes() {

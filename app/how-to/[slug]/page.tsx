@@ -120,7 +120,7 @@ export default async function HowToArticlePage({ params }: { params: { slug: str
                 <span>•</span>
                 <span>Updated {new Date(article.published_at || article.created_at).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}</span>
                 <span>•</span>
-                <span>{article.reading_time_mins || 6} min read</span>
+                <span>{article.reading_time_mins || 3} min read</span>
               </div>
             </header>
 

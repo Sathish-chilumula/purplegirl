@@ -5,14 +5,19 @@ import { ChevronRight } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { HeroIllustration } from '@/components/home/HeroIllustration';
+import * as motion from "motion/react-client";
 import type { Metadata } from 'next';
-
-export const runtime = 'edge';
+import { HomeSchema } from '@/components/seo/HomeSchema';
 
 export const metadata: Metadata = {
   title: "How-To Guides & Anonymous Advice for Indian Women",
   description: "Honest how-to guides on relationships, health, career, skin, and more — written for Indian women. 100% anonymous Q&A, no login required.",
+  alternates: {
+    canonical: '/',
+  },
 };
+
+export const runtime = 'edge';
 
 async function getHomeData() {
   const [categoriesRes, articlesRes, quizzesRes] = await Promise.all([
@@ -46,16 +51,18 @@ export default async function Home() {
   const { categories, featuredArticles, latestQuizzes } = await getHomeData();
 
   return (
-    <div className="bg-pg-cream min-h-screen pb-20">
-      
+    <>
+      <HomeSchema />
+      <div className="bg-pg-cream min-h-screen pb-20">
+
       {/* ━━━━━━━━━━━━━━━━━━━━━━━
           SECTION 1 — Hero Search Bar
           ━━━━━━━━━━━━━━━━━━━━━━━ */}
       <section className="pt-12 pb-16 md:pt-24 md:pb-20 px-6 relative bg-pg-rose-light overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(#E91E8C_1px,transparent_1px)] [background-size:24px_24px] opacity-10" />
-        
+
         <div className="max-w-[1100px] mx-auto relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-12 fade-up">
-          
+
           {/* Mobile: Illustration comes first (order-1), Desktop: Illustration goes right (order-2) */}
           <div className="w-full md:w-[45%] order-1 md:order-2 flex justify-center shrink-0">
             <HeroIllustration />
@@ -98,8 +105,8 @@ export default async function Home() {
                 { label: 'Skin Care', href: '/category/skin-beauty' },
                 { label: 'Pregnancy', href: '/category/pregnancy-fertility' },
               ].map((tag) => (
-                <Link 
-                  key={tag.label} 
+                <Link
+                  key={tag.label}
                   href={tag.href}
                   className="bg-white/60 hover:bg-white text-pg-gray-700 px-4 py-1.5 rounded-full transition-colors border border-pg-rose/10 shrink-0"
                 >
@@ -119,7 +126,7 @@ export default async function Home() {
         <h2 className="font-sans text-[22px] font-bold text-pg-gray-900 mb-8 text-center md:text-left">
           Browse by Category
         </h2>
-        
+
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {categories.map((cat) => (
             <Link key={cat.id} href={`/category/${cat.slug}`}>
@@ -169,7 +176,7 @@ export default async function Home() {
                   {article.intro?.substring(0, 100)}...
                 </p>
                 <div className="text-[10px] md:text-xs font-bold text-pg-gray-400 uppercase tracking-widest mt-auto">
-                  ⏱ {article.reading_time_mins || 5} min
+                  ⏱ {article.reading_time_mins || 3} min
                 </div>
               </Card>
             </Link>

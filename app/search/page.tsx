@@ -32,7 +32,13 @@ export async function generateMetadata({ searchParams }: SearchPageProps): Promi
     }
   }
 
-  return { title, description };
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: '/search',
+    },
+  };
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
