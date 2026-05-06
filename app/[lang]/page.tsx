@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { AskBox } from '@/components/home/AskBox';
-import { ChevronRight, Flame } from 'lucide-react';
+import { ChevronRight, Flame, Activity } from 'lucide-react';
+import { getDictionary } from '@/lib/dictionary';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { HeroIllustration } from '@/components/home/HeroIllustration';
@@ -77,7 +78,10 @@ async function getHomeData(lang: string) {
 
 export default async function Home({ params }: HomePageProps) {
   const { lang } = await params;
-  const { categories, featuredArticles, latestQuizzes } = await getHomeData(lang);
+  const [{ categories, featuredArticles, latestQuizzes }, dict] = await Promise.all([
+    getHomeData(lang),
+    getDictionary(lang),
+  ]);
 
   return (
     <>
@@ -225,14 +229,15 @@ export default async function Home({ params }: HomePageProps) {
           <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-2">
             <div>
               <h2 className="font-display text-[22px] md:text-[28px] font-bold text-pg-gray-900 mb-1">
-                Interactive Tools
+                {lang === 'hi' ? 'इंटरैक्टिव टूल्स' : lang === 'te' ? 'ఇంటరాక్టివ్ సాధనాలు' : 'Interactive Tools'}
               </h2>
               <p className="text-pg-gray-500 text-sm">
-                Private calculators and checkers
+                {lang === 'hi' ? 'निजी कैलकुलेटर और जांच' : lang === 'te' ? 'ప్రైవేట్ కాల్కులేటర్లు మరియు తనిఖీలు' : 'Private calculators and symptom checkers'}
               </p>
             </div>
           </div>
           <div className="grid md:grid-cols-2 gap-4">
+            {/* Period Calculator */}
             <Link href="/tools/period-calculator">
               <Card className="p-6 md:p-8 flex items-center gap-6 hover:border-pg-rose transition-colors group h-full">
                 <div className="bg-pg-rose/10 text-pg-rose p-4 rounded-2xl shrink-0 group-hover:scale-110 transition-transform">
@@ -240,9 +245,25 @@ export default async function Home({ params }: HomePageProps) {
                 </div>
                 <div>
                   <h3 className="font-display font-bold text-xl text-pg-gray-900 mb-2 group-hover:text-pg-rose transition-colors">
-                    Period & Ovulation Calculator
+                    {dict.calculator_period_title}
                   </h3>
-                  <p className="text-pg-gray-500 text-sm">Track your cycle and predict your most fertile days. 100% private.</p>
+                  <p className="text-pg-gray-500 text-sm">{dict.calculator_period_desc}</p>
+                </div>
+              </Card>
+            </Link>
+            {/* Symptom Checker */}
+            <Link href="/tools/symptom-checker">
+              <Card className="p-6 md:p-8 flex items-center gap-6 hover:border-pg-plum transition-colors group h-full">
+                <div className="bg-pg-plum/10 text-pg-plum p-4 rounded-2xl shrink-0 group-hover:scale-110 transition-transform">
+                  <Activity size={32} />
+                </div>
+                <div>
+                  <h3 className="font-display font-bold text-xl text-pg-gray-900 mb-2 group-hover:text-pg-plum transition-colors">
+                    {lang === 'hi' ? 'लक्षण जांचकर्ता' : lang === 'te' ? 'లక్షణ తనిఖీ' : 'Symptom Checker'}
+                  </h3>
+                  <p className="text-pg-gray-500 text-sm">
+                    {lang === 'hi' ? 'PCOS, थायराइड, या हार्मोनल असंतुलन के लक्षण जांचें।' : lang === 'te' ? 'PCOS, థైరాయిడ్ లేదా హార్మోన్ లక్షణాలు తనిఖీ చేయండి.' : 'Check if your symptoms match PCOS, thyroid, or hormonal imbalance.'}
+                  </p>
                 </div>
               </Card>
             </Link>

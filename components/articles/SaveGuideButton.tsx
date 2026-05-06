@@ -3,11 +3,18 @@
 import React, { useState, useEffect } from 'react';
 import { Bookmark, BookmarkCheck } from 'lucide-react';
 
-export function SaveGuideButton({ slug }: { slug: string }) {
+interface Props {
+  slug: string;
+  saveLabel?: string;
+  savedLabel?: string;
+}
+
+export function SaveGuideButton({ slug, saveLabel = 'Save', savedLabel = 'Saved' }: Props) {
   const [isSaved, setIsSaved] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Check if slug is in localStorage
+    setMounted(true);
     try {
       const savedStr = localStorage.getItem('pg_saved_guides');
       if (savedStr) {
@@ -23,17 +30,11 @@ export function SaveGuideButton({ slug }: { slug: string }) {
     try {
       const savedStr = localStorage.getItem('pg_saved_guides');
       let saved: string[] = savedStr ? JSON.parse(savedStr) : [];
-      
       if (isSaved) {
-        // Remove
-        saved = saved.filter(s => s !== slug);
+        saved = saved.filter((s) => s !== slug);
       } else {
-        // Add
-        if (!saved.includes(slug)) {
-          saved.push(slug);
-        }
+        if (!saved.includes(slug)) saved.push(slug);
       }
-      
       localStorage.setItem('pg_saved_guides', JSON.stringify(saved));
       setIsSaved(!isSaved);
     } catch (e) {
@@ -41,18 +42,20 @@ export function SaveGuideButton({ slug }: { slug: string }) {
     }
   };
 
+  if (!mounted) return null;
+
   return (
     <button
       onClick={toggleSave}
-      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${
-        isSaved 
-          ? 'bg-pg-plum text-white border border-pg-plum' 
+      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
+        isSaved
+          ? 'bg-pg-plum text-white border border-pg-plum scale-105'
           : 'bg-white text-pg-gray-600 border border-pg-gray-200 hover:border-pg-plum hover:text-pg-plum'
       }`}
-      aria-label={isSaved ? "Remove from Saved Guides" : "Save Guide"}
+      aria-label={isSaved ? savedLabel : saveLabel}
     >
       {isSaved ? <BookmarkCheck size={14} /> : <Bookmark size={14} />}
-      {isSaved ? 'Saved' : 'Save'}
+      {isSaved ? savedLabel : saveLabel}
     </button>
   );
 }

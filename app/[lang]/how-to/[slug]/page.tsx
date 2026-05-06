@@ -140,7 +140,7 @@ export default async function HowToArticlePage({ params }: ArticlePageProps) {
                     })()} min read
                   </span>
                 </div>
-                <SaveGuideButton slug={article.slug} />
+                <SaveGuideButton slug={article.slug} saveLabel={dict.article_save} savedLabel={dict.article_saved} />
               </div>
             </header>
 
