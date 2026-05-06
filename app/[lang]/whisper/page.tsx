@@ -9,6 +9,8 @@ import { slugify } from '@/lib/slugify';
 import { useRouter } from 'next/navigation';
 import { ManuscriptSymbols } from '@/components/home/ManuscriptElements';
 
+export const runtime = 'edge';
+
 export default function WhisperModePage() {
   const router = useRouter();
   const [question, setQuestion] = useState('');

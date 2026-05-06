@@ -2,6 +2,8 @@ import { getDictionary } from '@/lib/dictionary';
 import { PeriodCalculatorClient } from './PeriodCalculatorClient';
 import type { Metadata } from 'next';
 
+export const runtime = 'edge';
+
 const SITE_URL = 'https://purplegirl.in';
 
 interface PageProps {

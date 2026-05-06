@@ -4,6 +4,8 @@ import React, { useState, Suspense } from 'react';
 import { Shield, Sparkles, Send, RefreshCcw, Bookmark, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 
+export const runtime = 'edge';
+
 interface AnswerResult {
   question: string;
   answer: string;

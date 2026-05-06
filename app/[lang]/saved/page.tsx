@@ -6,6 +6,8 @@ import { Card } from '@/components/ui/Card';
 import { Bookmark, Loader2, Home } from 'lucide-react';
 import { supabase } from '@/lib/supabase'; // We need the client supabase to fetch data
 
+export const runtime = 'edge';
+
 interface Article {
   slug: string;
   title: string;

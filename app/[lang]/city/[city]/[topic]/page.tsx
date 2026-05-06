@@ -8,18 +8,14 @@ import {
 } from '@/lib/city-data';
 import { Card } from '@/components/ui/Card';
 
+export const runtime = 'edge';
+
 
 interface CityPageProps {
   params: Promise<{ lang: string; city: string; topic: string }>;
 }
 
-export async function generateStaticParams() {
-  const pairs = getAllCityTopicPairs();
-  const langs = ['en', 'hi', 'te'];
-  return langs.flatMap(lang =>
-    pairs.map(({ city, topic }) => ({ lang, city, topic }))
-  );
-}
+
 
 export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {
   const { city, topic, lang } = await params;

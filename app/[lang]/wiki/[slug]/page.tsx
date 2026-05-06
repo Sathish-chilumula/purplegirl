@@ -5,15 +5,13 @@ import { ChevronRight, BookOpen, CheckCircle } from 'lucide-react';
 import { getWikiTerm, getAllWikiSlugs } from '@/lib/wiki-terms';
 import { Card } from '@/components/ui/Card';
 
+export const runtime = 'edge';
+
 interface WikiPageProps {
   params: Promise<{ lang: string; slug: string }>;
 }
 
-export async function generateStaticParams() {
-  const slugs = getAllWikiSlugs();
-  const langs = ['en', 'hi', 'te'];
-  return langs.flatMap(lang => slugs.map(slug => ({ lang, slug })));
-}
+
 
 export async function generateMetadata({ params }: WikiPageProps): Promise<Metadata> {
   const { slug, lang } = await params;

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CheckCircle2, Shield, HeartHandshake, PenTool } from "lucide-react";
 
+export const runtime = 'edge';
+
 interface AboutPageProps {
   params: Promise<{ lang: string }>;
 }

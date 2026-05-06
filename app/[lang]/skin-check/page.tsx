@@ -4,6 +4,8 @@ import { ArrowLeft } from 'lucide-react';
 import SkinAnalyzer from '@/components/skin/SkinAnalyzer';
 import { SITE_NAME } from '@/lib/constants';
 
+export const runtime = 'edge';
+
 export const metadata: Metadata = {
   title: `Skin Photo Analysis | ${SITE_NAME}`,
   description: 'Upload a photo of your skin concern for an instant, private, AI-powered analysis tailored for Indian skin.',

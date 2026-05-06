@@ -5,16 +5,14 @@ import { ChevronRight, CheckCircle, XCircle, Minus } from 'lucide-react';
 import { getComparePage, getAllCompareSlugs } from '@/lib/compare-data';
 import { Card } from '@/components/ui/Card';
 
+export const runtime = 'edge';
+
 
 interface ComparePageProps {
   params: Promise<{ lang: string; slug: string }>;
 }
 
-export async function generateStaticParams() {
-  const slugs = getAllCompareSlugs();
-  const langs = ['en', 'hi', 'te'];
-  return langs.flatMap(lang => slugs.map(slug => ({ lang, slug })));
-}
+
 
 export async function generateMetadata({ params }: ComparePageProps): Promise<Metadata> {
   const { slug, lang } = await params;

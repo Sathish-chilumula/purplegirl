@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+export const runtime = 'edge';
+
 export default function TermsPage() {
   return (
     <div className="bg-pg-cream min-h-screen py-16 px-6">
