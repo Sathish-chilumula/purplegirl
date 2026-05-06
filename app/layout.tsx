@@ -42,6 +42,13 @@ export default function RootLayout({
           crossOrigin="anonymous"
         ></script>
 
+      </head>
+      <body className="antialiased font-sans">
+        <Header />
+        <main className="min-h-screen">
+          {children}
+        </main>
+        <Footer />
         {/* CueLinks JS (Invisible Affiliate Link Converter) */}
         <script dangerouslySetInnerHTML={{
           __html: `
@@ -55,13 +62,6 @@ export default function RootLayout({
             }());
           `
         }} />
-      </head>
-      <body className="antialiased font-sans">
-        <Header />
-        <main className="min-h-screen">
-          {children}
-        </main>
-        <Footer />
       </body>
     </html>
   );
