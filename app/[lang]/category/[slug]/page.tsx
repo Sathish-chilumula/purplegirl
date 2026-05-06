@@ -29,15 +29,27 @@ async function getCategoryArticles(categorySlug: string) {
   return data || [];
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const category = await getCategoryData(params.slug);
+const SITE_URL = 'https://purplegirl.in';
+
+interface CategoryPageProps {
+  params: Promise<{ lang: string; slug: string }>;
+}
+
+export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
+  const { lang, slug } = await params;
+  const category = await getCategoryData(slug);
   if (!category) return { title: 'Category Not Found' };
   
   return {
     title: `${category.name} Problems & Advice for Indian Women | PurpleGirl`,
     description: `How-to guides for Indian women facing ${category.name.toLowerCase()} problems. Honest, anonymous advice.`,
     alternates: {
-      canonical: `/category/${params.slug}`
+      canonical: lang === 'en' ? `/category/${slug}` : `/${lang}/category/${slug}`,
+      languages: {
+        'en': `${SITE_URL}/category/${slug}`,
+        'hi': `${SITE_URL}/hi/category/${slug}`,
+        'te': `${SITE_URL}/te/category/${slug}`,
+      }
     },
     openGraph: {
       title: `${category.name} Advice | PurpleGirl`,
@@ -50,13 +62,10 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 import AdSenseUnit from '@/components/ads/AdSenseUnit';
 import { CategorySchema } from '@/components/seo/CategorySchema';
 
-interface CategoryPageProps {
-  params: Promise<{ slug: string }>;
-}
-
 export default async function CategoryPage(props: CategoryPageProps) {
   const params = await props.params;
   const category = await getCategoryData(params.slug);
+  const lang = params.lang;
 
   if (!category) {
     notFound();

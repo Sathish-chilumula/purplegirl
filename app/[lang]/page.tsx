@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { AskBox } from '@/components/home/AskBox';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Flame } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { HeroIllustration } from '@/components/home/HeroIllustration';
@@ -9,13 +9,40 @@ import * as motion from "motion/react-client";
 import type { Metadata } from 'next';
 import { HomeSchema } from '@/components/seo/HomeSchema';
 
-export const metadata: Metadata = {
-  title: "How-To Guides & Anonymous Advice for Indian Women",
-  description: "Honest how-to guides on relationships, health, career, skin, and more — written for Indian women. 100% anonymous Q&A, no login required.",
-  alternates: {
-    canonical: '/',
-  },
-};
+const SITE_URL = 'https://purplegirl.in';
+
+interface HomePageProps {
+  params: Promise<{ lang: string }>;
+}
+
+export async function generateMetadata({ params }: HomePageProps): Promise<Metadata> {
+  const { lang } = await params;
+  
+  const titles: Record<string, string> = {
+    en: "How-To Guides & Anonymous Advice for Indian Women",
+    hi: "भारतीय महिलाओं के लिए गाइड और सलाह | PurpleGirl",
+    te: "భారతీయ మహిళలకు గైడ్‌లు మరియు సలహా | PurpleGirl",
+  };
+
+  const descs: Record<string, string> = {
+    en: "Honest how-to guides on relationships, health, career, skin, and more — written for Indian women. 100% anonymous Q&A, no login required.",
+    hi: "रिश्तों, स्वास्थ्य, करियर और त्वचा पर ईमानदार गाइड — भारतीय महिलाओं के लिए। 100% गुमनाम सवाल-जवाब।",
+    te: "సంబంధాలు, ఆరోగ్యం, కెరీర్ మరియు చర్మంపై నిజాయితీగా గైడ్‌లు — భారతీయ మహిళలకు. 100% అనామక ప్రశ్న-జవాబు.",
+  };
+
+  return {
+    title: titles[lang] || titles.en,
+    description: descs[lang] || descs.en,
+    alternates: {
+      canonical: lang === 'en' ? '/' : `/${lang}`,
+      languages: {
+        'en': SITE_URL,
+        'hi': `${SITE_URL}/hi`,
+        'te': `${SITE_URL}/te`,
+      },
+    },
+  };
+}
 
 export const runtime = 'edge';
 
@@ -24,7 +51,7 @@ async function getHomeData() {
     supabaseAdmin
       .from('categories')
       .select('*')
-      .lt('display_order', 99)          // exclude sex-intimacy (display_order = 99)
+      .lt('display_order', 99)
       .order('display_order', { ascending: true }),
     supabaseAdmin
       .from('articles')
@@ -47,7 +74,8 @@ async function getHomeData() {
   };
 }
 
-export default async function Home() {
+export default async function Home({ params }: HomePageProps) {
+  const { lang } = await params;
   const { categories, featuredArticles, latestQuizzes } = await getHomeData();
 
   return (

@@ -49,21 +49,27 @@ async function getRelatedArticles(article: any) {
   return data || [];
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const article = await getArticleData(params.slug);
+const SITE_URL = 'https://purplegirl.in';
+
+interface ArticlePageProps {
+  params: Promise<{ lang: string; slug: string }>;
+}
+
+export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
+  const { lang, slug } = await params;
+  const article = await getArticleData(slug);
   if (!article) return { title: 'Not Found' };
   
-  const baseSlug = article.slug.replace('-hi', '').replace('-te', '');
-
+  // For hreflang, we link to the English version at root and translated versions with /[lang]/ prefix
   return {
     title: `${article.title} | PurpleGirl`,
     description: article.meta_description || article.intro,
     alternates: {
-      canonical: `/how-to/${article.slug}`,
+      canonical: lang === 'en' ? `/how-to/${slug}` : `/${lang}/how-to/${slug}`,
       languages: {
-        'en-IN': `/how-to/${baseSlug}`,
-        'hi-IN': `/how-to/${baseSlug}-hi`,
-        'te-IN': `/how-to/${baseSlug}-te`,
+        'en': `${SITE_URL}/how-to/${slug}`,
+        'hi': `${SITE_URL}/hi/how-to/${slug}`,
+        'te': `${SITE_URL}/te/how-to/${slug}`,
       }
     },
     openGraph: {
@@ -74,8 +80,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function HowToArticlePage({ params }: { params: { slug: string } }) {
-  const article = await getArticleData(params.slug);
+export default async function HowToArticlePage({ params }: ArticlePageProps) {
+  const { slug } = await params;
+  const article = await getArticleData(slug);
 
   if (!article) {
     notFound();
