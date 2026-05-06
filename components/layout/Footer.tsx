@@ -83,6 +83,18 @@ export default function Footer({ dict, lang }: FooterProps) {
               <button onClick={() => changeLanguage('te')} className={`text-left text-sm transition-colors flex items-center gap-3 ${lang === 'te' ? 'text-pg-rose font-bold' : 'text-white/50 hover:text-white'}`}>
                 <span className="text-base">🇮🇳</span> తెలుగు (Telugu)
               </button>
+              <button onClick={() => changeLanguage('bn')} className={`text-left text-sm transition-colors flex items-center gap-3 ${lang === 'bn' ? 'text-pg-rose font-bold' : 'text-white/50 hover:text-white'}`}>
+                <span className="text-base">🇮🇳</span> বাংলা (Bengali)
+              </button>
+              <button onClick={() => changeLanguage('mr')} className={`text-left text-sm transition-colors flex items-center gap-3 ${lang === 'mr' ? 'text-pg-rose font-bold' : 'text-white/50 hover:text-white'}`}>
+                <span className="text-base">🇮🇳</span> मराठी (Marathi)
+              </button>
+              <button onClick={() => changeLanguage('ta')} className={`text-left text-sm transition-colors flex items-center gap-3 ${lang === 'ta' ? 'text-pg-rose font-bold' : 'text-white/50 hover:text-white'}`}>
+                <span className="text-base">🇮🇳</span> தமிழ் (Tamil)
+              </button>
+              <button onClick={() => changeLanguage('gu')} className={`text-left text-sm transition-colors flex items-center gap-3 ${lang === 'gu' ? 'text-pg-rose font-bold' : 'text-white/50 hover:text-white'}`}>
+                <span className="text-base">🇮🇳</span> ગુજરાતી (Gujarati)
+              </button>
             </div>
           </div>
         </div>
