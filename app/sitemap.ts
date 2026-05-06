@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 
 const SITE_URL = 'https://purplegirl.in';
-const locales = ['en', 'hi', 'te'];
+const locales = ['en', 'hi', 'te', 'bn', 'mr', 'ta', 'gu'];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 1. Fetch all articles
