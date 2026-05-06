@@ -50,20 +50,18 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const article = await getArticleData(params.slug);
   if (!article) return { title: 'Not Found' };
   
-  const isHindi = article.language === 'hi' || article.slug.endsWith('-hi');
-  const baseSlug = article.slug.replace('-hi', '');
+  const baseSlug = article.slug.replace('-hi', '').replace('-te', '');
 
   return {
     title: `${article.title} | PurpleGirl`,
     description: article.meta_description || article.intro,
-    alternates: isHindi ? {
-      canonical: `/how-to/${baseSlug}`,
-      languages: {
-        'en': `/how-to/${baseSlug}`,
-        'hi': `/how-to/${article.slug}`,
-      }
-    } : {
+    alternates: {
       canonical: `/how-to/${article.slug}`,
+      languages: {
+        'en-IN': `/how-to/${baseSlug}`,
+        'hi-IN': `/how-to/${baseSlug}-hi`,
+        'te-IN': `/how-to/${baseSlug}-te`,
+      }
     },
     openGraph: {
       title: article.title,

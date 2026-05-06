@@ -34,14 +34,25 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${dmSans.variable} ${playfair.variable}`}>
       <head>
-        {/* Ezoic Head Script */}
+        {/* Google AdSense */}
+        <script 
+          async 
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3809505002238691"
+          crossOrigin="anonymous"
+        ></script>
+
+        {/* CueLinks JS (Invisible Affiliate Link Converter) */}
         <script dangerouslySetInnerHTML={{
-          __html: `(function() {
-            var script = document.createElement('script');
-            script.src = '//www.ezojs.com/ezoic/sa.min.js';
-            script.async = true;
-            document.head.appendChild(script);
-          })();`
+          __html: `
+            var cId = "283648";
+            (function(d, t) {
+              var s = document.createElement("script");
+              s.type = "text/javascript";
+              s.async = true;
+              s.src = (document.location.protocol == "https:" ? "https://cdn0.cuelinks.com/js/" : "http://cdn0.cuelinks.com/js/")  + "cuelinksv2.js";
+              document.getElementsByTagName("body")[0].appendChild(s);
+            }());
+          `
         }} />
       </head>
       <body className="antialiased font-sans">
