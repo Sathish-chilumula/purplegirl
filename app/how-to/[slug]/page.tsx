@@ -7,7 +7,6 @@ import { ArticleSchemas } from '@/components/seo/ArticleSchemas';
 import { ChevronRight, Lock, AlertTriangle, Sparkles, ChevronDown } from 'lucide-react';
 import { Metadata } from 'next';
 import AdSenseUnit from '@/components/ads/AdSenseUnit';
-import SmartProductWidget from '@/components/monetization/SmartProductWidget';
 
 export const runtime = 'edge';
 
