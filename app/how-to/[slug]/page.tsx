@@ -7,6 +7,8 @@ import { ArticleSchemas } from '@/components/seo/ArticleSchemas';
 import { ChevronRight, Lock, AlertTriangle, Sparkles, ChevronDown } from 'lucide-react';
 import { Metadata } from 'next';
 import AdSenseUnit from '@/components/ads/AdSenseUnit';
+import { FeedbackWidget } from '@/components/articles/FeedbackWidget';
+import { SaveGuideButton } from '@/components/articles/SaveGuideButton';
 
 export const runtime = 'edge';
 
@@ -115,12 +117,15 @@ export default async function HowToArticlePage({ params }: { params: { slug: str
               <h1 className="font-display text-4xl md:text-5xl font-extrabold text-pg-gray-900 leading-[1.1] mb-6">
                 {article.title}
               </h1>
-              <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-pg-gray-500 font-medium">
-                <span>By PurpleGirl Editors</span>
-                <span>•</span>
-                <span>Updated {new Date(article.published_at || article.created_at).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}</span>
-                <span>•</span>
-                <span>{article.reading_time_mins || 3} min read</span>
+              <div className="flex flex-wrap items-center justify-between gap-4 mt-6">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-pg-gray-500 font-medium">
+                  <span>By PurpleGirl Editors</span>
+                  <span className="hidden sm:inline">•</span>
+                  <span>Updated {new Date(article.published_at || article.created_at).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}</span>
+                  <span className="hidden sm:inline">•</span>
+                  <span>{article.reading_time_mins || 3} min read</span>
+                </div>
+                <SaveGuideButton slug={article.slug} />
               </div>
             </header>
 
@@ -242,6 +247,8 @@ export default async function HowToArticlePage({ params }: { params: { slug: str
 
             {/* Smart Product Affiliate Widget */}
             <SmartProductWidget category={article.category} title={article.title} />
+
+            <FeedbackWidget slug={article.slug} />
 
             {/* 11. Ad Slot 3 — hidden until AdSense approved */}
             <AdSenseUnit slot="end-article" className="my-8" />

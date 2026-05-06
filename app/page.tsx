@@ -189,6 +189,39 @@ export default async function Home() {
       </section>
 
       {/* ━━━━━━━━━━━━━━━━━━━━━━━
+          SECTION 3.5 — Interactive Tools
+          ━━━━━━━━━━━━━━━━━━━━━━━ */}
+      <section className="px-4 py-8 md:py-12">
+        <div className="max-w-content mx-auto">
+          <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-2">
+            <div>
+              <h2 className="font-display text-[22px] md:text-[28px] font-bold text-pg-gray-900 mb-1">
+                Interactive Tools
+              </h2>
+              <p className="text-pg-gray-500 text-sm">
+                Private calculators and checkers
+              </p>
+            </div>
+          </div>
+          <div className="grid md:grid-cols-2 gap-4">
+            <Link href="/tools/period-calculator">
+              <Card className="p-6 md:p-8 flex items-center gap-6 hover:border-pg-rose transition-colors group h-full">
+                <div className="bg-pg-rose/10 text-pg-rose p-4 rounded-2xl shrink-0 group-hover:scale-110 transition-transform">
+                  <Flame size={32} />
+                </div>
+                <div>
+                  <h3 className="font-display font-bold text-xl text-pg-gray-900 mb-2 group-hover:text-pg-rose transition-colors">
+                    Period & Ovulation Calculator
+                  </h3>
+                  <p className="text-pg-gray-500 text-sm">Track your cycle and predict your most fertile days. 100% private.</p>
+                </div>
+              </Card>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━
           SECTION 4 — Quizzes Strip
           ━━━━━━━━━━━━━━━━━━━━━━━ */}
       <section id="quizzes" className="my-12 bg-pg-plum text-white py-10 md:py-14 px-4 overflow-hidden relative">

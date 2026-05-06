@@ -2,16 +2,16 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Search, Menu, X, ChevronDown, ChevronRight, Zap, TrendingUp, Flame, HelpCircle, Calendar } from 'lucide-react';
+import { Search, Menu, X, ChevronDown, ChevronRight, Zap, TrendingUp, Flame, HelpCircle, Calendar, Bookmark, MessagesSquare } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
 
 const topLinks = [
-  { label: 'Random Article', icon: Zap, href: '/search' },
+  { label: 'Saved Guides', icon: Bookmark, href: '/saved' },
   { label: 'Trending Now', icon: TrendingUp, href: '/search?q=trending' },
-  { label: 'Quizzes 🔥', icon: Flame, href: '/#quizzes' },
+  { label: 'Public Q&A Feed', icon: MessagesSquare, href: '/questions' },
+  { label: 'Quizzes 🔥', icon: Flame, href: '/quizzes' },
   { label: 'Ask Anonymously', icon: HelpCircle, href: '/ask' },
-  { label: 'New This Week', icon: Calendar, href: '/search' },
 ];
 
 const categoryColumns = [
