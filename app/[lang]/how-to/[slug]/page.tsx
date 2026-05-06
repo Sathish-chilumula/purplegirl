@@ -1,6 +1,5 @@
 import React from 'react';
 import SmartProductWidget from '@/components/monetization/SmartProductWidget';
-import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { ArticleSchemas } from '@/components/seo/ArticleSchemas';
@@ -17,14 +16,40 @@ import { LeadCaptureWidget } from '@/components/articles/LeadCaptureWidget';
 
 export const runtime = 'edge';
 
-async function getArticleData(slug: string) {
-  const { data } = await supabaseAdmin
+async function getArticleData(slug: string, lang: string) {
+  // Try to find exact slug match first (e.g., if they navigated to 'my-guide-hi' directly)
+  const { data: exactMatch } = await supabaseAdmin
     .from('articles')
     .select('*')
     .eq('slug', slug)
     .eq('is_published', true)
     .single();
-  return data;
+
+  // If we found it, and its language matches the route, or it's english, return it.
+  if (exactMatch && exactMatch.language === lang) {
+    return { article: exactMatch, redirectSlug: null };
+  }
+
+  // If the user requested an English slug (e.g. 'my-guide') but under a translated route (e.g. '/hi/')
+  if (lang !== 'en') {
+    // Attempt to find the translated version of this slug
+    const { data: translatedMatch } = await supabaseAdmin
+      .from('articles')
+      .select('*')
+      .eq('language', lang)
+      .or(`slug.eq.${slug}-${lang},slug.like.${slug.substring(0, 50)}%`)
+      .eq('is_published', true)
+      .limit(1)
+      .single();
+      
+    if (translatedMatch) {
+      // We found the translation! We should redirect the user to the correct native slug.
+      return { article: null, redirectSlug: translatedMatch.slug };
+    }
+  }
+
+  // Fallback to the exact match (even if it's the wrong language)
+  return { article: exactMatch, redirectSlug: null };
 }
 
 /**
@@ -60,9 +85,17 @@ interface ArticlePageProps {
   params: Promise<{ lang: string; slug: string }>;
 }
 
+import { redirect, notFound } from 'next/navigation';
+
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
   const { lang, slug } = await params;
-  const article = await getArticleData(slug);
+  const { article, redirectSlug } = await getArticleData(slug, lang);
+  
+  if (redirectSlug) {
+    // We can't redirect in generateMetadata easily without throwing, but Next.js will call the component and redirect there.
+    return { title: 'Redirecting...' };
+  }
+
   if (!article) return { title: 'Not Found' };
   
   // For hreflang, we link to the English version at root and translated versions with /[lang]/ prefix
@@ -87,7 +120,11 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
 
 export default async function HowToArticlePage({ params }: ArticlePageProps) {
   const { lang, slug } = await params;
-  const article = await getArticleData(slug);
+  const { article, redirectSlug } = await getArticleData(slug, lang);
+
+  if (redirectSlug) {
+    redirect(`/${lang}/how-to/${redirectSlug}`);
+  }
 
   if (!article) {
     notFound();

@@ -7,6 +7,7 @@ const dictionaries: Record<string, () => Promise<Dictionary>> = {
 };
 
 export const getDictionary = async (locale: string): Promise<Dictionary> => {
-  const loader = dictionaries[locale] || dictionaries['en'];
-  return loader();
+  // The user requested that the UI (menus, buttons) remain in English,
+  // and ONLY the article content be translated.
+  return dictionaries['en']();
 };

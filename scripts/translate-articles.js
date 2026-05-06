@@ -23,7 +23,13 @@ const TRANSLATION_PROMPT = `You are a professional translator and content writer
 Your task is to translate the provided JSON content into {TARGET_LANGUAGE}.
 Maintain the warm, empathetic, and highly relatable "older sister" tone. Use everyday, natural conversational {TARGET_LANGUAGE}.
 
-CRITICAL RULES:
+CRITICAL TRANSLATION STYLE RULES:
+- DO NOT use complex, formal, or pure {TARGET_LANGUAGE} (e.g., do not use pure Sanskritized Hindi or Granthika Telugu).
+- ALWAYS keep common English words in English (either transliterated or in English script) if they are commonly used in daily conversation.
+- Examples: Use "Job" instead of "Udyogam", "Family" instead of "Kutumbam/Parivar", "Mirror" instead of "Darpanam", "Diet", "PCOS", "Office", etc.
+- The goal is to make it EXTREMELY easy and natural to read for a modern Indian woman who speaks "Hinglish" or "Tanglish".
+
+CRITICAL JSON RULES:
 1. Translate all string values EXCEPT keys. Keep JSON structure exactly the same.
 2. Also provide a "native_slug" field: a romanized {TARGET_LANGUAGE} slug (lowercase, hyphens, no spaces) that represents how an Indian woman would search for this topic in {TARGET_LANGUAGE}. Max 80 chars.
 3. Return ONLY raw JSON. No markdown backticks, no explanations.
