@@ -2,13 +2,27 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CheckCircle2, Shield, HeartHandshake, PenTool } from "lucide-react";
 
-export const metadata: Metadata = {
-  title: "About PurpleGirl | Anonymous Advice for Indian Women",
-  description: "PurpleGirl is India's trusted anonymous platform for women — honest how-to guides on relationships, health, career, and more. No login, no judgment.",
-  alternates: {
-    canonical: '/about',
-  },
-};
+interface AboutPageProps {
+  params: Promise<{ lang: string }>;
+}
+
+const SITE_URL = 'https://purplegirl.in';
+
+export async function generateMetadata({ params }: AboutPageProps): Promise<Metadata> {
+  const { lang } = await params;
+  return {
+    title: "About PurpleGirl | Anonymous Advice for Indian Women",
+    description: "PurpleGirl is India's trusted anonymous platform for women — honest how-to guides on relationships, health, career, and more. No login, no judgment.",
+    alternates: {
+      canonical: lang === 'en' ? '/about' : `/${lang}/about`,
+      languages: {
+        'en': `${SITE_URL}/about`,
+        'hi': `${SITE_URL}/hi/about`,
+        'te': `${SITE_URL}/te/about`,
+      },
+    },
+  };
+}
 
 export default function AboutPage() {
   return (

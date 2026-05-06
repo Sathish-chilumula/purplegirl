@@ -1,75 +1,65 @@
 import { MetadataRoute } from 'next';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 
+const SITE_URL = 'https://purplegirl.in';
+const locales = ['en', 'hi', 'te'];
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://purplegirl.in';
+  // 1. Fetch all articles
+  const { data: articles } = await supabaseAdmin
+    .from('articles')
+    .select('slug, language, updated_at, created_at')
+    .eq('is_published', true);
 
-  // 1. Static Routes
-  const staticRoutes = [
-    { url: baseUrl, lastModified: new Date(), changeFrequency: 'daily' as const, priority: 1.0 },
-    { url: `${baseUrl}/quizzes`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.8 },
-    { url: `${baseUrl}/ask`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
-    { url: `${baseUrl}/about`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.5 },
-    { url: `${baseUrl}/contact`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.4 },
-    { url: `${baseUrl}/privacy`, lastModified: new Date(), changeFrequency: 'yearly' as const, priority: 0.3 },
-    { url: `${baseUrl}/terms`, lastModified: new Date(), changeFrequency: 'yearly' as const, priority: 0.3 },
-  ] as MetadataRoute.Sitemap;
-
-  // 2. Dynamic Categories
+  // 2. Fetch all categories
   const { data: categories } = await supabaseAdmin
     .from('categories')
     .select('slug');
-  const categoryRoutes = (categories || []).map((cat) => ({
-    url: `${baseUrl}/category/${cat.slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'daily' as const,
-    priority: 0.9,
-  })) as MetadataRoute.Sitemap;
 
-  // 3. Dynamic Articles
-  // NOTE: articles table has: generated_at, published_at, created_at (no updated_at)
-  const { data: articles } = await supabaseAdmin
-    .from('articles')
-    .select('slug, generated_at, published_at, created_at')
-    .eq('is_published', true)
-    .order('created_at', { ascending: false });
+  const sitemapEntries: MetadataRoute.Sitemap = [];
 
-  const articleRoutes = (articles || []).map((article) => ({
-    url: `${baseUrl}/how-to/${article.slug}`,
-    lastModified: new Date(
-      article.generated_at || article.published_at || article.created_at || Date.now()
-    ),
-    changeFrequency: 'weekly' as const,
-    priority: 0.7,
-  })) as MetadataRoute.Sitemap;
+  // Static Pages for each locale
+  const staticPages = ['', '/about', '/quizzes', '/contact'];
+  
+  for (const lang of locales) {
+    const prefix = lang === 'en' ? '' : `/${lang}`;
+    
+    for (const page of staticPages) {
+      sitemapEntries.push({
+        url: `${SITE_URL}${prefix}${page}`,
+        lastModified: new Date(),
+        changeFrequency: 'daily',
+        priority: page === '' ? 1.0 : 0.5,
+      });
+    }
 
-  // 4. Dynamic Quizzes (published only)
-  const { data: quizzes } = await supabaseAdmin
-    .from('quizzes')
-    .select('slug, created_at')
-    .eq('is_published', true);
+    // Categories for each locale
+    if (categories) {
+      for (const cat of categories) {
+        sitemapEntries.push({
+          url: `${SITE_URL}${prefix}/category/${cat.slug}`,
+          lastModified: new Date(),
+          changeFrequency: 'weekly',
+          priority: 0.7,
+        });
+      }
+    }
+  }
 
-  const quizRoutes = (quizzes || []).map((quiz) => ({
-    url: `${baseUrl}/quiz/${quiz.slug}`,
-    lastModified: new Date(quiz.created_at || Date.now()),
-    changeFrequency: 'monthly' as const,
-    priority: 0.8,
-  })) as MetadataRoute.Sitemap;
+  // Articles (already have language info)
+  if (articles) {
+    for (const article of articles) {
+      const lang = article.language || 'en';
+      const prefix = lang === 'en' ? '' : `/${lang}`;
+      
+      sitemapEntries.push({
+        url: `${SITE_URL}${prefix}/how-to/${article.slug}`,
+        lastModified: new Date(article.updated_at || article.created_at),
+        changeFrequency: 'monthly',
+        priority: 0.8,
+      });
+    }
+  }
 
-  // 5. Dynamic Q&A pages — QAPage schema eligible (Google rich results)
-  const { data: questions } = await supabaseAdmin
-    .from('questions')
-    .select('slug, created_at')
-    .eq('is_published', true)
-    .not('slug', 'is', null)
-    .order('created_at', { ascending: false });
-
-  const questionRoutes = (questions || []).map((q) => ({
-    url: `${baseUrl}/q/${q.slug}`,
-    lastModified: new Date(q.created_at || Date.now()),
-    changeFrequency: 'monthly' as const,
-    priority: 0.6,
-  })) as MetadataRoute.Sitemap;
-
-  return [...staticRoutes, ...categoryRoutes, ...articleRoutes, ...quizRoutes, ...questionRoutes];
+  return sitemapEntries;
 }

@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
 
 export const runtime = 'edge';
 
-async function getHomeData() {
+async function getHomeData(lang: string) {
   const [categoriesRes, articlesRes, quizzesRes] = await Promise.all([
     supabaseAdmin
       .from('categories')
@@ -56,6 +56,7 @@ async function getHomeData() {
     supabaseAdmin
       .from('articles')
       .select('slug, title, intro, reading_time_mins, category')
+      .eq('language', lang)
       .eq('is_published', true)
       .order('view_count', { ascending: false })
       .limit(6),
@@ -76,7 +77,7 @@ async function getHomeData() {
 
 export default async function Home({ params }: HomePageProps) {
   const { lang } = await params;
-  const { categories, featuredArticles, latestQuizzes } = await getHomeData();
+  const { categories, featuredArticles, latestQuizzes } = await getHomeData(lang);
 
   return (
     <>

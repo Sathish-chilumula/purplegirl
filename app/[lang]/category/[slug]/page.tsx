@@ -19,11 +19,12 @@ async function getCategoryData(slug: string) {
   return data;
 }
 
-async function getCategoryArticles(categorySlug: string) {
+async function getCategoryArticles(categorySlug: string, lang: string) {
   const { data } = await supabaseAdmin
     .from('articles')
     .select('slug, title, intro, reading_time_mins')
     .eq('category', categorySlug)
+    .eq('language', lang)
     .eq('is_published', true)
     .order('view_count', { ascending: false });
   return data || [];
@@ -71,12 +72,16 @@ export default async function CategoryPage(props: CategoryPageProps) {
     notFound();
   }
 
-  const articles = await getCategoryArticles(category.slug);
+  const articles = await getCategoryArticles(category.slug, lang);
 
   return (
     <>
-      <CategorySchema name={category.name} description={category.description} slug={category.slug} />
-      <div className="bg-pg-cream min-h-screen pb-24">
+      <CategorySchema 
+        name={category.name} 
+        description={category.description} 
+        slug={category.slug}
+        lang={lang}
+      /><div className="bg-pg-cream min-h-screen pb-24">
       {/* ━━━━━━━━━━━━━━━━━━━━━━━
           1. CATEGORY HERO
           ━━━━━━━━━━━━━━━━━━━━━━━ */}

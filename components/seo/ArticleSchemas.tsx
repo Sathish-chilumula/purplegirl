@@ -6,6 +6,10 @@ export const ArticleSchemas = ({ article }: { article: any }) => {
   const publishedDate = article.published_at || article.generated_at || article.created_at;
   const baseUrl = 'https://purplegirl.in';
 
+  const lang = article.language || 'en';
+  const localePrefix = lang === 'en' ? '' : `/${lang}`;
+  const displayLang = lang === 'hi' ? 'hi-IN' : lang === 'te' ? 'te-IN' : 'en-IN';
+
   // 1. HowTo Schema — gives Google step-by-step rich snippets in SERP
   const howToSchema = {
     "@context": "https://schema.org",
@@ -13,6 +17,7 @@ export const ArticleSchemas = ({ article }: { article: any }) => {
     "name": article.title,
     "description": article.meta_description || article.intro,
     "totalTime": `PT${article.reading_time_mins || 5}M`,
+    "inLanguage": displayLang,
     "tool": (article.content_json.things_needed || []).map((item: string) => ({
       "@type": "HowToTool",
       "name": item
@@ -32,9 +37,10 @@ export const ArticleSchemas = ({ article }: { article: any }) => {
     "@type": "Article",
     "headline": article.title,
     "description": article.meta_description || article.intro,
-    "url": `${baseUrl}/how-to/${article.slug}`,
+    "url": `${baseUrl}${localePrefix}/how-to/${article.slug}`,
     "datePublished": publishedDate,
     "dateModified": publishedDate,
+    "inLanguage": displayLang,
     "author": {
       "@type": "Organization",
       "name": "PurpleGirl Editorial Team",
@@ -51,10 +57,9 @@ export const ArticleSchemas = ({ article }: { article: any }) => {
     },
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `${baseUrl}/how-to/${article.slug}`
+      "@id": `${baseUrl}${localePrefix}/how-to/${article.slug}`
     },
     "articleSection": article.category?.replace(/-/g, ' '),
-    "inLanguage": article.language === 'hi' ? 'hi-IN' : 'en-IN',
     "about": {
       "@type": "Thing",
       "name": article.category?.replace(/-/g, ' ')
@@ -66,6 +71,7 @@ export const ArticleSchemas = ({ article }: { article: any }) => {
   const faqSchema = hasFaqs ? {
     "@context": "https://schema.org",
     "@type": "FAQPage",
+    "inLanguage": displayLang,
     "mainEntity": article.content_json.faqs.map((faq: any) => ({
       "@type": "Question",
       "name": faq.q,
@@ -85,19 +91,19 @@ export const ArticleSchemas = ({ article }: { article: any }) => {
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": baseUrl
+        "item": `${baseUrl}${localePrefix}`
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": article.category?.replace(/-/g, ' '),
-        "item": `${baseUrl}/category/${article.category}`
+        "item": `${baseUrl}${localePrefix}/category/${article.category}`
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": article.title,
-        "item": `${baseUrl}/how-to/${article.slug}`
+        "item": `${baseUrl}${localePrefix}/how-to/${article.slug}`
       }
     ]
   };

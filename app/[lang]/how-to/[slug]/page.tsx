@@ -9,6 +9,7 @@ import { Metadata } from 'next';
 import AdSenseUnit from '@/components/ads/AdSenseUnit';
 import { FeedbackWidget } from '@/components/articles/FeedbackWidget';
 import { SaveGuideButton } from '@/components/articles/SaveGuideButton';
+import { getDictionary } from '@/lib/dictionary';
 
 export const runtime = 'edge';
 
@@ -81,12 +82,14 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
 }
 
 export default async function HowToArticlePage({ params }: ArticlePageProps) {
-  const { slug } = await params;
+  const { lang, slug } = await params;
   const article = await getArticleData(slug);
 
   if (!article) {
     notFound();
   }
+
+  const dict = await getDictionary(lang as any);
 
   // Fetch real related articles in parallel with view count increment
   const [relatedArticles] = await Promise.all([
@@ -130,7 +133,12 @@ export default async function HowToArticlePage({ params }: ArticlePageProps) {
                   <span className="hidden sm:inline">•</span>
                   <span>Updated {new Date(article.published_at || article.created_at).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}</span>
                   <span className="hidden sm:inline">•</span>
-                  <span>{article.reading_time_mins || 3} min read</span>
+                  <span>
+                    {(() => {
+                      const words = (article.intro + ' ' + (article.content_json?.steps?.map((s: any) => s.headline + ' ' + s.body).join(' ') || '')).split(/\s+/).length;
+                      return Math.ceil(words / 200);
+                    })()} min read
+                  </span>
                 </div>
                 <SaveGuideButton slug={article.slug} />
               </div>
@@ -228,6 +236,32 @@ export default async function HowToArticlePage({ params }: ArticlePageProps) {
               </div>
             )}
 
+            {/* 10. Feedback Widget */}
+            <FeedbackWidget articleId={article.id} dict={dict} />
+
+            {/* 11. Related Articles */}
+            {relatedArticles.length > 0 && (
+              <div className="mt-20">
+                <h2 className="font-display text-2xl font-bold text-pg-gray-900 mb-8">
+                  Related Guides
+                </h2>
+                <div className="grid md:grid-cols-2 gap-6">
+                  {relatedArticles.map((rel: any) => (
+                    <Link key={rel.slug} href={`/how-to/${rel.slug}`}>
+                      <Card className="p-6 hover:border-pg-rose transition-colors h-full flex flex-col">
+                        <h3 className="font-sans font-bold text-pg-gray-900 mb-2 leading-tight">
+                          {rel.title}
+                        </h3>
+                        <span className="text-pg-rose text-sm font-bold mt-auto inline-flex items-center gap-1">
+                          Read Guide <ChevronRight size={14} />
+                        </span>
+                      </Card>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="my-16 border-t border-pg-gray-100" />
 
             {/* 9. FAQ Section */}
@@ -254,8 +288,6 @@ export default async function HowToArticlePage({ params }: ArticlePageProps) {
 
             {/* Smart Product Affiliate Widget */}
             <SmartProductWidget category={article.category} title={article.title} />
-
-            <FeedbackWidget slug={article.slug} />
 
             {/* 11. Ad Slot 3 — hidden until AdSense approved */}
             <AdSenseUnit slot="end-article" className="my-8" />
