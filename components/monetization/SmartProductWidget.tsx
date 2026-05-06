@@ -14,7 +14,7 @@ const PRODUCT_MAP: Record<string, { name: string; desc: string; url: string; pri
   'skin-beauty': {
     name: 'Minimalist 10% Vitamin C Face Serum',
     desc: 'Brightens skin, reduces dark spots and hyperpigmentation for glowing skin.',
-    url: 'https://www.nykaa.com/minimalist-10-percent-vitamin-c-face-serum-for-glowing-skin/p/1067980',
+    url: 'https://www.nykaa.com/search/result/?q=minimalist+vitamin+c+serum',
     price: '₹699',
     brand: 'Minimalist',
     tag: 'Dermatologist Recommended',
@@ -22,7 +22,7 @@ const PRODUCT_MAP: Record<string, { name: string; desc: string; url: string; pri
   'fashion-style': {
     name: 'Biba Women Kurta Set',
     desc: 'Elegant, comfortable ethnic wear perfect for daily office or casual outings.',
-    url: 'https://www.myntra.com/kurta-sets/biba/biba-women-printed-kurta-with-trousers--dupatta/24584210/buy',
+    url: 'https://www.myntra.com/biba-kurta-sets',
     price: '₹1,599',
     brand: 'BIBA',
     tag: 'Bestseller',
@@ -30,7 +30,7 @@ const PRODUCT_MAP: Record<string, { name: string; desc: string; url: string; pri
   'health-wellness': {
     name: 'Oziva Protein & Herbs for Women',
     desc: 'Clean protein with Ayurvedic herbs for better metabolism and hormonal balance.',
-    url: 'https://www.amazon.in/OZiva-Protein-Herbs-Women-Chocolate/dp/B073X7P66V',
+    url: 'https://www.amazon.in/s?k=oziva+protein+for+women',
     price: '₹1,449',
     brand: 'OZiva',
     tag: 'Women\'s Health',
@@ -38,7 +38,7 @@ const PRODUCT_MAP: Record<string, { name: string; desc: string; url: string; pri
   'home-household': {
     name: 'Pigeon by Stovekraft Chopper',
     desc: 'Save time in the kitchen with this effortless manual vegetable chopper.',
-    url: 'https://www.amazon.in/Pigeon-Stovekraft-Plastic-Chopper-3-Blades/dp/B01LWYRQCO',
+    url: 'https://www.amazon.in/s?k=pigeon+chopper',
     price: '₹249',
     brand: 'Pigeon',
     tag: 'Time Saver',
@@ -46,7 +46,7 @@ const PRODUCT_MAP: Record<string, { name: string; desc: string; url: string; pri
   'default': {
     name: 'Nykaa Cosmetics Matte to Last Liquid Lipstick',
     desc: 'Long-lasting, transfer-proof matte lipstick for everyday confidence.',
-    url: 'https://www.nykaa.com/nykaa-matte-to-last-liquid-lipstick/p/308111',
+    url: 'https://www.nykaa.com/search/result/?q=nykaa+matte+lipstick',
     price: '₹599',
     brand: 'Nykaa',
     tag: 'Editor\'s Pick',
