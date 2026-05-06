@@ -147,6 +147,19 @@ export default async function HowToArticlePage({ params }: ArticlePageProps) {
                 <SaveGuideButton slug={article.slug} saveLabel={dict.article_save} savedLabel={dict.article_saved} />
               </div>
 
+              {/* In-Article Language Switcher */}
+              <div className="mt-8 p-4 bg-pg-rose/5 border border-pg-rose/10 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-2 text-sm font-bold text-pg-gray-800">
+                  <span className="text-xl">🌐</span>
+                  Read this guide in your language:
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Link href={`/how-to/${slug}`} className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${lang === 'en' ? 'bg-pg-rose text-white' : 'bg-white text-pg-gray-600 hover:text-pg-rose border border-pg-gray-200 hover:border-pg-rose/30'}`}>🇺🇸 English</Link>
+                  <Link href={`/hi/how-to/${slug}`} className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${lang === 'hi' ? 'bg-pg-rose text-white' : 'bg-white text-pg-gray-600 hover:text-pg-rose border border-pg-gray-200 hover:border-pg-rose/30'}`}>🇮🇳 हिन्दी</Link>
+                  <Link href={`/te/how-to/${slug}`} className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${lang === 'te' ? 'bg-pg-rose text-white' : 'bg-white text-pg-gray-600 hover:text-pg-rose border border-pg-gray-200 hover:border-pg-rose/30'}`}>🇮🇳 తెలుగు</Link>
+                </div>
+              </div>
+
               {/* Expert Reviewer Badge */}
               {(() => {
                 const expert = getExpertForCategory(article.category);

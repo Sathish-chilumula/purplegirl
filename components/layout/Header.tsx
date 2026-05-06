@@ -175,6 +175,10 @@ const languages = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
   { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
   { code: 'te', name: 'తెలుగు', flag: '🇮🇳' },
+  { code: 'bn', name: 'বাংলা', flag: '🇮🇳' },
+  { code: 'mr', name: 'मराठी', flag: '🇮🇳' },
+  { code: 'ta', name: 'தமிழ்', flag: '🇮🇳' },
+  { code: 'gu', name: 'ગુજરાતી', flag: '🇮🇳' },
 ];
 
 export default function Header({ dict, lang }: HeaderProps) {
@@ -326,6 +330,43 @@ export default function Header({ dict, lang }: HeaderProps) {
           <Link href="/search" className="hidden sm:flex p-2 text-pg-gray-400 hover:text-pg-rose transition-colors" aria-label="Search">
             <Search size={20} />
           </Link>
+          
+          {/* Language Switcher Dropdown */}
+          <div className="relative" ref={langRef}>
+            <button 
+              onClick={() => setLangOpen(!langOpen)}
+              className="flex items-center gap-1.5 p-2 text-sm font-bold text-pg-gray-700 hover:text-pg-rose transition-colors rounded-full hover:bg-pg-gray-100"
+            >
+              <span className="text-base">{languages.find(l => l.code === lang)?.flag || '🌐'}</span>
+              <span className="uppercase text-xs hidden sm:inline">{lang}</span>
+              <ChevronDown size={14} className={`transition-transform duration-200 ${langOpen ? 'rotate-180' : ''}`} />
+            </button>
+            
+            {langOpen && (
+              <div className="absolute top-full right-0 mt-2 w-48 bg-white border border-pg-gray-100 rounded-2xl shadow-xl shadow-pg-gray-200/50 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
+                <div className="p-2 space-y-1">
+                  <div className="px-3 py-2 text-xs font-bold text-pg-gray-400 uppercase tracking-wider">
+                    Select Language
+                  </div>
+                  {languages.map((l) => (
+                    <button
+                      key={l.code}
+                      onClick={() => changeLanguage(l.code)}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-sm transition-colors ${
+                        lang === l.code 
+                          ? 'bg-pg-rose-light text-pg-rose font-bold' 
+                          : 'text-pg-gray-700 hover:bg-pg-gray-50 hover:text-pg-rose'
+                      }`}
+                    >
+                      <span className="text-base">{l.flag}</span>
+                      {l.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
           <Link href="/ask" className="hidden md:block">
             <Button variant="primary" className="py-2 px-6 text-sm shadow-sm">
               {dict.nav_ask}
@@ -404,10 +445,31 @@ export default function Header({ dict, lang }: HeaderProps) {
             </Link>
           </div>
 
-          <div className="p-6 mt-auto border-t border-pg-gray-100">
-            <Link href="/ask" onClick={handleLinkClick}>
+          <div className="p-6 mt-auto border-t border-pg-gray-100 space-y-6">
+            
+            <div className="space-y-3">
+              <div className="text-sm font-bold text-pg-gray-400 uppercase tracking-wider mb-2">Select Language / भाषा</div>
+              <div className="grid grid-cols-2 gap-2">
+                {languages.map((l) => (
+                  <button
+                    key={l.code}
+                    onClick={() => { changeLanguage(l.code); setMenuOpen(false); }}
+                    className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm transition-colors ${
+                      lang === l.code 
+                        ? 'bg-pg-rose-light text-pg-rose font-bold border border-pg-rose/20' 
+                        : 'bg-pg-gray-50 text-pg-gray-700 hover:bg-pg-gray-100 border border-transparent'
+                    }`}
+                  >
+                    <span className="text-lg">{l.flag}</span>
+                    {l.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <Link href="/ask" onClick={handleLinkClick} className="block w-full">
               <Button variant="primary" className="w-full py-4 text-lg shadow-md">
-                Ask Anonymously
+                {dict.nav_ask}
               </Button>
             </Link>
           </div>
