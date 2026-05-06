@@ -11,15 +11,20 @@ const config: Config = {
       colors: {
         pg: {
           rose: {
-            DEFAULT: '#E91E8C',
-            light: '#FCE4F3',
-            dark: '#B5146A',
+            DEFAULT: '#E1A49B', // Rose Gold
+            light: '#FDECEF',   // Soft Blush
+            dark: '#C88077',    // Deep Rose
           },
           plum: {
-            DEFAULT: '#6B21A8',
-            light: '#F3E8FF',
+            DEFAULT: '#581C87', // Deep Premium Plum
+            light: '#FAF5FF',   // Extremely soft plum bg
+            dark: '#3B0764',
           },
-          cream: '#FFF9FB',
+          gold: {
+            DEFAULT: '#D97706', // Warm Gold
+            light: '#FEF3C7',
+          },
+          cream: '#FFF1F2',     // Very soft blush cream
           white: '#FFFFFF',
           gray: {
             100: '#F5F5F5',

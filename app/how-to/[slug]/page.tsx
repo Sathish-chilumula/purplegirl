@@ -1,4 +1,5 @@
 import React from 'react';
+import SmartProductWidget from '@/components/monetization/SmartProductWidget';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { supabaseAdmin } from '@/lib/supabase-admin';
@@ -6,6 +7,7 @@ import { ArticleSchemas } from '@/components/seo/ArticleSchemas';
 import { ChevronRight, Lock, AlertTriangle, Sparkles, ChevronDown } from 'lucide-react';
 import { Metadata } from 'next';
 import AdSenseUnit from '@/components/ads/AdSenseUnit';
+import SmartProductWidget from '@/components/monetization/SmartProductWidget';
 
 export const runtime = 'edge';
 
@@ -238,6 +240,9 @@ export default async function HowToArticlePage({ params }: { params: { slug: str
                 </div>
               </div>
             )}
+
+            {/* Smart Product Affiliate Widget */}
+            <SmartProductWidget category={article.category} title={article.title} />
 
             {/* 11. Ad Slot 3 — hidden until AdSense approved */}
             <AdSenseUnit slot="end-article" className="my-8" />

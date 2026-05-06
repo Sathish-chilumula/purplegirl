@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import SmartProductWidget from '@/components/monetization/SmartProductWidget';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, Sparkles, TrendingUp } from 'lucide-react';
@@ -91,6 +92,7 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
           {/* Main Content */}
           <div className="flex-1">
             <AnswerCard question={question} answer={question.answers} />
+            <SmartProductWidget category={question.categories?.slug || 'default'} title={question.title} />
           </div>
 
           {/* Sidebar */}

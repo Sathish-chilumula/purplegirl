@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
-import { DM_Sans, Playfair_Display } from "next/font/google";
+import { Outfit, Lora } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
-const dmSans = DM_Sans({
+const outfit = Outfit({
   subsets: ["latin"],
   variable: "--font-sans",
 });
 
-const playfair = Playfair_Display({
+const lora = Lora({
   subsets: ["latin"],
   variable: "--font-display",
 });
@@ -32,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${dmSans.variable} ${playfair.variable}`}>
+    <html lang="en" className={`${outfit.variable} ${lora.variable}`}>
       <head>
         <link rel="icon" href="/icon.png" />
         {/* Google AdSense */}

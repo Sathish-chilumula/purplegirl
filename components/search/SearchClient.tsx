@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Search, ArrowRight, Loader2, X, BookOpen, Clock } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import SmartProductWidget from '@/components/monetization/SmartProductWidget';
 
 interface Article {
   slug: string;
@@ -226,8 +227,10 @@ export default function SearchClient({ initialCategories }: { initialCategories:
               </Link>
             </div>
           ) : hasSearched ? (
-            <div className="grid sm:grid-cols-2 gap-6">
-              {articles.map((article) => (
+            <div className="space-y-8">
+              <SmartProductWidget category={categoryParam || 'default'} title={query} />
+              <div className="grid sm:grid-cols-2 gap-6">
+                {articles.map((article) => (
                 <Link
                   key={article.slug}
                   href={`/how-to/${article.slug}`}
@@ -252,6 +255,7 @@ export default function SearchClient({ initialCategories }: { initialCategories:
                   </div>
                 </Link>
               ))}
+              </div>
             </div>
           ) : (
             /* Default state: no search yet */
