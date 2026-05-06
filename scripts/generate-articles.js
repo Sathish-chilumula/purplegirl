@@ -194,8 +194,20 @@ async function generateArticle() {
       console.log(`[DRY RUN] Would insert article: ${articleDef.slug}`);
       console.log(JSON.stringify(parsedContent, null, 2));
     } else {
+      // Generate a clean full-length slug from the title (max 100 chars)
+      const cleanSlug = articleDef.slug && !articleDef.slug.endsWith('-')
+        ? articleDef.slug
+        : articleDef.title
+            .toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, '')
+            .trim()
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .substring(0, 100)
+            .replace(/-$/, '');
+
       const { error } = await supabase.from('articles').insert([{
-        slug: articleDef.slug,
+        slug: cleanSlug,
         title: articleDef.title,
         category: articleDef.category,
         meta_description: parsedContent.meta_description,
@@ -208,9 +220,9 @@ async function generateArticle() {
       }]);
 
       if (error) {
-        console.error(`Supabase Insert Error for ${articleDef.slug}:`, error);
+        console.error(`Supabase Insert Error for ${cleanSlug}:`, error);
       } else {
-        console.log(`✅ Successfully published: ${articleDef.slug}`);
+        console.log(`✅ Successfully published: ${cleanSlug}`);
       }
     }
 

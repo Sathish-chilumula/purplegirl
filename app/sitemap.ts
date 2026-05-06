@@ -56,5 +56,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   })) as MetadataRoute.Sitemap;
 
-  return [...staticRoutes, ...categoryRoutes, ...articleRoutes, ...quizRoutes];
+  // 5. Dynamic Q&A pages — QAPage schema eligible (Google rich results)
+  const { data: questions } = await supabaseAdmin
+    .from('questions')
+    .select('slug, created_at')
+    .eq('is_published', true)
+    .not('slug', 'is', null)
+    .order('created_at', { ascending: false });
+
+  const questionRoutes = (questions || []).map((q) => ({
+    url: `${baseUrl}/q/${q.slug}`,
+    lastModified: new Date(q.created_at || Date.now()),
+    changeFrequency: 'monthly' as const,
+    priority: 0.6,
+  })) as MetadataRoute.Sitemap;
+
+  return [...staticRoutes, ...categoryRoutes, ...articleRoutes, ...quizRoutes, ...questionRoutes];
 }

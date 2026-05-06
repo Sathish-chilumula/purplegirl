@@ -19,6 +19,33 @@ async function getArticleData(slug: string) {
   return data;
 }
 
+/**
+ * Fetches real related articles:
+ * 1. First tries using the article's related_article_slugs array
+ * 2. Falls back to other articles in the same category
+ */
+async function getRelatedArticles(article: any) {
+  // Try related_article_slugs first
+  if (article.related_article_slugs && article.related_article_slugs.length > 0) {
+    const { data } = await supabaseAdmin
+      .from('articles')
+      .select('slug, title')
+      .in('slug', article.related_article_slugs.slice(0, 4))
+      .eq('is_published', true);
+    if (data && data.length > 0) return data;
+  }
+  // Fallback: same category, excluding current article
+  const { data } = await supabaseAdmin
+    .from('articles')
+    .select('slug, title')
+    .eq('category', article.category)
+    .eq('is_published', true)
+    .neq('slug', article.slug)
+    .order('view_count', { ascending: false })
+    .limit(4);
+  return data || [];
+}
+
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const article = await getArticleData(params.slug);
   if (!article) return { title: 'Not Found' };
@@ -53,8 +80,11 @@ export default async function HowToArticlePage({ params }: { params: { slug: str
     notFound();
   }
 
-  // Fire and forget view count increment
-  supabaseAdmin.rpc('increment_view_count', { article_id: article.id }).then();
+  // Fetch real related articles in parallel with view count increment
+  const [relatedArticles] = await Promise.all([
+    getRelatedArticles(article),
+    supabaseAdmin.rpc('increment_view_count', { article_id: article.id }).then(),
+  ]);
 
   return (
     <>
@@ -221,24 +251,23 @@ export default async function HowToArticlePage({ params }: { params: { slug: str
               ━━━━━━━━━━━━━━━━━━━━━━━ */}
           <aside className="lg:w-[30%] space-y-10 lg:sticky lg:top-28 self-start">
             
-            {/* More Guides */}
-            <div className="bg-pg-cream rounded-2xl p-6 border border-pg-gray-100">
-              <h3 className="font-bold text-pg-gray-900 uppercase text-xs tracking-widest mb-6">
-                More in {article.category.replace(/-/g, ' ')}
-              </h3>
-              <div className="space-y-4">
-                {/* These would be fetched dynamically in a real component based on related_slugs or category */}
-                <Link href="#" className="block hover:text-pg-rose transition-colors">
-                  <h4 className="font-display font-bold text-[16px] leading-tight mb-1">How to Know If Your Marriage Is Worth Saving</h4>
-                </Link>
-                <Link href="#" className="block hover:text-pg-rose transition-colors">
-                  <h4 className="font-display font-bold text-[16px] leading-tight mb-1">Signs Your Husband Is Gaslighting You</h4>
-                </Link>
-                <Link href="#" className="block hover:text-pg-rose transition-colors">
-                  <h4 className="font-display font-bold text-[16px] leading-tight mb-1">How to Set Boundaries with In-Laws Without Fighting</h4>
-                </Link>
+            {/* Real Related Articles */}
+            {relatedArticles.length > 0 && (
+              <div className="bg-pg-cream rounded-2xl p-6 border border-pg-gray-100">
+                <h3 className="font-bold text-pg-gray-900 uppercase text-xs tracking-widest mb-6">
+                  More in {article.category.replace(/-/g, ' ')}
+                </h3>
+                <div className="space-y-4">
+                  {relatedArticles.map((related: any) => (
+                    <Link key={related.slug} href={`/how-to/${related.slug}`} className="block group">
+                      <h4 className="font-display font-bold text-[15px] leading-tight text-pg-gray-900 group-hover:text-pg-rose transition-colors">
+                        {related.title}
+                      </h4>
+                    </Link>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Quiz Widget */}
             <div className="bg-pg-plum text-white rounded-2xl p-8 text-center">

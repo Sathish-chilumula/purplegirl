@@ -1,12 +1,14 @@
 'use client';
 
 import React, { useState, Suspense } from 'react';
-import { Shield, Sparkles, Send, RefreshCcw } from 'lucide-react';
+import { Shield, Sparkles, Send, RefreshCcw, Bookmark, ExternalLink } from 'lucide-react';
+import Link from 'next/link';
 
 interface AnswerResult {
   question: string;
   answer: string;
   category: string;
+  permalink: string | null;
 }
 
 function AskContent() {
@@ -39,6 +41,7 @@ function AskContent() {
         question: questionText.trim(),
         answer: data.answer,
         category: data.category,
+        permalink: data.permalink || null,
       });
     } catch (err: any) {
       console.error(err);
@@ -88,6 +91,22 @@ function AskContent() {
                 <p className="text-slate-700 leading-[1.9] text-[16px] whitespace-pre-wrap">{result.answer}</p>
               </div>
             </div>
+
+            {/* Permalink — bookmark link */}
+            {result?.permalink && (
+              <div className="bg-purple-50 border border-purple-100 rounded-xl p-4 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-2 text-purple-700">
+                  <Bookmark size={16} className="shrink-0" />
+                  <span className="text-sm font-medium">Saved! You can revisit this answer anytime.</span>
+                </div>
+                <Link
+                  href={result.permalink}
+                  className="flex items-center gap-1.5 text-xs font-bold text-purple-600 hover:text-purple-800 shrink-0 underline"
+                >
+                  View Permalink <ExternalLink size={12} />
+                </Link>
+              </div>
+            )}
 
             {/* Actions */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
