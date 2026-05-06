@@ -34,6 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${dmSans.variable} ${playfair.variable}`}>
       <head>
+        <link rel="icon" href="/icon.png" />
         {/* Google AdSense */}
         <script 
           async 
