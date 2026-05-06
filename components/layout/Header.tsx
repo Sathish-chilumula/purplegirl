@@ -6,12 +6,17 @@ import { Search, Menu, X, ChevronDown, ChevronRight, Zap, TrendingUp, Flame, Hel
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
 
-const topLinks = [
-  { label: 'Saved Guides', icon: Bookmark, href: '/saved' },
-  { label: 'Trending Now', icon: TrendingUp, href: '/search?q=trending' },
-  { label: 'Public Q&A Feed', icon: MessagesSquare, href: '/questions' },
-  { label: 'Quizzes 🔥', icon: Flame, href: '/quizzes' },
-  { label: 'Ask Anonymously', icon: HelpCircle, href: '/ask' },
+interface HeaderProps {
+  dict: any; // Using any for now to avoid complex type mismatch during transition
+  lang: string;
+}
+
+const getTopLinks = (dict: any) => [
+  { label: dict.nav_saved, icon: Bookmark, href: '/saved' },
+  { label: dict.nav_trending, icon: TrendingUp, href: '/search?q=trending' },
+  { label: dict.nav_qa_feed, icon: MessagesSquare, href: '/questions' },
+  { label: dict.nav_quizzes, icon: Flame, href: '/quizzes' },
+  { label: dict.nav_ask, icon: HelpCircle, href: '/ask' },
 ];
 
 const categoryColumns = [
@@ -161,54 +166,60 @@ const categoryColumns = [
   },
 ];
 
-// Split into 4 columns (4 rows per column)
 const col1 = categoryColumns.slice(0, 4);
 const col2 = categoryColumns.slice(4, 8);
 const col3 = categoryColumns.slice(8, 12);
 const col4 = categoryColumns.slice(12, 16);
 
-export default function Header() {
+const languages = [
+  { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
+  { code: 'te', name: 'తెలుగు', flag: '🇮🇳' },
+];
+
+export default function Header({ dict, lang }: HeaderProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [exploreOpen, setExploreOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const langRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setExploreOpen(false);
-      }
-    };
-    
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setExploreOpen(false);
       }
+      if (langRef.current && !langRef.current.contains(e.target as Node)) {
+        setLangOpen(false);
+      }
     };
 
-    if (exploreOpen) {
-      document.addEventListener('keydown', handleEscape);
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [exploreOpen]);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleLinkClick = () => {
     setExploreOpen(false);
     setMenuOpen(false);
+    setLangOpen(false);
   };
+
+  const changeLanguage = (newLang: string) => {
+    document.cookie = `NEXT_LOCALE=${newLang}; path=/; max-age=31536000`;
+    const currentPath = pathname.replace(/^\/(hi|te|en)/, '') || '/';
+    router.push(newLang === 'en' ? currentPath : `/${newLang}${currentPath}`);
+    setLangOpen(false);
+  };
+
+  const topLinks = getTopLinks(dict);
 
   return (
     <header className="sticky top-0 z-[100] bg-white/90 backdrop-blur-md border-b border-pg-gray-100">
       <div className="max-w-content mx-auto px-6 h-20 flex items-center justify-between gap-8 relative" ref={dropdownRef}>
         
-        {/* Logo */}
         <Link href="/" onClick={handleLinkClick} className="flex items-center gap-3 shrink-0">
           <div className="w-10 h-10 rounded-xl bg-pg-rose flex items-center justify-center shadow-lg shadow-pg-rose/20 text-white font-display font-black text-xl italic">
             P
@@ -218,17 +229,16 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* Desktop Nav */}
         <nav className="hidden lg:flex items-center gap-1 h-full">
           <Link
             href="/"
             className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
-              pathname === '/' 
+              pathname === '/' || pathname === `/${lang}`
                 ? 'bg-pg-rose-light text-pg-rose' 
                 : 'text-pg-gray-500 hover:text-pg-rose hover:bg-pg-gray-100'
             }`}
           >
-            Home
+            {dict.nav_home}
           </Link>
           
           <button
@@ -239,22 +249,21 @@ export default function Header() {
                 : 'text-pg-gray-500 hover:text-pg-rose hover:bg-pg-gray-100'
             }`}
           >
-            Explore <ChevronDown size={14} className={`transition-transform duration-200 ${exploreOpen ? 'rotate-180' : ''}`} />
+            {dict.nav_explore} <ChevronDown size={14} className={`transition-transform duration-200 ${exploreOpen ? 'rotate-180' : ''}`} />
           </button>
 
           <Link
             href="/quizzes"
             className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
-              pathname === '/quizzes' 
+              pathname.includes('/quizzes') 
                 ? 'bg-pg-rose-light text-pg-rose' 
                 : 'text-pg-gray-500 hover:text-pg-rose hover:bg-pg-gray-100'
             }`}
           >
-            Quizzes
+            {dict.nav_quizzes}
           </Link>
         </nav>
 
-        {/* Desktop Mega Menu Dropdown */}
         {exploreOpen && (
           <div 
             className="hidden lg:block absolute top-[80px] left-0 w-full bg-white border-b border-pg-rose/20 shadow-xl shadow-pg-rose/5 transform transition-all duration-180 ease-out z-50 animate-in fade-in slide-in-from-top-2"
@@ -319,7 +328,7 @@ export default function Header() {
           </Link>
           <Link href="/ask" className="hidden md:block">
             <Button variant="primary" className="py-2 px-6 text-sm shadow-sm">
-              Ask Anonymously
+              {dict.nav_ask}
             </Button>
           </Link>
           

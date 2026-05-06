@@ -126,7 +126,9 @@ export default async function ArticleOGImage({
             borderRadius: '50%',
             background: '#F9A8D4',
           }} />
-          100% Anonymous • No Judgment • purplegirl.in
+          {lang === 'hi' ? '100% गुमनाम • कोई निर्णय नहीं • purplegirl.in' : 
+           lang === 'te' ? '100% అనామక • తీర్పు లేదు • purplegirl.in' : 
+           '100% Anonymous • No Judgment • purplegirl.in'}
         </div>
       </div>
     ),

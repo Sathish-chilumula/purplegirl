@@ -221,6 +221,7 @@ async function generateArticle() {
         content_json: parsedContent.content_json,
         reading_time_mins: readingTimeMins,
         is_published: true, // Auto-publish for now
+        language: 'en',
         published_at: new Date().toISOString()
       }]);
 

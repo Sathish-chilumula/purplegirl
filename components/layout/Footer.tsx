@@ -3,15 +3,22 @@
 import Link from 'next/link';
 import { Heart, ShieldCheck } from 'lucide-react';
 
-const support = [
-  { href: '/ask', label: 'Ask a Question' },
+interface FooterProps {
+  dict: any;
+  lang: string;
+}
+
+const getSupport = (dict: any) => [
+  { href: '/ask', label: dict.nav_ask },
   { href: '/privacy', label: 'Privacy Policy' },
   { href: '/terms', label: 'Terms of Use' },
   { href: '/about', label: 'About PurpleGirl' },
   { href: '/contact', label: 'Contact' },
 ];
 
-export default function Footer() {
+export default function Footer({ dict, lang }: FooterProps) {
+  const support = getSupport(dict);
+  
   return (
     <footer className="bg-[#2a0a42] text-white/70 py-16 px-6 border-t border-white/5">
       <div className="max-w-content mx-auto">
@@ -28,8 +35,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-sm leading-relaxed mb-6 text-white/60">
-              India's anonymous elder sister platform. A safe, judgment-free space where 
-              women ask what they can't ask anywhere else — and get real, kind answers.
+              {dict.footer_tagline}
             </p>
             <div className="p-4 bg-white/5 rounded-xl border border-white/10 text-xs leading-relaxed text-white/50">
               <strong className="text-white/80 block mb-1">Disclaimer:</strong>
@@ -60,7 +66,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <p className="text-xs text-white/40">
-            © {new Date().getFullYear()} PurpleGirl.in — All Rights Reserved.
+            © {new Date().getFullYear()} PurpleGirl.in — {dict.footer_rights}
           </p>
           <div className="flex items-center gap-2 text-xs text-white/50">
             <ShieldCheck size={14} className="text-green-400" />

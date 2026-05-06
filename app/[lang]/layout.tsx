@@ -3,6 +3,7 @@ import { Outfit, Lora } from "next/font/google";
 import "../globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { getDictionary } from "@/lib/dictionary";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -38,7 +39,8 @@ export default async function RootLayout(props: {
 }) {
   const { children } = props;
   const params = await props.params;
-  const lang = params.lang || 'en';
+  const lang = (params.lang || 'en') as 'en' | 'hi' | 'te';
+  const dict = await getDictionary(lang);
 
   return (
     <html lang={lang} className={`${outfit.variable} ${lora.variable}`}>
@@ -54,11 +56,11 @@ export default async function RootLayout(props: {
         ></script>
       </head>
       <body className="antialiased font-sans">
-        <Header />
+        <Header dict={dict} lang={lang} />
         <main className="min-h-screen">
           {children}
         </main>
-        <Footer />
+        <Footer dict={dict} lang={lang} />
         {/* CueLinks JS (Invisible Affiliate Link Converter) */}
         <script dangerouslySetInnerHTML={{
           __html: `
