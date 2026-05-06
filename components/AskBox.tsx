@@ -89,7 +89,7 @@ export function AskBox() {
         {detectedFolio && (
           <div className="px-4 py-1 border border-pg-gold-500/50 bg-pg-gold-100/30 text-pg-gold-700 font-cinzel text-[9px] tracking-widest uppercase rounded shadow-sm flex items-center gap-2 parchment-unfurl">
             <span className="text-pg-crimson-600">✦</span>
-            Detected: {detectedFolio.volumeLabel} — {detectedFolio.title}
+            Detected: {detectedFolio.replace(/-/g, ' ')}
           </div>
         )}
       </div>

@@ -7,9 +7,10 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 interface FeedbackWidgetProps {
   articleId: string;
   dict: any;
+  lang?: string;
 }
 
-export function FeedbackWidget({ articleId, dict }: FeedbackWidgetProps) {
+export function FeedbackWidget({ articleId, dict, lang = 'en' }: FeedbackWidgetProps) {
   const [status, setStatus] = useState<'idle' | 'helpful' | 'not-helpful' | 'submitted'>('idle');
   const [feedback, setFeedback] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -20,8 +21,7 @@ export function FeedbackWidget({ articleId, dict }: FeedbackWidgetProps) {
     // Immediately log the simple vote via API or client-side supabase if available
     // For simplicity in this demo, we'll assume a supabase instance is available or use a server action
     // But since this is 'use client', we should use the client-side supabase
-    const { createClientComponentClient } = await import('@supabase/auth-helpers-nextjs');
-    const supabase = createClientComponentClient();
+    const { supabase } = await import('@/lib/supabase');
 
     await supabase.from('article_feedback').insert([{
       article_id: articleId,
@@ -39,8 +39,7 @@ export function FeedbackWidget({ articleId, dict }: FeedbackWidgetProps) {
 
     setIsSubmitting(true);
     
-    const { createClientComponentClient } = await import('@supabase/auth-helpers-nextjs');
-    const supabase = createClientComponentClient();
+    const { supabase } = await import('@/lib/supabase');
 
     await supabase.from('article_feedback').insert([{
       article_id: articleId,

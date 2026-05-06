@@ -1,0 +1,52 @@
+.next/types/app/about/page.ts(2,24): error TS2307: Cannot find module '../../../../app/about/page.js' or its corresponding type declarations.
+.next/types/app/about/page.ts(5,29): error TS2307: Cannot find module '../../../../app/about/page.js' or its corresponding type declarations.
+.next/types/app/ask/page.ts(2,24): error TS2307: Cannot find module '../../../../app/ask/page.js' or its corresponding type declarations.
+.next/types/app/ask/page.ts(5,29): error TS2307: Cannot find module '../../../../app/ask/page.js' or its corresponding type declarations.
+.next/types/app/category/[slug]/page.ts(2,24): error TS2307: Cannot find module '../../../../../app/category/[slug]/page.js' or its corresponding type declarations.
+.next/types/app/category/[slug]/page.ts(5,29): error TS2307: Cannot find module '../../../../../app/category/[slug]/page.js' or its corresponding type declarations.
+.next/types/app/contact/page.ts(2,24): error TS2307: Cannot find module '../../../../app/contact/page.js' or its corresponding type declarations.
+.next/types/app/contact/page.ts(5,29): error TS2307: Cannot find module '../../../../app/contact/page.js' or its corresponding type declarations.
+.next/types/app/how-to/[slug]/page.ts(2,24): error TS2307: Cannot find module '../../../../../app/how-to/[slug]/page.js' or its corresponding type declarations.
+.next/types/app/how-to/[slug]/page.ts(5,29): error TS2307: Cannot find module '../../../../../app/how-to/[slug]/page.js' or its corresponding type declarations.
+.next/types/app/journey/page.ts(2,24): error TS2307: Cannot find module '../../../../app/journey/page.js' or its corresponding type declarations.
+.next/types/app/journey/page.ts(5,29): error TS2307: Cannot find module '../../../../app/journey/page.js' or its corresponding type declarations.
+.next/types/app/journey/preferences/page.ts(2,24): error TS2307: Cannot find module '../../../../../app/journey/preferences/page.js' or its corresponding type declarations.
+.next/types/app/journey/preferences/page.ts(5,29): error TS2307: Cannot find module '../../../../../app/journey/preferences/page.js' or its corresponding type declarations.
+.next/types/app/page.ts(2,24): error TS2307: Cannot find module '../../../app/page.js' or its corresponding type declarations.
+.next/types/app/page.ts(5,29): error TS2307: Cannot find module '../../../app/page.js' or its corresponding type declarations.
+.next/types/app/privacy/page.ts(2,24): error TS2307: Cannot find module '../../../../app/privacy/page.js' or its corresponding type declarations.
+.next/types/app/privacy/page.ts(5,29): error TS2307: Cannot find module '../../../../app/privacy/page.js' or its corresponding type declarations.
+.next/types/app/q/[slug]/hindi/page.ts(2,24): error TS2307: Cannot find module '../../../../../../app/q/[slug]/hindi/page.js' or its corresponding type declarations.
+.next/types/app/q/[slug]/hindi/page.ts(5,29): error TS2307: Cannot find module '../../../../../../app/q/[slug]/hindi/page.js' or its corresponding type declarations.
+.next/types/app/q/[slug]/page.ts(2,24): error TS2307: Cannot find module '../../../../../app/q/[slug]/page.js' or its corresponding type declarations.
+.next/types/app/q/[slug]/page.ts(5,29): error TS2307: Cannot find module '../../../../../app/q/[slug]/page.js' or its corresponding type declarations.
+.next/types/app/q/[slug]/telugu/page.ts(2,24): error TS2307: Cannot find module '../../../../../../app/q/[slug]/telugu/page.js' or its corresponding type declarations.
+.next/types/app/q/[slug]/telugu/page.ts(5,29): error TS2307: Cannot find module '../../../../../../app/q/[slug]/telugu/page.js' or its corresponding type declarations.
+.next/types/app/quiz/[slug]/page.ts(2,24): error TS2307: Cannot find module '../../../../../app/quiz/[slug]/page.js' or its corresponding type declarations.
+.next/types/app/quiz/[slug]/page.ts(5,29): error TS2307: Cannot find module '../../../../../app/quiz/[slug]/page.js' or its corresponding type declarations.
+.next/types/app/quizzes/page.ts(2,24): error TS2307: Cannot find module '../../../../app/quizzes/page.js' or its corresponding type declarations.
+.next/types/app/quizzes/page.ts(5,29): error TS2307: Cannot find module '../../../../app/quizzes/page.js' or its corresponding type declarations.
+.next/types/app/search/page.ts(2,24): error TS2307: Cannot find module '../../../../app/search/page.js' or its corresponding type declarations.
+.next/types/app/search/page.ts(5,29): error TS2307: Cannot find module '../../../../app/search/page.js' or its corresponding type declarations.
+.next/types/app/skin-check/page.ts(2,24): error TS2307: Cannot find module '../../../../app/skin-check/page.js' or its corresponding type declarations.
+.next/types/app/skin-check/page.ts(5,29): error TS2307: Cannot find module '../../../../app/skin-check/page.js' or its corresponding type declarations.
+.next/types/app/terms/page.ts(2,24): error TS2307: Cannot find module '../../../../app/terms/page.js' or its corresponding type declarations.
+.next/types/app/terms/page.ts(5,29): error TS2307: Cannot find module '../../../../app/terms/page.js' or its corresponding type declarations.
+.next/types/app/trending/page.ts(2,24): error TS2307: Cannot find module '../../../../app/trending/page.js' or its corresponding type declarations.
+.next/types/app/trending/page.ts(5,29): error TS2307: Cannot find module '../../../../app/trending/page.js' or its corresponding type declarations.
+.next/types/app/whisper/page.ts(2,24): error TS2307: Cannot find module '../../../../app/whisper/page.js' or its corresponding type declarations.
+.next/types/app/whisper/page.ts(5,29): error TS2307: Cannot find module '../../../../app/whisper/page.js' or its corresponding type declarations.
+components/articles/FeedbackWidget.tsx(23,58): error TS2307: Cannot find module '@supabase/auth-helpers-nextjs' or its corresponding type declarations.
+components/articles/FeedbackWidget.tsx(42,58): error TS2307: Cannot find module '@supabase/auth-helpers-nextjs' or its corresponding type declarations.
+components/articles/FeedbackWidget.tsx(94,14): error TS2304: Cannot find name 'lang'.
+components/articles/FeedbackWidget.tsx(94,57): error TS2304: Cannot find name 'lang'.
+components/AskBox.tsx(92,38): error TS2339: Property 'volumeLabel' does not exist on type 'string'.
+components/AskBox.tsx(92,68): error TS2339: Property 'title' does not exist on type 'string'.
+lib/dictionary.ts(4,20): error TS2307: Cannot find module '../../dictionaries/en.json' or its corresponding type declarations.
+lib/dictionary.ts(5,20): error TS2307: Cannot find module '../../dictionaries/hi.json' or its corresponding type declarations.
+lib/dictionary.ts(6,20): error TS2307: Cannot find module '../../dictionaries/te.json' or its corresponding type declarations.
+lib/hooks/useIntersectionObserver.ts(19,21): error TS2339: Property 'triggerOnce' does not exist on type '{}'.
+lib/hooks/useIntersectionObserver.ts(36,15): error TS2339: Property 'threshold' does not exist on type '{}'.
+lib/hooks/useIntersectionObserver.ts(36,34): error TS2339: Property 'rootMargin' does not exist on type '{}'.
+lib/hooks/useIntersectionObserver.ts(36,54): error TS2339: Property 'root' does not exist on type '{}'.
+lib/hooks/useIntersectionObserver.ts(36,68): error TS2339: Property 'triggerOnce' does not exist on type '{}'.

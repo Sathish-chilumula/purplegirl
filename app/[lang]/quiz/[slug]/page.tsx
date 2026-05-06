@@ -43,7 +43,7 @@ export default async function QuizPage({ params }: { params: { slug: string } })
 
   return (
     <div className="bg-pg-cream min-h-screen py-16 px-6">
-      <QuizEngine quiz={quiz} />
+      <QuizEngine quiz={{ ...quiz, slug: params.slug }} />
     </div>
   );
 }

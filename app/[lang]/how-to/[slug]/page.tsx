@@ -4,12 +4,16 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { ArticleSchemas } from '@/components/seo/ArticleSchemas';
-import { ChevronRight, Lock, AlertTriangle, Sparkles, ChevronDown } from 'lucide-react';
+import { ChevronRight, Lock, AlertTriangle, Sparkles, ChevronDown, Shield } from 'lucide-react';
 import { Metadata } from 'next';
 import AdSenseUnit from '@/components/ads/AdSenseUnit';
 import { FeedbackWidget } from '@/components/articles/FeedbackWidget';
 import { SaveGuideButton } from '@/components/articles/SaveGuideButton';
 import { getDictionary } from '@/lib/dictionary';
+import { getExpertForCategory } from '@/lib/experts';
+import { Card } from '@/components/ui/Card';
+import { OtherWomenAsked } from '@/components/articles/OtherWomenAsked';
+import { LeadCaptureWidget } from '@/components/articles/LeadCaptureWidget';
 
 export const runtime = 'edge';
 
@@ -142,6 +146,27 @@ export default async function HowToArticlePage({ params }: ArticlePageProps) {
                 </div>
                 <SaveGuideButton slug={article.slug} saveLabel={dict.article_save} savedLabel={dict.article_saved} />
               </div>
+
+              {/* Expert Reviewer Badge */}
+              {(() => {
+                const expert = getExpertForCategory(article.category);
+                return (
+                  <Link
+                    href="/experts"
+                    className="mt-5 flex items-center gap-3 bg-pg-cream border border-pg-gray-100 rounded-xl px-4 py-3 hover:border-pg-rose transition-colors group w-full sm:w-auto sm:inline-flex"
+                  >
+                    <div className="w-9 h-9 rounded-full bg-pg-rose-light border border-pg-rose/20 flex items-center justify-center shrink-0">
+                      <Shield size={14} className="text-pg-rose" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-bold uppercase tracking-widest text-pg-gray-400">Reviewed by</p>
+                      <p className="text-[13px] font-bold text-pg-gray-900 group-hover:text-pg-rose transition-colors truncate">
+                        {expert.name} · <span className="font-normal text-pg-gray-600">{expert.credentials}</span>
+                      </p>
+                    </div>
+                  </Link>
+                );
+              })()}
             </header>
 
             {/* 3. Intro (Mirror Moment) */}
@@ -288,6 +313,18 @@ export default async function HowToArticlePage({ params }: ArticlePageProps) {
 
             {/* Smart Product Affiliate Widget */}
             <SmartProductWidget category={article.category} title={article.title} />
+
+            {/* Other Women Also Asked */}
+            <OtherWomenAsked
+              articleCategory={article.category}
+              articleTitle={article.title}
+            />
+
+            {/* Lead Capture — WhatsApp + Email */}
+            <LeadCaptureWidget
+              category={article.category}
+              articleTitle={article.title}
+            />
 
             {/* 11. Ad Slot 3 — hidden until AdSense approved */}
             <AdSenseUnit slot="end-article" className="my-8" />

@@ -6,6 +6,9 @@ import { getDictionary } from '@/lib/dictionary';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { HeroIllustration } from '@/components/home/HeroIllustration';
+import { LifecycleFilter } from '@/components/home/LifecycleFilter';
+import { TrendingQuestions } from '@/components/home/TrendingQuestions';
+import { FeaturedGuideOfWeek } from '@/components/home/FeaturedGuideOfWeek';
 import * as motion from "motion/react-client";
 import type { Metadata } from 'next';
 import { HomeSchema } from '@/components/seo/HomeSchema';
@@ -48,7 +51,7 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
 export const runtime = 'edge';
 
 async function getHomeData(lang: string) {
-  const [categoriesRes, articlesRes, quizzesRes] = await Promise.all([
+  const [categoriesRes, articlesRes, quizzesRes, featuredRes] = await Promise.all([
     supabaseAdmin
       .from('categories')
       .select('*')
@@ -67,18 +70,28 @@ async function getHomeData(lang: string) {
       .eq('is_published', true)
       .order('created_at', { ascending: false })
       .limit(6),
+    // Featured Guide of the Week — article flagged is_featured=true, or fallback to most-viewed
+    supabaseAdmin
+      .from('articles')
+      .select('slug, title, intro, reading_time_mins, category')
+      .eq('language', lang)
+      .eq('is_published', true)
+      .order('view_count', { ascending: false })
+      .limit(1)
+      .single(),
   ]);
 
   return {
     categories: categoriesRes.data || [],
     featuredArticles: articlesRes.data || [],
     latestQuizzes: quizzesRes.data || [],
+    featuredGuide: featuredRes.data || null,
   };
 }
 
 export default async function Home({ params }: HomePageProps) {
   const { lang } = await params;
-  const [{ categories, featuredArticles, latestQuizzes }, dict] = await Promise.all([
+  const [{ categories, featuredArticles, latestQuizzes, featuredGuide }, dict] = await Promise.all([
     getHomeData(lang),
     getDictionary(lang),
   ]);
@@ -153,33 +166,45 @@ export default async function Home({ params }: HomePageProps) {
       </section>
 
       {/* ━━━━━━━━━━━━━━━━━━━━━━━
-          SECTION 2 — Category Grid
+          SECTION 1.2 — Featured Guide of the Week
           ━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section id="categories" className="py-20 px-6 max-w-content mx-auto">
-        <h2 className="font-sans text-[22px] font-bold text-pg-gray-900 mb-8 text-center md:text-left">
-          Browse by Category
-        </h2>
+      <FeaturedGuideOfWeek guide={featuredGuide} />
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {categories.map((cat) => (
-            <Link key={cat.id} href={`/category/${cat.slug}`}>
-              <Card className="flex flex-col items-center text-center hover:border-pg-rose hover:bg-pg-rose-light/30 transition-all h-full p-6">
-                <div className="text-[40px] mb-4">
-                  {cat.icon_emoji || '✨'}
-                </div>
-                <h3 className="font-sans text-[16px] font-bold text-pg-gray-900 mb-1 leading-tight">
-                  {cat.name}
-                </h3>
-                {/* Only show count if there are articles */}
-                {cat.article_count > 0 ? (
-                  <span className="text-sm text-pg-gray-500">{cat.article_count} guides</span>
-                ) : (
-                  <span className="text-xs text-pg-gray-400 italic">Coming soon</span>
-                )}
-              </Card>
-            </Link>
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━
+          SECTION 1.5 — Social Proof Bar
+          ━━━━━━━━━━━━━━━━━━━━━━━ */}
+      <section className="bg-white border-y border-pg-gray-100 py-4 px-6">
+        <div className="max-w-content mx-auto flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-center">
+          {[
+            { value: '1,20,000+', label: 'Women Helped' },
+            { value: '245+', label: 'How-To Guides' },
+            { value: '100%', label: 'Anonymous' },
+            { value: '18', label: 'Categories' },
+          ].map(({ value, label }) => (
+            <div key={label} className="flex items-center gap-2">
+              <span className="font-display font-bold text-pg-rose text-[18px]">{value}</span>
+              <span className="text-pg-gray-500 text-sm">{label}</span>
+            </div>
           ))}
         </div>
+      </section>
+
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━
+          SECTION 1.7 — Trending Questions
+          ━━━━━━━━━━━━━━━━━━━━━━━ */}
+      <TrendingQuestions />
+
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━
+          SECTION 2 — Category Grid with Lifecycle Filter
+          ━━━━━━━━━━━━━━━━━━━━━━━ */}
+      <section id="categories" className="py-20 px-6 max-w-content mx-auto">
+        <h2 className="font-sans text-[22px] font-bold text-pg-gray-900 mb-4 text-center md:text-left">
+          Browse by Category
+        </h2>
+        <p className="text-pg-gray-500 text-sm mb-6 text-center md:text-left">
+          Select your life stage to find the most relevant guides for you.
+        </p>
+        <LifecycleFilter categories={categories} />
       </section>
 
       {/* ━━━━━━━━━━━━━━━━━━━━━━━
@@ -325,5 +350,6 @@ export default async function Home({ params }: HomePageProps) {
       </section>
 
     </div>
+  </>
   );
 }
