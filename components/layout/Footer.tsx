@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Heart, ShieldCheck } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { Heart, ShieldCheck, Globe } from 'lucide-react';
 
 interface FooterProps {
   dict: any;
@@ -18,6 +19,14 @@ const getSupport = (dict: any) => [
 
 export default function Footer({ dict, lang }: FooterProps) {
   const support = getSupport(dict);
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const changeLanguage = (newLang: string) => {
+    document.cookie = `NEXT_LOCALE=${newLang}; path=/; max-age=31536000`;
+    const currentPath = pathname.replace(/^\/(hi|te|en)/, '') || '/';
+    router.push(newLang === 'en' ? currentPath : `/${newLang}${currentPath}`);
+  };
   
   return (
     <footer className="bg-[#2a0a42] text-white/70 py-16 px-6 border-t border-white/5">
@@ -57,6 +66,24 @@ export default function Footer({ dict, lang }: FooterProps) {
                 </li>
               ))}
             </ul>
+          </div>
+
+          {/* Language / Locale Selector */}
+          <div>
+            <h4 className="text-white/90 font-bold uppercase text-xs tracking-widest mb-6 flex items-center gap-2">
+              <Globe size={14} /> Language / भाषा
+            </h4>
+            <div className="flex flex-col gap-3">
+              <button onClick={() => changeLanguage('en')} className={`text-left text-sm transition-colors flex items-center gap-3 ${lang === 'en' ? 'text-pg-rose font-bold' : 'text-white/50 hover:text-white'}`}>
+                <span className="text-base">🇺🇸</span> English (Default)
+              </button>
+              <button onClick={() => changeLanguage('hi')} className={`text-left text-sm transition-colors flex items-center gap-3 ${lang === 'hi' ? 'text-pg-rose font-bold' : 'text-white/50 hover:text-white'}`}>
+                <span className="text-base">🇮🇳</span> हिन्दी (Hindi)
+              </button>
+              <button onClick={() => changeLanguage('te')} className={`text-left text-sm transition-colors flex items-center gap-3 ${lang === 'te' ? 'text-pg-rose font-bold' : 'text-white/50 hover:text-white'}`}>
+                <span className="text-base">🇮🇳</span> తెలుగు (Telugu)
+              </button>
+            </div>
           </div>
         </div>
 
