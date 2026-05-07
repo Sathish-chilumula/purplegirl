@@ -52,18 +52,31 @@ async function callAI(systemPrompt, userMessage) {
     return JSON.parse(data.choices[0].message.content);
   } catch (error) {
     console.log("Groq failed, falling back to Gemini...", error.message);
-    const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${process.env.GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: systemPrompt }] },
-        contents: [{ role: 'user', parts: [{ text: userMessage }] }],
-        generationConfig: { temperature: 0.3, responseMimeType: "application/json" }
-      })
-    });
-    if (!geminiRes.ok) throw new Error(`Gemini fallback failed: ${geminiRes.status}`);
-    const data = await geminiRes.json();
-    return JSON.parse(data.candidates[0].content.parts[0].text);
+    const GEMINI_MODELS = ['gemini-3.1-flash-lite-preview', 'gemini-2.5-flash-lite'];
+    
+    for (const model of GEMINI_MODELS) {
+      try {
+        const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: systemPrompt }] },
+            contents: [{ role: 'user', parts: [{ text: userMessage }] }],
+            generationConfig: { temperature: 0.3, responseMimeType: "application/json" }
+          })
+        });
+        if (geminiRes.ok) {
+          const data = await geminiRes.json();
+          return JSON.parse(data.candidates[0].content.parts[0].text);
+        }
+        if (geminiRes.status === 429) {
+           throw new Error(`Gemini quota exhausted (${geminiRes.status})`);
+        }
+      } catch (e) {
+        console.warn(`Gemini ${model} failed:`, e.message);
+      }
+    }
+    throw new Error('All Gemini models failed for translation.');
   }
 }
 
@@ -83,7 +96,7 @@ async function translateArticles() {
     .eq('language', 'en')
     .eq('is_published', true)
     .order('created_at', { ascending: false })
-    .limit(5); // Translate 5 per run to stay within free API limits
+    .limit(15); // Translate 15 per run (x2 languages = 30 calls)
 
   if (fetchErr) {
     console.error('Error fetching articles:', fetchErr);

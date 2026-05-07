@@ -2,8 +2,8 @@ name: Weekly Generate Quizzes
 
 on:
   schedule:
-    # Runs at 2 AM IST every Sunday (20:30 UTC Saturday)
-    - cron: '30 20 * * 6'
+    # Runs at 2 AM IST every Thursday and Sunday (20:30 UTC Wed & Sat)
+    - cron: '30 20 * * 3,6'
   workflow_dispatch:
 
 permissions:

@@ -187,9 +187,9 @@ async function main() {
     process.exit(1);
   }
 
-  // Get up to 3 random topics
+  // Get up to 5 random topics
   const topicsToProcess = [];
-  while (topicsToProcess.length < 3 && bank.length > 0) {
+  while (topicsToProcess.length < 5 && bank.length > 0) {
     const randIdx = Math.floor(Math.random() * bank.length);
     topicsToProcess.push(bank.splice(randIdx, 1)[0]);
   }
