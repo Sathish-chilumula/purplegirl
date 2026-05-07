@@ -1,6 +1,8 @@
 import { MetadataRoute } from 'next';
 
 export const revalidate = 0; // Force fully dynamic sitemap update
+export const runtime = 'edge';
+
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { getAllWikiSlugs } from '@/lib/wiki-terms';
 import { getAllCompareSlugs } from '@/lib/compare-data';
