@@ -51,7 +51,7 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
 export const runtime = 'edge';
 
 async function getHomeData(lang: string) {
-  const [categoriesRes, articlesRes, quizzesRes, featuredRes] = await Promise.all([
+  const [categoriesRes, articlesRes, quizzesRes, featuredRes, questionsRes] = await Promise.all([
     supabaseAdmin
       .from('categories')
       .select('*')
@@ -70,7 +70,7 @@ async function getHomeData(lang: string) {
       .eq('is_published', true)
       .order('created_at', { ascending: false })
       .limit(6),
-    // Featured Guide of the Week — article flagged is_featured=true, or fallback to most-viewed
+    // Featured Guide of the Week
     supabaseAdmin
       .from('articles')
       .select('slug, title, intro, reading_time_mins, category')
@@ -79,6 +79,13 @@ async function getHomeData(lang: string) {
       .order('view_count', { ascending: false })
       .limit(1)
       .single(),
+    // Live trending questions from Q&A feed
+    supabaseAdmin
+      .from('questions')
+      .select('slug, question_text, category')
+      .eq('is_published', true)
+      .order('created_at', { ascending: false })
+      .limit(6),
   ]);
 
   return {
@@ -86,12 +93,17 @@ async function getHomeData(lang: string) {
     featuredArticles: articlesRes.data || [],
     latestQuizzes: quizzesRes.data || [],
     featuredGuide: featuredRes.data || null,
+    trendingQuestions: (questionsRes.data || []).map((q: any) => ({
+      question: q.question_text,
+      category: q.category || 'general',
+      slug: q.slug,
+    })),
   };
 }
 
 export default async function Home({ params }: HomePageProps) {
   const { lang } = await params;
-  const [{ categories, featuredArticles, latestQuizzes, featuredGuide }, dict] = await Promise.all([
+  const [{ categories, featuredArticles, latestQuizzes, featuredGuide, trendingQuestions }, dict] = await Promise.all([
     getHomeData(lang),
     getDictionary(lang),
   ]);
@@ -119,13 +131,13 @@ export default async function Home({ params }: HomePageProps) {
             {/* SEO: screen-reader only H1 */}
             <h1 className="sr-only">How-To Guides & Anonymous Advice for Indian Women</h1>
 
-            {/* Visual headline — shown to users */}
-            <p className="font-display text-[28px] md:text-[42px] font-bold text-pg-gray-900 leading-tight mb-4">
-              The Safe Space for Indian Women.
-              <span className="text-pg-rose block">Honest Advice & How-To Guides.</span>
+            {/* Visual headline — honest, direct, human */}
+            <p className="font-display text-[28px] md:text-[44px] font-bold text-pg-gray-900 leading-tight mb-4">
+              Questions you can't ask anyone.
+              <span className="text-pg-rose block">Answers you actually need.</span>
             </p>
             <p className="font-sans text-[16px] md:text-[18px] text-pg-gray-700 mb-8 max-w-lg mx-auto md:mx-0">
-              Pain-first guides, honest quizzes, and anonymous Q&A — written for Indian women who can't ask anyone else.
+              Honest guides on relationships, health, money, and rights — for Indian women. No login, no tracking, completely private.
             </p>
 
             <form action="/search" className="relative w-full max-w-xl mx-auto md:mx-0 mb-6">
@@ -190,9 +202,9 @@ export default async function Home({ params }: HomePageProps) {
       </section>
 
       {/* ━━━━━━━━━━━━━━━━━━━━━━━
-          SECTION 1.7 — Trending Questions
+          SECTION 1.7 — Trending Questions (live from DB)
           ━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <TrendingQuestions />
+      <TrendingQuestions questions={trendingQuestions} />
 
       {/* ━━━━━━━━━━━━━━━━━━━━━━━
           SECTION 2 — Category Grid with Lifecycle Filter
@@ -223,18 +235,19 @@ export default async function Home({ params }: HomePageProps) {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
           {featuredArticles.length > 0 ? featuredArticles.map((article) => (
             <Link key={article.slug} href={`/how-to/${article.slug}`}>
-              <Card className="h-full hover:border-pg-rose transition-colors flex flex-col p-3 md:p-6">
+              <Card className="h-full hover:border-pg-rose hover:-translate-y-1 hover:shadow-lg hover:shadow-pg-rose/10 transition-all duration-300 flex flex-col p-3 md:p-6 cursor-pointer">
                 <div className="mb-2 md:mb-4">
                   <Badge className="text-[9px] md:text-[10px]">{article.category.replace(/-/g, ' ')}</Badge>
                 </div>
-                <h3 className="font-display text-[13px] md:text-[18px] font-bold text-pg-gray-900 mb-2 md:mb-3 line-clamp-3 leading-snug">
+                <h3 className="font-display text-[13px] md:text-[18px] font-bold text-pg-gray-900 mb-2 md:mb-3 line-clamp-3 leading-snug group-hover:text-pg-rose transition-colors">
                   {article.title}
                 </h3>
                 <p className="hidden md:block text-pg-gray-500 text-sm line-clamp-3 mb-6 flex-grow">
                   {article.intro?.substring(0, 100)}...
                 </p>
-                <div className="text-[10px] md:text-xs font-bold text-pg-gray-400 uppercase tracking-widest mt-auto">
-                  ⏱ {article.reading_time_mins || 3} min
+                <div className="text-[10px] md:text-xs font-bold text-pg-gray-400 uppercase tracking-widest mt-auto flex items-center gap-2">
+                  <span>⏱ {article.reading_time_mins || 3} min</span>
+                  <span className="text-pg-rose ml-auto">Read →</span>
                 </div>
               </Card>
             </Link>
@@ -343,10 +356,34 @@ export default async function Home({ params }: HomePageProps) {
       </section>
 
       {/* ━━━━━━━━━━━━━━━━━━━━━━━
-          SECTION 5 — Anonymous Ask Box
+          SECTION 5 — Anonymous Ask CTA
           ━━━━━━━━━━━━━━━━━━━━━━━ */}
       <section className="py-16 px-6 max-w-content mx-auto">
         <AskBox />
+      </section>
+
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━
+          SECTION 6 — Emotional Private CTA
+          ━━━━━━━━━━━━━━━━━━━━━━━ */}
+      <section className="py-16 px-6 bg-gradient-to-br from-pg-plum via-pg-plum/90 to-rose-900 text-white">
+        <div className="max-w-2xl mx-auto text-center">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-rose-200 mb-4">You are not alone</p>
+          <h2 className="font-display text-[28px] md:text-[38px] font-bold leading-tight mb-6">
+            There's a question you haven't asked anyone.
+          </h2>
+          <p className="text-white/80 text-lg mb-10 leading-relaxed">
+            Maybe your family doesn't know. Maybe you're scared of being judged.<br />
+            But you still need a clear, honest answer.
+          </p>
+          <Link
+            href="/ask"
+            className="inline-flex items-center gap-3 bg-white text-pg-plum font-bold px-8 py-4 rounded-2xl text-[16px] hover:bg-pg-rose hover:text-white transition-all duration-300 hover:scale-105 shadow-xl"
+          >
+            Ask it here, completely privately
+            <ChevronRight size={20} />
+          </Link>
+          <p className="mt-6 text-white/40 text-sm">No name. No email. No login. Just an honest answer.</p>
+        </div>
       </section>
 
     </div>

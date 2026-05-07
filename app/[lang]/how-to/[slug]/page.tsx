@@ -57,6 +57,29 @@ async function getArticleData(slug: string, lang: string) {
  * 1. First tries using the article's related_article_slugs array
  * 2. Falls back to other articles in the same category
  */
+async function getRelatedQuiz(category: string) {
+  // Find a quiz matching the article category, fallback to relationships
+  const categoryMap: Record<string, string[]> = {
+    'relationships-marriage': ['relationship-health-check', 'emotional-dependency-quiz', 'what-does-your-love-language-say-about-you', 'what-kind-of-wife-are-you', 'are-you-ready-for-marriage'],
+    'mental-health-emotions': ['sacrifice-level-quiz', 'are-you-a-people-pleaser', 'what-triggers-your-anxiety', 'whats-your-self-sabotage-style'],
+    'family-parenting': ['inlaw-boundary-quiz', 'what-kind-of-daughter-in-law-are-you'],
+    'womens-health': ['pcos-mood-quiz', 'how-healthy-is-your-relationship-with-food'],
+    'self-growth': ['bollywood-heroine-personality-match', 'which-indian-goddess-are-you', 'are-you-a-people-pleaser'],
+    'career-workplace': ['sacrifice-level-quiz', 'whats-your-self-sabotage-style'],
+    'health': ['pcos-mood-quiz', 'how-healthy-is-your-relationship-with-food'],
+  };
+  const preferred = categoryMap[category] || [];
+  const slug = preferred[0] || 'relationship-health-check';
+  const { data } = await supabaseAdmin
+    .from('quizzes')
+    .select('slug, title, category, thumbnail_emoji')
+    .eq('is_published', true)
+    .in('slug', preferred.length > 0 ? preferred : ['relationship-health-check'])
+    .limit(1)
+    .single();
+  return data || { slug, title: 'Take a Quiz', category, thumbnail_emoji: '✨' };
+}
+
 async function getRelatedArticles(article: any) {
   // Try related_article_slugs first
   if (article.related_article_slugs && article.related_article_slugs.length > 0) {
@@ -93,15 +116,14 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
   const { article, redirectSlug } = await getArticleData(slug, lang);
   
   if (redirectSlug) {
-    // We can't redirect in generateMetadata easily without throwing, but Next.js will call the component and redirect there.
     return { title: 'Redirecting...' };
   }
 
   if (!article) return { title: 'Not Found' };
   
-  // For hreflang, we link to the English version at root and translated versions with /[lang]/ prefix
   return {
-    title: `${article.title} | PurpleGirl`,
+    // Let the layout template append " | PurpleGirl" — don't add it here to avoid double-branding
+    title: article.title,
     description: article.meta_description || article.intro,
     alternates: {
       canonical: lang === 'en' ? `/how-to/${slug}` : `/${lang}/how-to/${slug}`,
@@ -109,13 +131,20 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
         'en': `${SITE_URL}/how-to/${slug}`,
         'hi': `${SITE_URL}/hi/how-to/${slug}`,
         'te': `${SITE_URL}/te/how-to/${slug}`,
+        'x-default': `${SITE_URL}/how-to/${slug}`,
       }
     },
     openGraph: {
       title: article.title,
       description: article.meta_description || article.intro,
       type: 'article',
-    }
+      url: lang === 'en' ? `${SITE_URL}/how-to/${slug}` : `${SITE_URL}/${lang}/how-to/${slug}`,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: article.title,
+      description: article.meta_description || article.intro,
+    },
   };
 }
 
@@ -133,9 +162,10 @@ export default async function HowToArticlePage({ params }: ArticlePageProps) {
 
   const dict = await getDictionary(lang as any);
 
-  // Fetch real related articles in parallel with view count increment
-  const [relatedArticles] = await Promise.all([
+  // Fetch related articles, matching quiz, and increment views in parallel
+  const [relatedArticles, relatedQuiz] = await Promise.all([
     getRelatedArticles(article),
+    getRelatedQuiz(article.category),
     supabaseAdmin.rpc('increment_view_count', { article_id: article.id }).then(),
   ]);
 
@@ -406,14 +436,23 @@ export default async function HowToArticlePage({ params }: ArticlePageProps) {
               </div>
             )}
 
-            {/* Quiz Widget */}
-            <div className="bg-pg-plum text-white rounded-2xl p-8 text-center">
-              <h3 className="font-display font-bold text-2xl mb-3">Is Your Relationship Healthy or Toxic?</h3>
-              <p className="text-sm text-pg-plum-light mb-6">Take our 3-minute quiz to find out anonymously.</p>
-              <Link href="/quiz/relationship-health-check" className="inline-block bg-white text-pg-plum font-bold py-3 px-6 rounded-xl hover:bg-pg-plum-light transition-colors text-sm w-full">
-                Take the Quiz →
-              </Link>
-            </div>
+            {/* Dynamic Related Quiz Widget */}
+            {relatedQuiz && (
+              <div className="bg-gradient-to-br from-pg-plum to-pg-plum/80 text-white rounded-2xl p-6 text-center shadow-lg">
+                <div className="text-4xl mb-3">{relatedQuiz.thumbnail_emoji || '✨'}</div>
+                <span className="inline-block px-3 py-1 bg-white/10 rounded-full text-[10px] font-bold uppercase tracking-widest mb-3">
+                  {relatedQuiz.category?.replace(/-/g, ' ')}
+                </span>
+                <h3 className="font-display font-bold text-lg leading-tight mb-3">{relatedQuiz.title}</h3>
+                <p className="text-xs text-white/70 mb-5">3 minutes · 100% anonymous</p>
+                <Link
+                  href={`/quiz/${relatedQuiz.slug}`}
+                  className="block bg-white text-pg-plum font-bold py-3 px-6 rounded-xl hover:bg-pg-rose hover:text-white transition-all text-sm"
+                >
+                  Take Quiz →
+                </Link>
+              </div>
+            )}
 
             {/* Sidebar Ad — hidden until AdSense approved */}
             <AdSenseUnit slot="sidebar" className="mt-4" />
