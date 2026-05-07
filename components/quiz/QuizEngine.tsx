@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { ChevronRight, Share2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { motion, AnimatePresence } from 'motion/react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 const triggerConfetti = () => {
   if (typeof window !== 'undefined' && (window as any).confetti) {
@@ -69,6 +71,9 @@ function normalizeResults(raw: any): QuizResult[] {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 export const QuizEngine = ({ quiz }: QuizEngineProps) => {
+  const params = useParams();
+  const lang = params?.lang || 'en';
+  
   const [state, setState] = useState<'intro' | 'playing' | 'result'>('intro');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   // Track selected OPTION INDEX (not score) to avoid falsy-zero comparison bugs
@@ -360,12 +365,12 @@ export const QuizEngine = ({ quiz }: QuizEngineProps) => {
           <p className="text-pg-gray-500 text-sm mb-4">
             Read guides related to <span className="font-bold text-pg-rose capitalize">{quiz.category.replace(/-/g, ' ')}</span>
           </p>
-          <a
-            href={`/category/${quiz.category}`}
+          <Link
+            href={`/${lang}/category/${quiz.category}`}
             className="inline-flex items-center gap-2 bg-pg-rose text-white font-bold px-6 py-3 rounded-xl hover:bg-pg-rose-dark transition-colors text-sm"
           >
             View {quiz.category.replace(/-/g, ' ')} Guides <ChevronRight size={16} />
-          </a>
+          </Link>
         </motion.div>
       </div>
     );
