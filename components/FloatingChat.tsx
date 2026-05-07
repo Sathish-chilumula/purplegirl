@@ -61,6 +61,11 @@ export function FloatingChat() {
         }),
       });
       const data = await res.json();
+      
+      if (!res.ok || !data.message) {
+        throw new Error(data.error || 'Failed to fetch response');
+      }
+      
       setMessages(prev => [...prev, data.message]);
     } catch {
       setMessages(prev => [
