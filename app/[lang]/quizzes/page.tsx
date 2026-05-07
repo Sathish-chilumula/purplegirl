@@ -8,13 +8,39 @@ import AdSenseUnit from '@/components/ads/AdSenseUnit';
 
 export const runtime = 'edge';
 
-export const metadata: Metadata = {
-  title: 'Personality & Advice Quizzes for Indian Women | PurpleGirl',
-  description: 'Take fun, insightful, and completely anonymous quizzes about relationships, health, and personality tailored for Indian women.',
-  alternates: {
-    canonical: '/quizzes',
-  },
-};
+const SITE_URL = 'https://purplegirl.in';
+
+interface QuizzesPageProps {
+  params: Promise<{ lang: string }>;
+}
+
+export async function generateMetadata({ params }: QuizzesPageProps): Promise<Metadata> {
+  const { lang } = await params;
+  const titles: Record<string, string> = {
+    en: 'Personality & Advice Quizzes for Indian Women | PurpleGirl',
+    hi: 'भारतीय महिलाओं के लिए क्विज़ | PurpleGirl',
+    te: 'భారతీయ మహిళలకు క్విజ్‌లు | PurpleGirl',
+  };
+  const descs: Record<string, string> = {
+    en: 'Take fun, insightful, and completely anonymous quizzes about relationships, health, and personality tailored for Indian women.',
+    hi: 'रिश्तों, स्वास्थ्य और व्यक्तित्व के बारे में मजेदार और पूरी तरह से गुमनाम क्विज़ लें।',
+    te: 'సంబంధాలు, ఆరోగ్యం మరియు వ్యక్తిత్వం గురించి సరదాగా క్విజ్‌లు తీసుకోండి.',
+  };
+  const canonical = lang === 'en' ? '/quizzes' : `/${lang}/quizzes`;
+  return {
+    title: titles[lang] || titles.en,
+    description: descs[lang] || descs.en,
+    alternates: {
+      canonical,
+      languages: {
+        'en': `${SITE_URL}/quizzes`,
+        'hi': `${SITE_URL}/hi/quizzes`,
+        'te': `${SITE_URL}/te/quizzes`,
+        'x-default': `${SITE_URL}/quizzes`,
+      },
+    },
+  };
+}
 
 async function getQuizzes() {
   const { data } = await supabaseAdmin
@@ -25,7 +51,8 @@ async function getQuizzes() {
   return data || [];
 }
 
-export default async function QuizzesPage() {
+export default async function QuizzesPage({ params }: QuizzesPageProps) {
+  const { lang: _lang } = await params;
   const quizzes = await getQuizzes();
 
   return (

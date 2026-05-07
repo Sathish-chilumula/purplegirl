@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Search, Menu, X, ChevronDown, ChevronRight, Zap, TrendingUp, Flame, HelpCircle, Calendar, Bookmark, MessagesSquare } from 'lucide-react';
+import { Search, Menu, X, ChevronDown, ChevronRight, Zap, TrendingUp, Flame, HelpCircle, Calendar, Bookmark, MessagesSquare, Calculator, BookOpen } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
 
@@ -17,6 +17,9 @@ const getTopLinks = (dict: any) => [
   { label: dict.nav_qa_feed, icon: MessagesSquare, href: '/questions' },
   { label: dict.nav_quizzes, icon: Flame, href: '/quizzes' },
   { label: dict.nav_ask, icon: HelpCircle, href: '/ask' },
+  { label: 'Period Calculator', icon: Calculator, href: '/tools/period-calculator' },
+  { label: 'Symptom Checker', icon: Zap, href: '/tools/symptom-checker' },
+  { label: 'Wiki / Glossary', icon: BookOpen, href: '/wiki/pcos' },
 ];
 
 const categoryColumns = [

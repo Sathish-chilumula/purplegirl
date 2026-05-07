@@ -1,4 +1,21 @@
 import Link from 'next/link';
+import { Metadata } from 'next';
+
+const SITE_URL = 'https://purplegirl.in';
+
+interface PrivacyPageProps {
+  params: Promise<{ lang: string }>;
+}
+
+export async function generateMetadata({ params }: PrivacyPageProps): Promise<Metadata> {
+  const { lang } = await params;
+  const canonical = lang === 'en' ? '/privacy' : `/${lang}/privacy`;
+  return {
+    title: 'Privacy Policy | PurpleGirl',
+    description: 'Read PurpleGirl\'s privacy policy. We are committed to keeping your data safe and your questions anonymous.',
+    alternates: { canonical, languages: { 'en': `${SITE_URL}/privacy`, 'x-default': `${SITE_URL}/privacy` } },
+  };
+}
 
 export const runtime = 'edge';
 

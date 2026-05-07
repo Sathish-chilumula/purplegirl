@@ -86,6 +86,7 @@ interface ArticlePageProps {
 }
 
 import { redirect, notFound } from 'next/navigation';
+import { autoLink } from '@/lib/auto-link';
 
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
   const { lang, slug } = await params;
@@ -256,9 +257,10 @@ export default async function HowToArticlePage({ params }: ArticlePageProps) {
                   </div>
                   
                   <div className="pl-14">
-                    <p className="text-[16px] leading-[1.8] text-pg-gray-700 mb-6">
-                      {step.body}
-                    </p>
+                    <p
+                      className="text-[16px] leading-[1.8] text-pg-gray-700 mb-6"
+                      dangerouslySetInnerHTML={{ __html: autoLink(step.body, lang) }}
+                    />
 
                     {step.tip && (
                       <div className="bg-pg-success/10 border border-pg-success/20 p-4 rounded-xl mb-4 text-sm text-pg-gray-900">

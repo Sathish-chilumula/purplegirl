@@ -1,3 +1,20 @@
+import { Metadata } from 'next';
+
+const SITE_URL = 'https://purplegirl.in';
+
+interface ContactPageProps {
+  params: Promise<{ lang: string }>;
+}
+
+export async function generateMetadata({ params }: ContactPageProps): Promise<Metadata> {
+  const { lang } = await params;
+  const canonical = lang === 'en' ? '/contact' : `/${lang}/contact`;
+  return {
+    title: 'Contact Us | PurpleGirl',
+    description: 'Get in touch with PurpleGirl. We\'d love to hear your feedback, questions, or partnership ideas.',
+    alternates: { canonical, languages: { 'en': `${SITE_URL}/contact`, 'x-default': `${SITE_URL}/contact` } },
+  };
+}
 
 export const runtime = 'edge';
 export default function ContactPage() {

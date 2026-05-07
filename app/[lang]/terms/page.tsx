@@ -1,4 +1,21 @@
 import Link from 'next/link';
+import { Metadata } from 'next';
+
+const SITE_URL = 'https://purplegirl.in';
+
+interface TermsPageProps {
+  params: Promise<{ lang: string }>;
+}
+
+export async function generateMetadata({ params }: TermsPageProps): Promise<Metadata> {
+  const { lang } = await params;
+  const canonical = lang === 'en' ? '/terms' : `/${lang}/terms`;
+  return {
+    title: 'Terms of Service | PurpleGirl',
+    description: 'Read PurpleGirl\'s terms of service. By using our platform you agree to these terms.',
+    alternates: { canonical, languages: { 'en': `${SITE_URL}/terms`, 'x-default': `${SITE_URL}/terms` } },
+  };
+}
 
 export const runtime = 'edge';
 

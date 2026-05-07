@@ -16,26 +16,42 @@ async function getQuizData(slug: string) {
   return data;
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const quiz = await getQuizData(params.slug);
+const SITE_URL = 'https://purplegirl.in';
+
+interface QuizPageProps {
+  params: Promise<{ lang: string; slug: string }>;
+}
+
+export async function generateMetadata({ params }: QuizPageProps): Promise<Metadata> {
+  const { lang, slug } = await params;
+  const quiz = await getQuizData(slug);
   if (!quiz) return { title: 'Quiz Not Found' };
-  
+
+  const canonical = lang === 'en' ? `/quiz/${slug}` : `/${lang}/quiz/${slug}`;
+
   return {
     title: `${quiz.title} | PurpleGirl Quiz`,
     description: quiz.description,
     alternates: {
-      canonical: `/quiz/${params.slug}`
+      canonical,
+      languages: {
+        'en': `${SITE_URL}/quiz/${slug}`,
+        'hi': `${SITE_URL}/hi/quiz/${slug}`,
+        'te': `${SITE_URL}/te/quiz/${slug}`,
+        'x-default': `${SITE_URL}/quiz/${slug}`,
+      },
     },
     openGraph: {
       title: `${quiz.title} | PurpleGirl Quiz`,
       description: quiz.description,
       type: 'website',
-    }
+    },
   };
 }
 
-export default async function QuizPage({ params }: { params: { slug: string } }) {
-  const quiz = await getQuizData(params.slug);
+export default async function QuizPage({ params }: QuizPageProps) {
+  const { slug } = await params;
+  const quiz = await getQuizData(slug);
 
   if (!quiz) {
     notFound();
@@ -43,7 +59,7 @@ export default async function QuizPage({ params }: { params: { slug: string } })
 
   return (
     <div className="bg-pg-cream min-h-screen py-16 px-6">
-      <QuizEngine quiz={{ ...quiz, slug: params.slug }} />
+      <QuizEngine quiz={{ ...quiz, slug: slug }} />
     </div>
   );
 }

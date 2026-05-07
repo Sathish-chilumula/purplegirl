@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { ThumbsUp, ThumbsDown, Send, CheckCircle2 } from 'lucide-react';
-import { supabaseAdmin } from '@/lib/supabase-admin';
 
 interface FeedbackWidgetProps {
   articleId: string;
@@ -18,9 +17,6 @@ export function FeedbackWidget({ articleId, dict, lang = 'en' }: FeedbackWidgetP
   const handleInitialFeedback = async (isHelpful: boolean) => {
     setStatus(isHelpful ? 'helpful' : 'not-helpful');
     
-    // Immediately log the simple vote via API or client-side supabase if available
-    // For simplicity in this demo, we'll assume a supabase instance is available or use a server action
-    // But since this is 'use client', we should use the client-side supabase
     const { supabase } = await import('@/lib/supabase');
 
     await supabase.from('article_feedback').insert([{

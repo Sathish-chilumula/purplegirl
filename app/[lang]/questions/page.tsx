@@ -7,13 +7,29 @@ import { SITE_NAME } from '@/lib/constants';
 
 export const runtime = 'edge';
 
-export const metadata: Metadata = {
-  title: `Public Q&A Feed | ${SITE_NAME}`,
-  description: 'Real questions from Indian women on relationships, family, and health, answered anonymously by PurpleGirl.',
-  alternates: {
-    canonical: '/questions',
-  },
-};
+const SITE_URL = 'https://purplegirl.in';
+
+interface QuestionsPageProps {
+  params: Promise<{ lang: string }>;
+}
+
+export async function generateMetadata({ params }: QuestionsPageProps): Promise<Metadata> {
+  const { lang } = await params;
+  const canonical = lang === 'en' ? '/questions' : `/${lang}/questions`;
+  return {
+    title: `Public Q&A Feed | ${SITE_NAME}`,
+    description: 'Real questions from Indian women on relationships, family, and health, answered anonymously by PurpleGirl.',
+    alternates: {
+      canonical,
+      languages: {
+        'en': `${SITE_URL}/questions`,
+        'hi': `${SITE_URL}/hi/questions`,
+        'te': `${SITE_URL}/te/questions`,
+        'x-default': `${SITE_URL}/questions`,
+      },
+    },
+  };
+}
 
 async function getQuestions() {
   const { data } = await supabaseAdmin
@@ -30,7 +46,8 @@ async function getQuestions() {
   return data || [];
 }
 
-export default async function QuestionsFeedPage() {
+export default async function QuestionsFeedPage({ params }: QuestionsPageProps) {
+  const { lang: _lang } = await params;
   const questions = await getQuestions();
 
   return (

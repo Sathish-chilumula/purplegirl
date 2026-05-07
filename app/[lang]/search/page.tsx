@@ -8,10 +8,14 @@ import { SITE_NAME } from '@/lib/constants';
 import { Loader2 } from 'lucide-react';
 
 interface SearchPageProps {
+  params: Promise<{ lang: string }>;
   searchParams: Promise<{ q?: string; category?: string }>;
 }
 
-export async function generateMetadata({ searchParams }: SearchPageProps): Promise<Metadata> {
+const SITE_URL = 'https://purplegirl.in';
+
+export async function generateMetadata({ params, searchParams }: SearchPageProps): Promise<Metadata> {
+  const { lang } = await params;
   const { q, category } = await searchParams;
 
   let title = `Search How-To Guides | ${SITE_NAME}`;
@@ -32,16 +36,25 @@ export async function generateMetadata({ searchParams }: SearchPageProps): Promi
     }
   }
 
+  const canonical = lang === 'en' ? '/search' : `/${lang}/search`;
+
   return {
     title,
     description,
     alternates: {
-      canonical: '/search',
+      canonical,
+      languages: {
+        'en': `${SITE_URL}/search`,
+        'hi': `${SITE_URL}/hi/search`,
+        'te': `${SITE_URL}/te/search`,
+        'x-default': `${SITE_URL}/search`,
+      },
     },
   };
 }
 
-export default async function SearchPage({ searchParams }: SearchPageProps) {
+export default async function SearchPage({ params, searchParams }: SearchPageProps) {
+  const { lang: _lang } = await params;
   const { category } = await searchParams;
 
   // Fetch categories for the sidebar filter

@@ -6,13 +6,29 @@ import { Card } from '@/components/ui/Card';
 
 export const runtime = 'edge';
 
-export const metadata: Metadata = {
-  title: 'Our Expert Reviewers | PurpleGirl',
-  description: 'PurpleGirl content is reviewed by qualified gynaecologists, psychologists, lawyers, and financial planners to ensure accuracy for Indian women.',
-  alternates: {
-    canonical: '/experts',
-  },
-};
+const SITE_URL = 'https://purplegirl.in';
+
+interface ExpertsPageProps {
+  params: Promise<{ lang: string }>;
+}
+
+export async function generateMetadata({ params }: ExpertsPageProps): Promise<Metadata> {
+  const { lang } = await params;
+  const canonical = lang === 'en' ? '/experts' : `/${lang}/experts`;
+  return {
+    title: 'Our Expert Reviewers | PurpleGirl',
+    description: 'PurpleGirl content is reviewed by qualified gynaecologists, psychologists, lawyers, and financial planners to ensure accuracy for Indian women.',
+    alternates: {
+      canonical,
+      languages: {
+        'en': `${SITE_URL}/experts`,
+        'hi': `${SITE_URL}/hi/experts`,
+        'te': `${SITE_URL}/te/experts`,
+        'x-default': `${SITE_URL}/experts`,
+      },
+    },
+  };
+}
 
 const EXPERT_PROFILES = [
   {
@@ -53,7 +69,7 @@ const EXPERT_PROFILES = [
   },
 ];
 
-export default function ExpertsPage() {
+export default function ExpertsPage({ params: _params }: ExpertsPageProps) {
   return (
     <div className="bg-pg-cream min-h-screen pb-20">
 
