@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Send, ShieldCheck, Lock, Loader2 } from 'lucide-react';
+import { Send, ShieldCheck, Lock, Loader2, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 type State = 'idle' | 'loading' | 'success' | 'error';
 
@@ -58,48 +59,77 @@ export const AskBox = () => {
       </div>
 
       {/* Answer State */}
-      {state === 'success' && answer ? (
-        <div className="max-w-2xl mx-auto">
-          <div className="bg-white rounded-2xl p-6 border border-pg-rose/20 shadow-sm mb-4">
-            <p className="text-xs font-bold uppercase tracking-widest text-pg-rose mb-3">Your Didi Says 💜</p>
-            <p className="text-pg-gray-700 leading-relaxed whitespace-pre-line">{answer}</p>
-          </div>
-          <button
-            onClick={reset}
-            className="w-full text-sm font-bold text-pg-rose underline underline-offset-4 hover:text-pg-rose-dark"
+      <AnimatePresence mode="wait">
+        {state === 'success' && answer ? (
+          <motion.div 
+            key="success"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="max-w-2xl mx-auto"
           >
-            Ask another question →
-          </button>
-        </div>
-      ) : (
-        <form onSubmit={handleSubmit} className="max-w-2xl mx-auto flex flex-col gap-3">
-          <textarea
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Type your question here... you can be completely honest."
-            className="w-full px-5 py-4 rounded-2xl bg-white border-2 border-white focus:border-pg-rose outline-none text-pg-gray-900 text-base shadow-sm transition-all resize-none"
-            style={{ minHeight: '100px' }}
-            disabled={state === 'loading'}
-          />
-          <button
-            type="submit"
-            disabled={!query.trim() || state === 'loading'}
-            className="w-full md:w-auto md:self-end bg-pg-rose hover:bg-pg-rose-dark disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold px-8 py-3 rounded-xl transition-colors shadow-md active:scale-95 flex items-center justify-center gap-2"
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-pg-rose/20 shadow-xl mb-6 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10">
+                <Sparkles size={40} className="text-pg-rose" />
+              </div>
+              <p className="text-xs font-bold uppercase tracking-widest text-pg-rose mb-4 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-pg-rose animate-pulse" />
+                PurpleGirl Says 💜
+              </p>
+              <p className="text-pg-gray-700 text-lg leading-[1.8] whitespace-pre-line relative z-10 font-medium">
+                {answer}
+              </p>
+            </div>
+            <button
+              onClick={reset}
+              className="w-full text-sm font-bold text-pg-rose underline underline-offset-4 hover:text-pg-rose-dark transition-colors"
+            >
+              Ask another question →
+            </button>
+          </motion.div>
+        ) : (
+          <motion.form 
+            key="form"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onSubmit={handleSubmit} 
+            className="max-w-2xl mx-auto flex flex-col gap-4"
           >
-            {state === 'loading' ? (
-              <><Loader2 size={16} className="animate-spin" /> Getting answer...</>
-            ) : (
-              <>Get My Answer <Send size={14} /></>
-            )}
-          </button>
+            <div className="relative group">
+              <textarea
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Type your question here... be as honest as you need to be."
+                className="w-full px-6 py-5 rounded-2xl bg-white border-2 border-white focus:border-pg-rose outline-none text-pg-gray-900 text-lg shadow-sm transition-all resize-none placeholder:text-pg-gray-300"
+                style={{ minHeight: '140px' }}
+                disabled={state === 'loading'}
+              />
+              <div className="absolute bottom-4 left-6 text-[10px] text-pg-gray-300 font-bold uppercase tracking-widest opacity-0 group-focus-within:opacity-100 transition-opacity">
+                Totally Anonymous 🔒
+              </div>
+            </div>
+            
+            <button
+              type="submit"
+              disabled={!query.trim() || state === 'loading'}
+              className="w-full md:w-auto md:self-end bg-pg-rose hover:bg-pg-rose-dark disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold px-10 py-4 rounded-xl transition-all shadow-lg shadow-pg-rose/20 active:scale-95 flex items-center justify-center gap-2 text-base"
+            >
+              {state === 'loading' ? (
+                <><Loader2 size={20} className="animate-spin" /> Thinking...</>
+              ) : (
+                <>Get My Answer <Send size={18} /></>
+              )}
+            </button>
 
-          {state === 'error' && (
-            <p className="text-sm text-red-500 text-center">
-              Something went wrong. Please try again in a moment. 💜
-            </p>
-          )}
-        </form>
-      )}
+            {state === 'error' && (
+              <p className="text-sm text-red-500 text-center font-medium">
+                I need a moment to think. Please try again. 💜
+              </p>
+            )}
+          </motion.form>
+        )}
+      </AnimatePresence>
 
       <div className="mt-6 flex flex-wrap items-center justify-center gap-2 md:gap-4 text-pg-gray-500 text-xs md:text-sm">
         <div className="flex items-center gap-1"><ShieldCheck size={14} className="text-pg-success" /> No login required.</div>

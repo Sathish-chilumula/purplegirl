@@ -6,6 +6,7 @@ import { ArticleSchemas } from '@/components/seo/ArticleSchemas';
 import { ChevronRight, Lock, AlertTriangle, Sparkles, ChevronDown, Shield } from 'lucide-react';
 import { Metadata } from 'next';
 import AdSenseUnit from '@/components/ads/AdSenseUnit';
+import ProductRecommendation from '@/components/ads/ProductRecommendation';
 import { FeedbackWidget } from '@/components/articles/FeedbackWidget';
 import { SaveGuideButton } from '@/components/articles/SaveGuideButton';
 import { getDictionary } from '@/lib/dictionary';
@@ -326,6 +327,11 @@ export default async function HowToArticlePage({ params }: ArticlePageProps) {
 
                     {/* Ad Slot 2 (after step 3) — hidden until AdSense approved */}
                     {index === 2 && <AdSenseUnit slot="mid-article" className="my-8" />}
+                    
+                    {/* Inject ProductRecommendation after the third step */}
+                    {index === 2 && (
+                      <ProductRecommendation category={article.category} lang={lang} />
+                    )}
                   </div>
                 </div>
               ))}

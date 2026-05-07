@@ -1,4 +1,6 @@
 import { MetadataRoute } from 'next';
+
+export const revalidate = 0; // Force fully dynamic sitemap update
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { getAllWikiSlugs } from '@/lib/wiki-terms';
 import { getAllCompareSlugs } from '@/lib/compare-data';
@@ -41,22 +43,34 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const prefix = lang === 'en' ? '' : `/${lang}`;
 
     for (const page of staticPages) {
+      const alternates: Record<string, string> = {};
+      locales.forEach(l => {
+        alternates[l] = `${SITE_URL}${l === 'en' ? '' : `/${l}`}${page}`;
+      });
+
       sitemapEntries.push({
         url: `${SITE_URL}${prefix}${page}`,
         lastModified: new Date(),
         changeFrequency: page === '' ? 'daily' : 'weekly',
         priority: page === '' ? 1.0 : 0.5,
+        alternates: { languages: alternates },
       });
     }
 
     // Categories for each locale
     if (categories) {
       for (const cat of categories) {
+        const alternates: Record<string, string> = {};
+        locales.forEach(l => {
+          alternates[l] = `${SITE_URL}${l === 'en' ? '' : `/${l}`}/category/${cat.slug}`;
+        });
+
         sitemapEntries.push({
           url: `${SITE_URL}${prefix}/category/${cat.slug}`,
           lastModified: new Date(),
           changeFrequency: 'weekly',
           priority: 0.7,
+          alternates: { languages: alternates },
         });
       }
     }

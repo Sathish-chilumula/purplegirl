@@ -6,16 +6,16 @@ export const runtime = 'edge';
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const SYSTEM_PROMPT = `
-You are "PurpleGirl"—a smart, calm, and trustworthy "elder sister" figure for women and girls.
+You are "PurpleGirl"—a smart, calm, and trustworthy friend for women and girls.
 Your purpose is to provide clear, honest, and judgment-free answers to questions that users may feel uncomfortable asking in real life.
-You are NOT a doctor, therapist, or authority figure. You are a supportive, informed guide.
+You are NOT a doctor, therapist, or authority figure. You are a supportive, informed guide who has been there too.
 
 TONE & STYLE:
 - Warm, calm, and respectful.
 - Honest but not harsh.
 - Slightly bold when needed, but never aggressive.
 - Never shame, blame, or scare the user.
-- Speak like a caring, intelligent older sister.
+- Speak like a caring, intelligent friend.
 
 ANSWER STRUCTURE:
 1. Reassurance: Normalize the question (e.g., "It's completely normal to wonder about this...").
@@ -32,14 +32,18 @@ Output Style: Short paragraphs, easy to read, no jargon, mobile-friendly.
 
 export async function POST(req: Request) {
   try {
-    const { messages } = await req.json();
+    const { messages, context } = await req.json();
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json({ error: 'Invalid messages format' }, { status: 400 });
     }
 
+    const contextualPrompt = context 
+      ? `${SYSTEM_PROMPT}\n\nCONTEXT: The user is currently reading about ${context}. If they ask something general, you can relate it back to this topic if appropriate.`
+      : SYSTEM_PROMPT;
+
     const groqMessages = [
-      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'system', content: contextualPrompt },
       ...messages.map(m => ({
         role: m.role,
         content: m.content

@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 
 // Fast CSS-animated SVG — no network request, renders instantly

@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { X, Send, Sparkles } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -10,18 +11,32 @@ interface Message {
 
 export function FloatingChat() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: 'assistant',
-      content: "Hey girl 💜 I'm PurpleGirl — your anonymous big sister. No topic is too uncomfortable. What's on your mind?",
-    },
-  ]);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+
+  // Detect context from URL
+  const context = useMemo(() => {
+    if (pathname.includes('/how-to/pcos') || pathname.includes('/wiki/pcos')) return 'PCOS';
+    if (pathname.includes('/how-to/periods') || pathname.includes('/tools/period-calculator')) return 'Periods';
+    if (pathname.includes('/how-to/relationships') || pathname.includes('/category/love-relationships')) return 'Relationships';
+    if (pathname.includes('/category/finance-career')) return 'Money & Career';
+    if (pathname.includes('/category/fashion-style')) return 'Fashion';
+    return null;
+  }, [pathname]);
+
+  const [messages, setMessages] = useState<Message[]>([]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const greeting = context 
+      ? `Hey girl 💜 I noticed you're looking into ${context}. I'm here to help you figure it out. Do you have any specific questions?`
+      : "Hey girl 💜 I'm PurpleGirl. I'm here to listen and help with the things you can't ask anyone else. What's on your mind?";
+    
+    setMessages([{ role: 'assistant', content: greeting }]);
+  }, [context]);
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
   }, [messages, isLoading]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,7 +52,10 @@ export function FloatingChat() {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [...messages, { role: 'user', content: userMessage }] }),
+        body: JSON.stringify({ 
+          messages: [...messages, { role: 'user', content: userMessage }],
+          context: context 
+        }),
       });
       const data = await res.json();
       setMessages(prev => [...prev, data.message]);
@@ -145,7 +163,7 @@ export function FloatingChat() {
                   color: 'rgba(255,255,255,0.7)',
                 }}
               >
-                Your Elder Sister · Always Online
+                Real Advice · Always Online
               </div>
             </div>
           </div>

@@ -2,8 +2,8 @@ name: Daily Translate Articles (Hindi + Telugu)
 
 on:
   schedule:
-    # Runs at 4 AM IST every day (22:30 UTC previous day)
-    - cron: '30 22 * * *'
+    # Runs at 2 AM, 10 AM, and 6 PM UTC (7:30 AM, 3:30 PM, 11:30 PM IST)
+    - cron: '0 2,10,18 * * *'
   workflow_dispatch:  # Allow manual trigger
 
 jobs:

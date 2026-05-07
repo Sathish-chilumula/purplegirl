@@ -3,6 +3,7 @@ import { Outfit, Lora } from "next/font/google";
 import "../globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { FloatingChat } from "@/components/FloatingChat";
 import { getDictionary } from "@/lib/dictionary";
 
 const outfit = Outfit({
@@ -61,6 +62,7 @@ export default async function RootLayout(props: {
           {children}
         </main>
         <Footer dict={dict} lang={lang} />
+        <FloatingChat />
         {/* CueLinks JS (Invisible Affiliate Link Converter) */}
         <script dangerouslySetInnerHTML={{
           __html: `

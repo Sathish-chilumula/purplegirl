@@ -13,13 +13,13 @@ interface HeaderProps {
 
 const getTopLinks = (dict: any) => [
   { label: dict.nav_saved, icon: Bookmark, href: '/saved' },
+  { label: dict.nav_stories, icon: MessagesSquare, href: '/stories' },
+  { label: dict.nav_wiki, icon: BookOpen, href: '/wiki/pcos' },
   { label: dict.nav_trending, icon: TrendingUp, href: '/search?q=trending' },
-  { label: dict.nav_qa_feed, icon: MessagesSquare, href: '/questions' },
   { label: dict.nav_quizzes, icon: Flame, href: '/quizzes' },
   { label: dict.nav_ask, icon: HelpCircle, href: '/ask' },
   { label: 'Period Calculator', icon: Calculator, href: '/tools/period-calculator' },
   { label: 'Symptom Checker', icon: Zap, href: '/tools/symptom-checker' },
-  { label: 'Wiki / Glossary', icon: BookOpen, href: '/wiki/pcos' },
 ];
 
 const categoryColumns = [

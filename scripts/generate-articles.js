@@ -68,9 +68,10 @@ async function generateArticle() {
   }
 
   // 2. Pick up to 15 titles from the bank
-  // NOTE: Gemini free tier = 20 req/day. Groq free tier ~14,400 req/day.
-  // Keeping batch at 15 ensures we stay within Gemini quota if Groq falls back.
-  const BATCH_SIZE = 15;
+  // NOTE: Groq free tier = ~14,400 req/day (primary). Gemini fallback only.
+  // gemini-3.1-flash-lite-preview (primary fallback) supports higher RPM than old 2.5-flash-lite.
+  // Batch of 25 is safe — Groq handles all 25, Gemini only kicks in on Groq failures.
+  const BATCH_SIZE = 25;
   const articlesToProcess = bank.splice(0, BATCH_SIZE);
   console.log(`Picked ${articlesToProcess.length} titles for this run.`);
 
@@ -143,7 +144,7 @@ async function generateArticle() {
         generationConfig: { temperature: 0.7 }
       });
 
-      // Cascade: try gemini-3.1-flash-lite-preview first, then gemini-2.5-flash-lite on 503
+      // Cascade: try gemini-3.1-flash-lite-preview first (latest, higher RPM), then gemini-2.5-flash-lite
       const GEMINI_MODELS = ['gemini-3.1-flash-lite-preview', 'gemini-2.5-flash-lite'];
       let geminiSuccess = false;
 
@@ -233,10 +234,9 @@ async function generateArticle() {
     }
 
     // Delay between API calls to avoid rate limits
-    // Use longer delay when using Gemini (free tier: 20 req/day, 2 req/min)
-    if (!isDryRun) {
-      const delay = usedFallback ? 35000 : 2000; // 35s for Gemini (2 rpm limit), 2s for Groq
-      if (usedFallback) console.log(`Using Gemini fallback — waiting ${delay/1000}s to respect rate limits...`);
+      // Groq: 2s delay. Gemini fallback: 15s (gemini-3.1-flash-lite-preview supports ~4 rpm free tier)
+      const delay = usedFallback ? 15000 : 2000;
+      if (usedFallback) console.log(`Using Gemini fallback — waiting ${delay/1000}s between requests...`);
       await new Promise(r => setTimeout(r, delay));
     }
   }

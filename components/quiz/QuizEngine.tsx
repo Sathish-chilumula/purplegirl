@@ -260,11 +260,12 @@ export const QuizEngine = ({ quiz }: QuizEngineProps) => {
 
   // ── RESULT ───────────────────────────────────────────────────────────────────
   if (state === 'result' && result) {
-    const quizUrl = quiz.slug
-      ? `https://purplegirl.in/quiz/${quiz.slug}`
+    const shareUrl = quiz.slug
+      ? `https://purplegirl.in/quiz/${quiz.slug}?resultTitle=${encodeURIComponent(result.title)}&resultEmoji=${encodeURIComponent(result.emoji || '✨')}&resultDesc=${encodeURIComponent(result.description.substring(0, 100))}`
       : 'https://purplegirl.in/quizzes';
+      
     const waText = encodeURIComponent(
-      `💜 I just took "${quiz.title}" on PurpleGirl!\n\nMy result: "${result.title}" ${result.emoji || '✨'}\n\n${result.description.substring(0, 80)}...\n\n→ Take it too: ${quizUrl}`
+      `💜 I just took "${quiz.title}" on PurpleGirl!\n\nMy result: "${result.title}" ${result.emoji || '✨'}\n\n→ Take it too: ${shareUrl}`
     );
 
     return (

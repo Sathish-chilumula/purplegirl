@@ -10,11 +10,12 @@ interface FooterProps {
 }
 
 const getSupport = (dict: any) => [
+  { href: '/stories', label: 'Real Stories' },
+  { href: '/wiki', label: 'Wiki & Glossary' },
+  { href: '/tools/what-should-i-do', label: 'What Should I Do?' },
   { href: '/ask', label: dict.nav_ask },
   { href: '/privacy', label: 'Privacy Policy' },
-  { href: '/terms', label: 'Terms of Use' },
   { href: '/about', label: 'About PurpleGirl' },
-  { href: '/contact', label: 'Contact' },
 ];
 
 export default function Footer({ dict, lang }: FooterProps) {
