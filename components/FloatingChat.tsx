@@ -24,6 +24,9 @@ export function FloatingChat() {
   }, [pathname]);
 
   const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const greeting = context 
