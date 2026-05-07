@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Calendar, Droplets, Heart, Info, ArrowRight } from 'lucide-react';
+import { Calendar, Droplets, Heart, Info, ArrowRight, Share2 } from 'lucide-react';
 import Link from 'next/link';
 
 interface Props {
@@ -41,6 +41,23 @@ export function PeriodCalculatorClient({ dict, lang }: Props) {
     fertileEnd.setDate(fertileEnd.getDate() + 1);
 
     setResults({ nextPeriod, ovulationDate, fertileStart, fertileEnd });
+  };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: labels.hero_title,
+          text: 'I just used this private Period & Ovulation Calculator on PurpleGirl. It is completely anonymous and very easy to use!',
+          url: window.location.href,
+        });
+      } catch (err) {
+        console.error('Error sharing:', err);
+      }
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert('Link copied to clipboard!');
+    }
   };
 
   const locale = lang === 'hi' ? 'hi-IN' : lang === 'te' ? 'te-IN' : 'en-IN';
@@ -173,10 +190,20 @@ export function PeriodCalculatorClient({ dict, lang }: Props) {
 
         {/* Results */}
         {results && (
-          <div className="bg-pg-rose-light rounded-3xl border border-pg-rose/20 p-6 md:p-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <h2 className="font-display text-2xl font-bold text-pg-gray-900 mb-6 text-center">
-              {labels.results_title}
-            </h2>
+          <div className="bg-pg-rose-light rounded-3xl border border-pg-rose/20 p-6 md:p-10 animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
+            <div className="flex justify-center items-center mb-6 relative">
+              <h2 className="font-display text-2xl font-bold text-pg-gray-900 text-center">
+                {labels.results_title}
+              </h2>
+              <button 
+                onClick={handleShare}
+                className="absolute right-0 top-1/2 -translate-y-1/2 p-2 bg-white rounded-full text-pg-rose hover:bg-pg-rose hover:text-white transition-colors shadow-sm"
+                aria-label="Share results"
+                title="Share this tool"
+              >
+                <Share2 size={18} />
+              </button>
+            </div>
 
             <div className="grid sm:grid-cols-2 gap-6 mb-8">
               <div className="bg-white rounded-2xl p-6 text-center shadow-sm">

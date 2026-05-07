@@ -363,6 +363,69 @@ export default async function Home({ params }: HomePageProps) {
       </section>
 
       {/* ━━━━━━━━━━━━━━━━━━━━━━━
+          SECTION 5.5 — Regional Language Section
+          ━━━━━━━━━━━━━━━━━━━━━━━ */}
+      <section className="py-16 px-6 bg-white border-y border-pg-gray-100">
+        <div className="max-w-content mx-auto">
+          <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4 text-center md:text-left">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-pg-rose mb-1">
+                Your Language, Your Safe Space
+              </p>
+              <h2 className="font-display text-[24px] md:text-[32px] font-bold text-pg-gray-900 leading-tight">
+                PurpleGirl speaks your language
+              </h2>
+            </div>
+            <div className="hidden md:block">
+              <span className="text-4xl">🇮🇳</span>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            {/* Hindi Card */}
+            <Link href="/hi" className="group">
+              <Card className="p-6 md:p-8 flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 hover:border-[#FF9933] transition-all duration-300">
+                <div className="bg-[#FF9933]/10 text-[#FF9933] w-16 h-16 rounded-2xl flex items-center justify-center font-display text-2xl font-bold group-hover:scale-110 transition-transform">
+                  अ
+                </div>
+                <div className="text-center md:text-left flex-1">
+                  <h3 className="font-display font-bold text-xl text-pg-gray-900 mb-2 group-hover:text-[#FF9933] transition-colors">
+                    हिंदी में पढ़ें
+                  </h3>
+                  <p className="text-pg-gray-500 text-sm mb-4">
+                    महिलाओं का स्वास्थ्य, रिश्ते और कानूनी अधिकारों पर विश्वसनीय जानकारी।
+                  </p>
+                  <span className="inline-flex items-center text-sm font-bold text-[#FF9933]">
+                    Explore Hindi Guides →
+                  </span>
+                </div>
+              </Card>
+            </Link>
+
+            {/* Telugu Card */}
+            <Link href="/te" className="group">
+              <Card className="p-6 md:p-8 flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 hover:border-[#138808] transition-all duration-300">
+                <div className="bg-[#138808]/10 text-[#138808] w-16 h-16 rounded-2xl flex items-center justify-center font-display text-2xl font-bold group-hover:scale-110 transition-transform">
+                  అ
+                </div>
+                <div className="text-center md:text-left flex-1">
+                  <h3 className="font-display font-bold text-xl text-pg-gray-900 mb-2 group-hover:text-[#138808] transition-colors">
+                    తెలుగులో చదవండి
+                  </h3>
+                  <p className="text-pg-gray-500 text-sm mb-4">
+                    మహిళల ఆరోగ్యం, సంబంధాలు మరియు చట్టపరమైన హక్కులపై నమ్మకమైన సమాచారం.
+                  </p>
+                  <span className="inline-flex items-center text-sm font-bold text-[#138808]">
+                    Explore Telugu Guides →
+                  </span>
+                </div>
+              </Card>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━
           SECTION 6 — Emotional Private CTA
           ━━━━━━━━━━━━━━━━━━━━━━━ */}
       <section className="py-16 px-6 bg-gradient-to-br from-pg-plum via-pg-plum/90 to-rose-900 text-white">
