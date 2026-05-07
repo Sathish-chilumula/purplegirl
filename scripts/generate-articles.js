@@ -234,6 +234,7 @@ async function generateArticle() {
     }
 
     // Delay between API calls to avoid rate limits
+    if (!isDryRun) {
       // Groq: 2s delay. Gemini fallback: 15s (gemini-3.1-flash-lite-preview supports ~4 rpm free tier)
       const delay = usedFallback ? 15000 : 2000;
       if (usedFallback) console.log(`Using Gemini fallback — waiting ${delay/1000}s between requests...`);
