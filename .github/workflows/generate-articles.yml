@@ -48,9 +48,7 @@ jobs:
           git add -A
           if ! git diff --staged --quiet; then
             git commit -m "chore: add trending article titles [$(date +'%Y-%m-%d %H:%M')] [skip ci]"
-            git checkout .
-            git clean -fd
-            git pull --rebase
+            git pull --rebase --autostash
             git push
           fi
 
@@ -95,8 +93,6 @@ jobs:
           git add -A
           if ! git diff --staged --quiet; then
             git commit -m "chore: update titles bank after article generation [$(date +'%Y-%m-%d %H:%M')] [skip ci]"
-            git checkout .
-            git clean -fd
-            git pull --rebase
+            git pull --rebase --autostash
             git push
           fi
