@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 
-export const revalidate = 0; // Force fully dynamic sitemap update
+export const revalidate = 0;
+export const dynamic = 'force-dynamic';
 export const runtime = 'edge';
 
 import { supabaseAdmin } from '@/lib/supabase-admin';
@@ -12,11 +13,14 @@ const SITE_URL = 'https://purplegirl.in';
 const locales = ['en', 'hi', 'te', 'bn', 'mr', 'ta', 'gu'];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // 1. Fetch all articles
-  const { data: articles } = await supabaseAdmin
+  const { data: articles, error: articlesError } = await supabaseAdmin
     .from('articles')
     .select('slug, language, published_at, created_at')
     .eq('is_published', true);
+
+  if (articlesError) {
+    console.error('Sitemap: Error fetching articles:', articlesError);
+  }
 
   // 2. Fetch all categories
   const { data: categories } = await supabaseAdmin
