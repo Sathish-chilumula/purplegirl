@@ -29,7 +29,7 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Run title population script
         env:
@@ -41,8 +41,8 @@ jobs:
         run: |
           git config --global user.name "PurpleGirl Bot"
           git config --global user.email "bot@purplegirl.in"
-          git add scripts/titles-bank.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: add trending article titles [$(date +'%Y-%m-%d %H:%M')] [skip ci]" && git pull --rebase && git push)
+          git add .
+          git diff --staged --quiet || (git commit -m "chore: add trending article titles [$(date +'%Y-%m-%d %H:%M')] [skip ci]" && git pull --rebase --autostash && git push)
 
   # ── Job 2: Generate articles from the titles bank ────────────────────────────
   # Runs after populate-titles on the 13:00 UTC trigger.
@@ -63,7 +63,7 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Run article generation script (batch of 25)
         env:
@@ -79,5 +79,5 @@ jobs:
         run: |
           git config --global user.name "PurpleGirl Bot"
           git config --global user.email "bot@purplegirl.in"
-          git add scripts/titles-bank.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: update titles bank after article generation [$(date +'%Y-%m-%d %H:%M')] [skip ci]" && git pull --rebase && git push)
+          git add .
+          git diff --staged --quiet || (git commit -m "chore: update titles bank after article generation [$(date +'%Y-%m-%d %H:%M')] [skip ci]" && git pull --rebase --autostash && git push)
