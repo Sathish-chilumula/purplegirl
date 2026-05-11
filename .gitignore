@@ -6,3 +6,9 @@ coverage/
 .env*
 !.env.example
 scratch/
+tsc_out.txt
+tsconfig.tsbuildinfo
+.next/
+.turbo/
+dist/
+build/

@@ -39,13 +39,7 @@ jobs:
         run: |
           git config --global user.name "PurpleGirl Bot"
           git config --global user.email "bot@purplegirl.in"
-          git config core.autocrlf false
-          git config core.filemode false
-          git add -A
-          if ! git diff --staged --quiet; then
-            git commit -m "chore: update quiz titles bank after generation [skip ci]"
-            git checkout .
-            git clean -fd
-            git pull --rebase
-            git push
-          fi
+          git add .
+          git commit -m "chore: update quiz titles bank after generation [skip ci]" || echo "No changes to commit"
+          git pull --rebase --autostash origin main
+          git push origin main
