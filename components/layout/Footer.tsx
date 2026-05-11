@@ -15,6 +15,9 @@ const getSupport = (dict: any) => [
   { href: '/tools/what-should-i-do', label: 'What Should I Do?' },
   { href: '/ask', label: dict.nav_ask },
   { href: '/privacy', label: 'Privacy Policy' },
+  { href: '/terms', label: 'Terms of Service' },
+  { href: '/disclaimer', label: 'Disclaimer' },
+  { href: '/contact', label: 'Contact Us' },
   { href: '/about', label: 'About PurpleGirl' },
 ];
 
