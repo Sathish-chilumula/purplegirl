@@ -15,7 +15,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 1. Fetch all articles
   const { data: articles } = await supabaseAdmin
     .from('articles')
-    .select('slug, language, updated_at, created_at')
+    .select('slug, language, published_at, created_at')
     .eq('is_published', true);
 
   // 2. Fetch all categories
@@ -85,7 +85,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const prefix = lang === 'en' ? '' : `/${lang}`;
       sitemapEntries.push({
         url: `${SITE_URL}${prefix}/how-to/${article.slug}`,
-        lastModified: new Date(article.updated_at || article.created_at),
+        lastModified: new Date(article.published_at || article.created_at),
         changeFrequency: 'monthly',
         priority: 0.8,
       });
