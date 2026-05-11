@@ -46,7 +46,13 @@ jobs:
           git config core.autocrlf false
           git config core.filemode false
           git add -A
-          git diff --staged --quiet || (git commit -m "chore: add trending article titles [$(date +'%Y-%m-%d %H:%M')] [skip ci]" && git pull --rebase --autostash && git push)
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: add trending article titles [$(date +'%Y-%m-%d %H:%M')] [skip ci]"
+            git checkout .
+            git clean -fd
+            git pull --rebase
+            git push
+          fi
 
   # ── Job 2: Generate articles from the titles bank ────────────────────────────
   # Runs after populate-titles on the 13:00 UTC trigger.
@@ -87,4 +93,10 @@ jobs:
           git config core.autocrlf false
           git config core.filemode false
           git add -A
-          git diff --staged --quiet || (git commit -m "chore: update titles bank after article generation [$(date +'%Y-%m-%d %H:%M')] [skip ci]" && git pull --rebase --autostash && git push)
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: update titles bank after article generation [$(date +'%Y-%m-%d %H:%M')] [skip ci]"
+            git checkout .
+            git clean -fd
+            git pull --rebase
+            git push
+          fi

@@ -42,4 +42,10 @@ jobs:
           git config core.autocrlf false
           git config core.filemode false
           git add -A
-          git diff --staged --quiet || (git commit -m "chore: update quiz titles bank after generation [skip ci]" && git pull --rebase --autostash && git push)
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: update quiz titles bank after generation [skip ci]"
+            git checkout .
+            git clean -fd
+            git pull --rebase
+            git push
+          fi
