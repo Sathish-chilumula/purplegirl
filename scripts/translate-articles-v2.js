@@ -242,7 +242,7 @@ async function translateArticles() {
     .select('*', { count: 'exact', head: true })
     .eq('is_published', true)
     .eq('language', 'en')
-    .gte('reading_time_mins', 4); // Eligible for translation
+    .eq('is_seo_optimized', true); // ONLY translate fully SEO optimized articles
 
   const { count: translatedCount } = await supabase
     .from('articles')
@@ -258,15 +258,14 @@ async function translateArticles() {
   console.log(`✅ Completed Translations:     ${translatedCount || 0} pages`);
   console.log(`⏳ Pending Translations:       ~${pendingCount} pages\n`);
 
-  // Fetch recent English articles, best quality first (longest reading time = most content)
-  const ARTICLES_PER_RUN = 5; // 5 articles × 6 langs = 30 AI calls per run
+  // Fetch recent English articles that are officially SEO Optimized
+  const ARTICLES_PER_RUN = 10; // 10 articles × 6 langs = 60 AI calls per run
   const { data: englishArticles, error } = await supabase
     .from('articles')
     .select('id, slug, title, category, subcategory, meta_description, intro, expert_tip, content_json, reading_time_mins')
     .eq('language', 'en')
     .eq('is_published', true)
-    .gte('reading_time_mins', 4) // Only translate high-quality articles (4+ min = ~800+ words)
-    .order('reading_time_mins', { ascending: false })
+    .eq('is_seo_optimized', true) // Only translate SEO Optimized articles
     .order('published_at', { ascending: false })
     .limit(ARTICLES_PER_RUN);
 
