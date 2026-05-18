@@ -5,6 +5,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { FloatingChat } from "@/components/FloatingChat";
 import { getDictionary } from "@/lib/dictionary";
+import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -55,20 +56,7 @@ export default async function RootLayout(props: {
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3809505002238691"
           crossOrigin="anonymous"
         ></script>
-        {/* Subscribe with Google */}
-        <script async src="https://news.google.com/swg/js/v1/swg-basic.js"></script>
-        <script dangerouslySetInnerHTML={{
-          __html: `
-            (self.SWG_BASIC = self.SWG_BASIC || []).push( basicSubscriptions => {
-              basicSubscriptions.init({
-                type: "NewsArticle",
-                isPartOfType: ["Product"],
-                isPartOfProductId: "CAow9sTGDA:openaccess",
-                clientOptions: { theme: "light", lang: "en" },
-              });
-            });
-          `
-        }} />
+        {/* Subscribe with Google removed per request */}
       </head>
       <body className="antialiased font-sans">
         <Header dict={dict} lang={lang} />
@@ -77,6 +65,7 @@ export default async function RootLayout(props: {
         </main>
         <Footer dict={dict} lang={lang} />
         <FloatingChat />
+        <PWAInstallPrompt />
         {/* CueLinks JS (Invisible Affiliate Link Converter) */}
         <script dangerouslySetInnerHTML={{
           __html: `

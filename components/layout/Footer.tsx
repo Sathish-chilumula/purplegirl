@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Heart, ShieldCheck, Globe } from 'lucide-react';
+import { InstallFooterButton } from '@/components/PWAInstallPrompt';
 
 interface FooterProps {
   dict: any;
@@ -26,10 +27,14 @@ export default function Footer({ dict, lang }: FooterProps) {
   const pathname = usePathname();
   const router = useRouter();
 
-  const changeLanguage = (newLang: string) => {
+  const currentPath = pathname.replace(/^\/(hi|te|bn|mr|ta|gu)/, '') || '/';
+  
+  const getLangLink = (newLang: string) => {
+    return newLang === 'en' ? currentPath : `/${newLang}${currentPath}`;
+  };
+  
+  const handleLanguageClick = (newLang: string) => {
     document.cookie = `NEXT_LOCALE=${newLang}; path=/; max-age=31536000`;
-    const currentPath = pathname.replace(/^\/(hi|te|en)/, '') || '/';
-    router.push(newLang === 'en' ? currentPath : `/${newLang}${currentPath}`);
   };
   
   return (
@@ -78,28 +83,30 @@ export default function Footer({ dict, lang }: FooterProps) {
               <Globe size={14} /> Language / भाषा
             </h4>
             <div className="flex flex-col gap-3">
-              <button onClick={() => changeLanguage('en')} className={`text-left text-sm transition-colors flex items-center gap-3 ${lang === 'en' ? 'text-pg-rose font-bold' : 'text-white/50 hover:text-white'}`}>
+              <Link href={getLangLink('en')} onClick={() => handleLanguageClick('en')} className={`text-left text-sm transition-colors flex items-center gap-3 ${lang === 'en' ? 'text-pg-rose font-bold' : 'text-white/50 hover:text-white'}`}>
                 <span className="text-base">🇺🇸</span> English (Default)
-              </button>
-              <button onClick={() => changeLanguage('hi')} className={`text-left text-sm transition-colors flex items-center gap-3 ${lang === 'hi' ? 'text-pg-rose font-bold' : 'text-white/50 hover:text-white'}`}>
+              </Link>
+              <Link href={getLangLink('hi')} onClick={() => handleLanguageClick('hi')} className={`text-left text-sm transition-colors flex items-center gap-3 ${lang === 'hi' ? 'text-pg-rose font-bold' : 'text-white/50 hover:text-white'}`}>
                 <span className="text-base">🇮🇳</span> हिन्दी (Hindi)
-              </button>
-              <button onClick={() => changeLanguage('te')} className={`text-left text-sm transition-colors flex items-center gap-3 ${lang === 'te' ? 'text-pg-rose font-bold' : 'text-white/50 hover:text-white'}`}>
+              </Link>
+              <Link href={getLangLink('te')} onClick={() => handleLanguageClick('te')} className={`text-left text-sm transition-colors flex items-center gap-3 ${lang === 'te' ? 'text-pg-rose font-bold' : 'text-white/50 hover:text-white'}`}>
                 <span className="text-base">🇮🇳</span> తెలుగు (Telugu)
-              </button>
-              <button onClick={() => changeLanguage('bn')} className={`text-left text-sm transition-colors flex items-center gap-3 ${lang === 'bn' ? 'text-pg-rose font-bold' : 'text-white/50 hover:text-white'}`}>
+              </Link>
+              <Link href={getLangLink('bn')} onClick={() => handleLanguageClick('bn')} className={`text-left text-sm transition-colors flex items-center gap-3 ${lang === 'bn' ? 'text-pg-rose font-bold' : 'text-white/50 hover:text-white'}`}>
                 <span className="text-base">🇮🇳</span> বাংলা (Bengali)
-              </button>
-              <button onClick={() => changeLanguage('mr')} className={`text-left text-sm transition-colors flex items-center gap-3 ${lang === 'mr' ? 'text-pg-rose font-bold' : 'text-white/50 hover:text-white'}`}>
+              </Link>
+              <Link href={getLangLink('mr')} onClick={() => handleLanguageClick('mr')} className={`text-left text-sm transition-colors flex items-center gap-3 ${lang === 'mr' ? 'text-pg-rose font-bold' : 'text-white/50 hover:text-white'}`}>
                 <span className="text-base">🇮🇳</span> मराठी (Marathi)
-              </button>
-              <button onClick={() => changeLanguage('ta')} className={`text-left text-sm transition-colors flex items-center gap-3 ${lang === 'ta' ? 'text-pg-rose font-bold' : 'text-white/50 hover:text-white'}`}>
+              </Link>
+              <Link href={getLangLink('ta')} onClick={() => handleLanguageClick('ta')} className={`text-left text-sm transition-colors flex items-center gap-3 ${lang === 'ta' ? 'text-pg-rose font-bold' : 'text-white/50 hover:text-white'}`}>
                 <span className="text-base">🇮🇳</span> தமிழ் (Tamil)
-              </button>
-              <button onClick={() => changeLanguage('gu')} className={`text-left text-sm transition-colors flex items-center gap-3 ${lang === 'gu' ? 'text-pg-rose font-bold' : 'text-white/50 hover:text-white'}`}>
+              </Link>
+              <Link href={getLangLink('gu')} onClick={() => handleLanguageClick('gu')} className={`text-left text-sm transition-colors flex items-center gap-3 ${lang === 'gu' ? 'text-pg-rose font-bold' : 'text-white/50 hover:text-white'}`}>
                 <span className="text-base">🇮🇳</span> ગુજરાતી (Gujarati)
-              </button>
+              </Link>
             </div>
+            
+            <InstallFooterButton />
           </div>
         </div>
 

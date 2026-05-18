@@ -265,7 +265,7 @@ async function translateArticles() {
     .select('id, slug, title, category, subcategory, meta_description, intro, expert_tip, content_json, reading_time_mins')
     .eq('language', 'en')
     .eq('is_published', true)
-    .gte('reading_time_mins', 4) // Only translate quality articles (4+ min = ~800+ words)
+    .gte('reading_time_mins', 4) // Only translate high-quality articles (4+ min = ~800+ words)
     .order('reading_time_mins', { ascending: false })
     .order('published_at', { ascending: false })
     .limit(ARTICLES_PER_RUN);

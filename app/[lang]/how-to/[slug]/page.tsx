@@ -15,12 +15,10 @@ import { Card } from '@/components/ui/Card';
 import { OtherWomenAsked } from '@/components/articles/OtherWomenAsked';
 import { LeadCaptureWidget } from '@/components/articles/LeadCaptureWidget';
 
-// NOTE: NO 'export const runtime = edge' here.
-// Removing edge runtime enables generateStaticParams (SSG).
-// Cloudflare Pages will pre-build every article as a static HTML file.
-// New articles added after build are served dynamically until next deploy.
-export const dynamicParams = true; // Allow dynamic rendering for new slugs not yet pre-built
-export const revalidate = 3600;   // Re-validate cached pages every 1 hour as fallback
+// Restored edge runtime for Cloudflare Pages dynamic rendering compatibility
+export const runtime = 'edge';
+export const dynamicParams = true;
+export const revalidate = 3600;
 
 async function getArticleData(slug: string, lang: string) {
   // Try to find exact slug match first (e.g., if they navigated to 'my-guide-hi' directly)
