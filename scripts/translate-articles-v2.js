@@ -265,7 +265,7 @@ async function translateArticles() {
   console.log(`⏳ Pending Translations:       ~${pendingCount} pages\n`);
 
   // Fetch recent English articles that are officially SEO Optimized
-  const ARTICLES_PER_RUN = 50; // 50 articles × 6 langs = 300 AI calls per run (approx 25 mins)
+  const ARTICLES_PER_RUN = 20; // 20 articles × 6 langs = 120 AI calls per run
   const { data: englishArticles, error } = await supabase
     .from('articles')
     .select('id, slug, title, category, subcategory, meta_description, intro, expert_tip, content_json, reading_time_mins')
