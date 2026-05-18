@@ -1,0 +1,57 @@
+name: Automated Pinterest Publishing
+
+on:
+  schedule:
+    # Job 1: Generate Pins (Every 4 hours)
+    # 2 AM, 6 AM, 10 AM, 2 PM, 6 PM, 10 PM UTC
+    - cron: '0 2,6,10,14,18,22 * * *'
+    
+    # Job 2: Publish Pins (Every hour on the half hour)
+    # e.g. 1:30, 2:30, 3:30
+    - cron: '30 * * * *'
+
+  workflow_dispatch:
+    inputs:
+      job_type:
+        description: 'Which script to run? (generate or publish)'
+        required: true
+        default: 'publish'
+
+permissions:
+  contents: write
+
+jobs:
+  run-pinterest-automation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Execute Generate Script if it's the 4-hour cron OR manual 'generate'
+      - name: Generate Pins (Satori/Resvg)
+        if: "github.event_name == 'schedule' && (github.event.schedule == '0 2,6,10,14,18,22 * * *') || (github.event_name == 'workflow_dispatch' && github.event.inputs.job_type == 'generate')"
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/generate-pins.js
+
+      # Execute Publish Script if it's the hourly cron OR manual 'publish'
+      - name: Publish to Pinterest
+        if: "github.event_name == 'schedule' && (github.event.schedule == '30 * * * *') || (github.event_name == 'workflow_dispatch' && github.event.inputs.job_type == 'publish')"
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          PINTEREST_ACCESS_TOKEN: ${{ secrets.PINTEREST_ACCESS_TOKEN }}
+          PINTEREST_BOARD_ID: ${{ secrets.PINTEREST_BOARD_ID }}
+        run: node scripts/post-to-pinterest.js

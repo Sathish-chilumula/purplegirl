@@ -54,7 +54,7 @@ async function main() {
     .select('id, title, slug, language, pin_image_url, meta_description')
     .not('pin_image_url', 'is', null)
     .is('pinterest_id', null)
-    .limit(5); // Small batch for testing
+    .limit(10); // Publish 10 pins per run (per hour)
 
   if (error) {
     console.error('Error fetching articles:', error);

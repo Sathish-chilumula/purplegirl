@@ -209,7 +209,9 @@ async function main() {
   const { data: articles, error } = await supabase
     .from('articles')
     .select('id, title, slug, category, language')
-    .limit(3); // Re-process 3 to show the difference
+    .is('pin_image_url', null) // Only process articles that don't have a pin yet
+    .order('published_at', { ascending: false })
+    .limit(50); // Process 50 per run
 
   for (const article of articles) {
     const publicUrl = await generatePin(article);
