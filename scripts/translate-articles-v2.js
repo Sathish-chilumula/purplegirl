@@ -20,56 +20,62 @@ const TARGET_LANGUAGES = [
   {
     code: 'hi',
     name: 'Hindi',
-    region: 'North India (Delhi, UP, MP, Rajasthan, Bihar, Jharkhand)',
-    searchStyle: 'Hinglish — mix of Hindi and English words as typed on Indian phones. Women search in Hinglish, not pure Hindi.',
-    exampleSearch: '"pcos symptoms kya hota hai", "husband se baat kaise kare", "pregnancy mein kya khaye"',
-    tone: 'Warm, conversational Hinglish — like a close friend speaking. Use everyday words, not formal Sanskrit-heavy Hindi.',
-    slug_style: 'Romanized Hinglish slug e.g. pcos-symptoms-kya-hote-hain or thyroid-ke-lakshan-hindi'
+    region: 'North India',
+    script: 'Devanagari script (e.g., नमस्ते)',
+    searchStyle: 'Conversational Hindi with English words, but EVERYTHING MUST BE WRITTEN IN DEVANAGARI SCRIPT.',
+    exampleSearch: '"PCOS के लक्षण", "हस्बैंड से बात कैसे करें", "प्रेगनेंसी में क्या खाएं"',
+    tone: 'Warm, conversational. Use everyday words written in Devanagari, not formal Sanskrit-heavy Hindi.',
+    slug_style: 'Romanized Hinglish slug (ENGLISH LETTERS ONLY) e.g. pcos-symptoms-hindi'
   },
   {
     code: 'te',
     name: 'Telugu',
-    region: 'Andhra Pradesh and Telangana (Hyderabad, Vijayawada, Tirupati)',
-    searchStyle: 'Tanglish — Telugu mixed with English. Modern Telugu women type in Roman script with English words mixed in.',
-    exampleSearch: '"pcos symptoms in telugu", "husband tho ela matladadam", "pregnancy lo em tinavali"',
-    tone: 'Friendly, conversational Tanglish — not formal Granthika Telugu. Use everyday Hyderabadi/Andhra expressions.',
-    slug_style: 'Romanized Telugu/Tanglish slug e.g. pcos-symptoms-telugu-lo or thyroid-lakshyalu-telugu'
+    region: 'Andhra Pradesh and Telangana',
+    script: 'Telugu script (e.g., నమస్కారం)',
+    searchStyle: 'Conversational Telugu mixed with English words, but EVERYTHING MUST BE WRITTEN IN TELUGU SCRIPT.',
+    exampleSearch: '"PCOS లక్షణాలు", "భర్తతో ఎలా మాట్లాడాలి", "ప్రెగ్నెన్సీ లో ఏం తినాలి"',
+    tone: 'Friendly, conversational. Use everyday Telugu expressions written in Telugu script.',
+    slug_style: 'Romanized Telugu slug (ENGLISH LETTERS ONLY) e.g. pcos-symptoms-telugu'
   },
   {
     code: 'bn',
     name: 'Bengali',
-    region: 'West Bengal and Bangladesh (Kolkata, Dhaka)',
-    searchStyle: 'Banglish — Bengali mixed with English, especially for health and tech terms.',
-    exampleSearch: '"pcos er lakkhon", "sami r sathe kothay bolar upay", "pregnancy te ki khete hoy"',
-    tone: 'Warm, modern Kolkata-style Bengali — not overly formal. Use common Banglish expressions women use daily.',
-    slug_style: 'Romanized Bengali slug e.g. pcos-er-lakkhan-bangla or thyroid-er-somossa-bangla'
+    region: 'West Bengal',
+    script: 'Bengali script (e.g., নমস্কার)',
+    searchStyle: 'Conversational Bengali mixed with English words, but EVERYTHING MUST BE WRITTEN IN BENGALI SCRIPT.',
+    exampleSearch: '"PCOS এর লক্ষণ", "স্বামীর সাথে কীভাবে কথা বলব", "প্রেগন্যান্সিতে কী খাবেন"',
+    tone: 'Warm, modern Kolkata-style Bengali. Use common expressions written in Bengali script.',
+    slug_style: 'Romanized Bengali slug (ENGLISH LETTERS ONLY) e.g. pcos-er-lakkhan-bangla'
   },
   {
     code: 'mr',
     name: 'Marathi',
-    region: 'Maharashtra (Mumbai, Pune, Nashik, Nagpur)',
-    searchStyle: 'Modern Marathi mixed with English — Mumbai/Pune style. Women search in casual Marathi, not literary Marathi.',
-    exampleSearch: '"pcos che lakshane", "navarasheshi kasa bolayche", "pregnancy madhe kay khayche"',
-    tone: 'Casual, warm Marathi — Mumbai/Pune style. Use everyday expressions, not classical Marathi. Mix English words naturally.',
-    slug_style: 'Romanized Marathi slug e.g. pcos-che-lakshan-marathi or thyroid-chi-lakshane-marathi'
+    region: 'Maharashtra',
+    script: 'Devanagari script (e.g., नमस्कार)',
+    searchStyle: 'Conversational Marathi mixed with English words, but EVERYTHING MUST BE WRITTEN IN DEVANAGARI SCRIPT.',
+    exampleSearch: '"PCOS ची लक्षणे", "नवऱ्याशी कसं बोलायचं", "प्रेग्नेंसी मध्ये काय खायचं"',
+    tone: 'Casual, warm Marathi. Use everyday expressions written in Devanagari script.',
+    slug_style: 'Romanized Marathi slug (ENGLISH LETTERS ONLY) e.g. pcos-che-lakshan-marathi'
   },
   {
     code: 'ta',
     name: 'Tamil',
-    region: 'Tamil Nadu and Sri Lanka Tamils (Chennai, Coimbatore, Madurai)',
-    searchStyle: 'Tanglish Tamil — Tamil words written in English letters, mixed with English terms for health/tech.',
-    exampleSearch: '"pcos symptoms tamil", "kaanavali arikurigal", "pregnancy la enna saapidanum"',
-    tone: 'Warm, conversational Chennai/Coimbatore Tamil — not Sangam literature style. Natural modern Tamil women speak.',
-    slug_style: 'Romanized Tamil slug e.g. pcos-arikurigal-tamil or thyroid-anru-tamil'
+    region: 'Tamil Nadu',
+    script: 'Tamil script (e.g., வணக்கம்)',
+    searchStyle: 'Conversational Tamil mixed with English words, but EVERYTHING MUST BE WRITTEN IN TAMIL SCRIPT.',
+    exampleSearch: '"PCOS அறிகுறிகள்", "கணவரிடம் எப்படி பேசுவது", "கர்ப்ப காலத்தில் என்ன சாப்பிட வேண்டும்"',
+    tone: 'Warm, conversational Chennai-style Tamil. Written entirely in Tamil script.',
+    slug_style: 'Romanized Tamil slug (ENGLISH LETTERS ONLY) e.g. pcos-arikurigal-tamil'
   },
   {
     code: 'gu',
     name: 'Gujarati',
-    region: 'Gujarat (Ahmedabad, Surat, Vadodara, Rajkot)',
-    searchStyle: 'Modern Gujarati mixed with Hindi and English. Gujarat women search in casual Gujarati-Hinglish.',
-    exampleSearch: '"pcos na lakshan", "pati sathe vaat kevi rite karvi", "pregnancy ma shu khavu"',
-    tone: 'Warm, practical Gujarati — Ahmedabad/Surat style. Use everyday Gujarati, not archaic forms. Mix common English words.',
-    slug_style: 'Romanized Gujarati slug e.g. pcos-na-lakshan-gujarati or thyroid-na-lakshan-gujarati'
+    region: 'Gujarat',
+    script: 'Gujarati script (e.g., નમસ્તે)',
+    searchStyle: 'Conversational Gujarati mixed with English words, but EVERYTHING MUST BE WRITTEN IN GUJARATI SCRIPT.',
+    exampleSearch: '"PCOS ના લક્ષણો", "પતિ સાથે કેવી રીતે વાત કરવી", "પ્રેગ્નેન્સી માં શું ખાવું"',
+    tone: 'Warm, practical Gujarati. Written entirely in Gujarati script.',
+    slug_style: 'Romanized Gujarati slug (ENGLISH LETTERS ONLY) e.g. pcos-na-lakshan-gujarati'
   }
 ];
 
@@ -82,10 +88,10 @@ function buildPrompt(lang) {
     '- Search style: ' + lang.searchStyle + '\n' +
     '- Example searches: ' + lang.exampleSearch + '\n' +
     '- Tone: ' + lang.tone + '\n\n' +
-    'CRITICAL RULES:\n' +
-    '1. Write how women in ' + lang.region + ' actually talk — not like a translation\n' +
-    '2. Keep medical/legal terms in English (PCOS, thyroid, IVF, FIR, etc.) — women search these in English\n' +
-    '3. Keep brand names in English (Amazon, Flipkart, Menstrupedia, etc.)\n' +
+    'CRITICAL RULES FOR NATIVE SCRIPT:\n' +
+    '1. ALL text MUST be written in the native ' + lang.script + '. Do NOT write the article in English letters (Latin/Roman script).\n' +
+    '2. You can use English words (like PCOS, IVF) but write the rest of the sentence in ' + lang.script + '.\n' +
+    '3. Keep brand names in English (Amazon, Flipkart) or transcribe them into the native script.\n' +
     '4. Adapt food/city/cultural references to ' + lang.region + ' specifically\n' +
     '5. Each step body: 120+ words minimum\n' +
     '6. Total adapted content: 1000+ words\n' +
