@@ -46,7 +46,7 @@ export default function ContactPage() {
             <div className="flex-grow border-t border-pg-gray-100"></div>
           </div>
 
-          <form action="https://formspree.io/f/YOUR_FORMSPREE_URL" method="POST" className="space-y-6 mt-6">
+          <form action="mailto:hello@purplegirl.in" method="POST" encType="text/plain" className="space-y-6 mt-6">
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>

@@ -42,43 +42,43 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const sitemapEntries: MetadataRoute.Sitemap = [];
 
-  // Static Pages for each locale
-  const staticPages = ['', '/about', '/quizzes', '/contact', '/questions', '/tools/period-calculator', '/tools/symptom-checker', '/experts'];
+  // Static Pages — English canonical only.
+  // These pages do NOT have translated content so we only include the English URL.
+  // Adding /hi/about, /te/privacy etc. causes duplicate content (they serve English via middleware).
+  const staticPages = [
+    { path: '', priority: 1.0, freq: 'daily' as const },
+    { path: '/about', priority: 0.7, freq: 'monthly' as const },
+    { path: '/quizzes', priority: 0.7, freq: 'weekly' as const },
+    { path: '/contact', priority: 0.5, freq: 'monthly' as const },
+    { path: '/questions', priority: 0.7, freq: 'weekly' as const },
+    { path: '/tools/period-calculator', priority: 0.8, freq: 'monthly' as const },
+    { path: '/tools/symptom-checker', priority: 0.8, freq: 'monthly' as const },
+    { path: '/experts', priority: 0.6, freq: 'monthly' as const },
+    { path: '/privacy', priority: 0.3, freq: 'monthly' as const },
+    { path: '/terms', priority: 0.3, freq: 'monthly' as const },
+    { path: '/disclaimer', priority: 0.3, freq: 'monthly' as const },
+  ];
 
-  for (const lang of locales) {
-    const prefix = lang === 'en' ? '' : `/${lang}`;
+  for (const page of staticPages) {
+    sitemapEntries.push({
+      url: `${SITE_URL}${page.path}`,
+      lastModified: new Date(),
+      changeFrequency: page.freq,
+      priority: page.priority,
+      alternates: { languages: { 'x-default': `${SITE_URL}${page.path}`, 'en': `${SITE_URL}${page.path}` } },
+    });
+  }
 
-    for (const page of staticPages) {
-      const alternates: Record<string, string> = {};
-      locales.forEach(l => {
-        alternates[l] = `${SITE_URL}${l === 'en' ? '' : `/${l}`}${page}`;
-      });
-
+  // Categories — English only (no translated category pages exist)
+  if (categories) {
+    for (const cat of categories) {
       sitemapEntries.push({
-        url: `${SITE_URL}${prefix}${page}`,
+        url: `${SITE_URL}/category/${cat.slug}`,
         lastModified: new Date(),
-        changeFrequency: page === '' ? 'daily' : 'weekly',
-        priority: page === '' ? 1.0 : 0.5,
-        alternates: { languages: alternates },
+        changeFrequency: 'weekly',
+        priority: 0.7,
+        alternates: { languages: { 'en': `${SITE_URL}/category/${cat.slug}` } },
       });
-    }
-
-    // Categories for each locale
-    if (categories) {
-      for (const cat of categories) {
-        const alternates: Record<string, string> = {};
-        locales.forEach(l => {
-          alternates[l] = `${SITE_URL}${l === 'en' ? '' : `/${l}`}/category/${cat.slug}`;
-        });
-
-        sitemapEntries.push({
-          url: `${SITE_URL}${prefix}/category/${cat.slug}`,
-          lastModified: new Date(),
-          changeFrequency: 'weekly',
-          priority: 0.7,
-          alternates: { languages: alternates },
-        });
-      }
     }
   }
 

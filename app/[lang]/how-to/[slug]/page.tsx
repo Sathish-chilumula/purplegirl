@@ -15,7 +15,12 @@ import { Card } from '@/components/ui/Card';
 import { OtherWomenAsked } from '@/components/articles/OtherWomenAsked';
 import { LeadCaptureWidget } from '@/components/articles/LeadCaptureWidget';
 
-export const runtime = 'edge';
+// NOTE: NO 'export const runtime = edge' here.
+// Removing edge runtime enables generateStaticParams (SSG).
+// Cloudflare Pages will pre-build every article as a static HTML file.
+// New articles added after build are served dynamically until next deploy.
+export const dynamicParams = true; // Allow dynamic rendering for new slugs not yet pre-built
+export const revalidate = 3600;   // Re-validate cached pages every 1 hour as fallback
 
 async function getArticleData(slug: string, lang: string) {
   // Try to find exact slug match first (e.g., if they navigated to 'my-guide-hi' directly)
@@ -49,8 +54,15 @@ async function getArticleData(slug: string, lang: string) {
     }
   }
 
-  // Fallback to the exact match (even if it's the wrong language)
-  return { article: exactMatch, redirectSlug: null };
+  // For English routes, return exact match (even if null → triggers notFound())
+  // For non-English routes with no translation found above: return null → clean 404.
+  // NOTE: Once a translation IS inserted to DB with language='hi'/'te' etc.,
+  // it will be caught at line 30 above and served correctly. The 404 only fires
+  // when NO translation exists yet — eliminating the duplicate content problem.
+  if (lang === 'en') {
+    return { article: exactMatch, redirectSlug: null };
+  }
+  return { article: null, redirectSlug: null };
 }
 
 /**
@@ -58,6 +70,22 @@ async function getArticleData(slug: string, lang: string) {
  * 1. First tries using the article's related_article_slugs array
  * 2. Falls back to other articles in the same category
  */
+async function getAvailableTranslations(englishSlug: string): Promise<Record<string, string>> {
+  // Returns map of lang -> translated slug for languages that have a real translation
+  const { data } = await supabaseAdmin
+    .from('articles')
+    .select('language, slug')
+    .or(`slug.like.${englishSlug.substring(0, 50)}%`)
+    .eq('is_published', true)
+    .neq('language', 'en');
+  
+  const result: Record<string, string> = {};
+  if (data) {
+    data.forEach((a: any) => { result[a.language] = a.slug; });
+  }
+  return result;
+}
+
 async function getRelatedQuiz(category: string) {
   // Find a quiz matching the article category, fallback to relationships
   const categoryMap: Record<string, string[]> = {
@@ -109,6 +137,33 @@ interface ArticlePageProps {
   params: Promise<{ lang: string; slug: string }>;
 }
 
+// ─── generateStaticParams: Pre-builds ALL published articles as static HTML ─────
+// At build time, Cloudflare Pages calls this, fetches every slug from Supabase,
+// and renders each article page as a pure static HTML file.
+// Google Googlebot gets served this static HTML directly from Cloudflare CDN — 
+// no server round-trip, fastest possible TTFB, ideal for indexing speed.
+export async function generateStaticParams() {
+  try {
+    // Fetch all published article slugs + languages in one call
+    const { data } = await supabaseAdmin
+      .from('articles')
+      .select('slug, language')
+      .eq('is_published', true)
+      .order('published_at', { ascending: false })
+      .limit(5000); // Cap to avoid build timeouts on huge datasets
+
+    if (!data) return [];
+
+    return data.map((article) => ({
+      lang: article.language === 'en' ? 'en' : article.language,
+      slug: article.slug,
+    }));
+  } catch (e) {
+    console.warn('generateStaticParams: Could not fetch articles, falling back to empty.', e);
+    return [];
+  }
+}
+
 import { redirect, notFound } from 'next/navigation';
 import { autoLink } from '@/lib/auto-link';
 
@@ -132,6 +187,10 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
         'en': `${SITE_URL}/how-to/${slug}`,
         'hi': `${SITE_URL}/hi/how-to/${slug}`,
         'te': `${SITE_URL}/te/how-to/${slug}`,
+        'bn': `${SITE_URL}/bn/how-to/${slug}`,
+        'mr': `${SITE_URL}/mr/how-to/${slug}`,
+        'ta': `${SITE_URL}/ta/how-to/${slug}`,
+        'gu': `${SITE_URL}/gu/how-to/${slug}`,
         'x-default': `${SITE_URL}/how-to/${slug}`,
       }
     },
@@ -163,10 +222,11 @@ export default async function HowToArticlePage({ params }: ArticlePageProps) {
 
   const dict = await getDictionary(lang as any);
 
-  // Fetch related articles, matching quiz, and increment views in parallel
-  const [relatedArticles, relatedQuiz] = await Promise.all([
+  // Fetch related articles, matching quiz, translations, and increment views in parallel
+  const [relatedArticles, relatedQuiz, availableTranslations] = await Promise.all([
     getRelatedArticles(article),
     getRelatedQuiz(article.category),
+    getAvailableTranslations(article.slug),
     supabaseAdmin.rpc('increment_view_count', { article_id: article.id }).then(),
   ]);
 
@@ -216,18 +276,24 @@ export default async function HowToArticlePage({ params }: ArticlePageProps) {
                 <SaveGuideButton slug={article.slug} saveLabel={dict.article_save} savedLabel={dict.article_saved} />
               </div>
 
-              {/* In-Article Language Switcher */}
-              <div className="mt-8 p-4 bg-pg-rose/5 border border-pg-rose/10 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-2 text-sm font-bold text-pg-gray-800">
-                  <span className="text-xl">🌐</span>
-                  Read this guide in your language:
+              {/* In-Article Language Switcher — only shows links for translations that exist */}
+              {(lang === 'en' ? Object.keys(availableTranslations).length > 0 : true) && (
+                <div className="mt-8 p-4 bg-pg-rose/5 border border-pg-rose/10 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="flex items-center gap-2 text-sm font-bold text-pg-gray-800">
+                    <span className="text-xl">🌐</span>
+                    Read this guide in your language:
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Link href={`/how-to/${slug}`} className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${lang === 'en' ? 'bg-pg-rose text-white' : 'bg-white text-pg-gray-600 hover:text-pg-rose border border-pg-gray-200 hover:border-pg-rose/30'}`}>🇺🇸 English</Link>
+                    {availableTranslations['hi'] && (
+                      <Link href={`/hi/how-to/${availableTranslations['hi']}`} className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${lang === 'hi' ? 'bg-pg-rose text-white' : 'bg-white text-pg-gray-600 hover:text-pg-rose border border-pg-gray-200 hover:border-pg-rose/30'}`}>🇮🇳 हिन्दी</Link>
+                    )}
+                    {availableTranslations['te'] && (
+                      <Link href={`/te/how-to/${availableTranslations['te']}`} className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${lang === 'te' ? 'bg-pg-rose text-white' : 'bg-white text-pg-gray-600 hover:text-pg-rose border border-pg-gray-200 hover:border-pg-rose/30'}`}>🇮🇳 తెలుగు</Link>
+                    )}
+                  </div>
                 </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <Link href={`/how-to/${slug}`} className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${lang === 'en' ? 'bg-pg-rose text-white' : 'bg-white text-pg-gray-600 hover:text-pg-rose border border-pg-gray-200 hover:border-pg-rose/30'}`}>🇺🇸 English</Link>
-                  <Link href={`/hi/how-to/${slug}`} className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${lang === 'hi' ? 'bg-pg-rose text-white' : 'bg-white text-pg-gray-600 hover:text-pg-rose border border-pg-gray-200 hover:border-pg-rose/30'}`}>🇮🇳 हिन्दी</Link>
-                  <Link href={`/te/how-to/${slug}`} className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${lang === 'te' ? 'bg-pg-rose text-white' : 'bg-white text-pg-gray-600 hover:text-pg-rose border border-pg-gray-200 hover:border-pg-rose/30'}`}>🇮🇳 తెలుగు</Link>
-                </div>
-              </div>
+              )}
 
               {/* Expert Reviewer Badge */}
               {(() => {
@@ -256,9 +322,6 @@ export default async function HowToArticlePage({ params }: ArticlePageProps) {
               {article.intro}
             </p>
 
-            {/* 4. Ad Slot 1 — hidden until AdSense approved */}
-            <AdSenseUnit slot="top-article" className="my-8" />
-
             {/* 8. Things You'll Need (Moved up for WikiHow style if exists) */}
             {article.content_json?.things_needed && article.content_json.things_needed.length > 0 && (
               <div className="bg-pg-rose-light p-6 rounded-2xl mb-12 border border-pg-rose/20">
@@ -274,67 +337,90 @@ export default async function HowToArticlePage({ params }: ArticlePageProps) {
               </div>
             )}
 
-            {/* 5. Steps Section */}
-            <div className="space-y-16">
-              {article.content_json?.steps?.map((step: any, index: number) => (
-                <div key={index} className="relative">
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className="w-10 h-10 rounded-full bg-pg-rose text-white flex items-center justify-center font-bold text-xl shrink-0 mt-1">
-                      {step.step_number || index + 1}
-                    </div>
-                    <h2 className="font-sans text-2xl font-bold text-pg-gray-900 leading-tight">
-                      {step.headline}
-                    </h2>
-                  </div>
-                  
-                  <div className="pl-14">
-                    <p
-                      className="text-[16px] leading-[1.8] text-pg-gray-700 mb-6"
-                      dangerouslySetInnerHTML={{ __html: autoLink(step.body, lang) }}
-                    />
-
-                    {step.tip && (
-                      <div className="bg-pg-success/10 border border-pg-success/20 p-4 rounded-xl mb-4 text-sm text-pg-gray-900">
-                        <strong className="text-pg-success block mb-1">💡 Tip:</strong>
-                        {step.tip}
-                      </div>
-                    )}
-
-                    {step.warning && (
-                      <div className="bg-pg-warning/10 border border-pg-warning/20 p-4 rounded-xl mb-4 text-sm text-pg-gray-900">
-                        <strong className="text-pg-warning block mb-1 flex items-center gap-1">
-                          <AlertTriangle size={16} /> Warning:
-                        </strong>
-                        {step.warning}
-                      </div>
-                    )}
-
-                    {/* Internal CTA to Anonymous Ask (after step 2) */}
-                    {index === 1 && (
-                      <div className="my-8 bg-pg-cream border border-pg-gray-100 p-6 rounded-xl flex flex-col sm:flex-row items-center gap-6 justify-between shadow-sm">
-                        <div className="flex items-start gap-3">
-                          <Lock className="text-pg-rose shrink-0 mt-1" />
-                          <p className="text-sm font-medium text-pg-gray-700">
-                            Have a specific question you can't ask anyone? 
-                            Ask it anonymously. No name. No judgment.
-                          </p>
+            {/* 5. Steps Section — Dynamic rendering, each step has a varied visual style */}
+            <div className="space-y-14">
+              {article.content_json?.steps?.map((step: any, index: number) => {
+                // Rotate through different visual treatments so no two articles look identical
+                const stepStyle = index % 4;
+                return (
+                  <div key={index} className="relative">
+                    {/* Step header — alternates between numbered circle and text badge */}
+                    {stepStyle !== 3 ? (
+                      <div className="flex items-start gap-4 mb-5">
+                        <div className={`w-10 h-10 rounded-full text-white flex items-center justify-center font-bold text-xl shrink-0 mt-1 ${
+                          stepStyle === 0 ? 'bg-pg-rose' : stepStyle === 1 ? 'bg-pg-plum' : 'bg-pg-gray-800'
+                        }`}>
+                          {step.step_number || index + 1}
                         </div>
-                        <Link href="/ask" className="shrink-0 bg-pg-white border-2 border-pg-rose text-pg-rose hover:bg-pg-rose hover:text-white px-6 py-2 rounded-lg font-bold transition-colors text-sm">
-                          Ask Here →
-                        </Link>
+                        <h2 className="font-sans text-2xl font-bold text-pg-gray-900 leading-tight pt-1">
+                          {step.headline}
+                        </h2>
+                      </div>
+                    ) : (
+                      <div className="mb-5">
+                        <span className="inline-block bg-pg-rose/10 text-pg-rose text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-2">Step {step.step_number || index + 1}</span>
+                        <h2 className="font-sans text-2xl font-bold text-pg-gray-900 leading-tight">{step.headline}</h2>
                       </div>
                     )}
 
-                    {/* Ad Slot 2 (after step 3) — hidden until AdSense approved */}
-                    {index === 2 && <AdSenseUnit slot="mid-article" className="my-8" />}
-                    
-                    {/* Inject ProductRecommendation after the third step */}
-                    {index === 2 && (
-                      <ProductRecommendation category={article.category} lang={lang} />
-                    )}
+                    <div className={stepStyle !== 3 ? 'pl-14' : ''}>
+                      <p
+                        className="text-[16px] leading-[1.8] text-pg-gray-700 mb-5"
+                        dangerouslySetInnerHTML={{ __html: autoLink(step.body, lang) }}
+                      />
+
+                      {/* Tip — rendered differently based on position, NOT always the same green box */}
+                      {step.tip && stepStyle === 0 && (
+                        <div className="border-l-4 border-pg-rose pl-4 my-4 text-sm text-pg-gray-700 italic">
+                          {step.tip}
+                        </div>
+                      )}
+                      {step.tip && stepStyle === 1 && (
+                        <p className="text-sm text-pg-gray-600 bg-pg-cream rounded-xl px-4 py-3 my-4">
+                          <span className="font-semibold text-pg-gray-800">Worth knowing: </span>{step.tip}
+                        </p>
+                      )}
+                      {step.tip && stepStyle === 2 && (
+                        <div className="flex items-start gap-3 my-4 text-sm text-pg-gray-700">
+                          <Sparkles size={16} className="text-pg-rose shrink-0 mt-0.5" />
+                          <span>{step.tip}</span>
+                        </div>
+                      )}
+                      {step.tip && stepStyle === 3 && (
+                        <blockquote className="border-l-2 border-pg-gray-300 pl-4 my-4 text-pg-gray-600 text-sm italic">{step.tip}</blockquote>
+                      )}
+
+                      {/* Warning — only shown when truly present, integrated naturally */}
+                      {step.warning && stepStyle % 2 === 0 && (
+                        <p className="text-sm text-pg-gray-700 my-4">
+                          <AlertTriangle size={14} className="inline text-pg-warning mr-1" />
+                          <span className="font-medium">Keep in mind: </span>{step.warning}
+                        </p>
+                      )}
+                      {step.warning && stepStyle % 2 === 1 && (
+                        <p className="text-sm text-pg-gray-600 bg-amber-50 border border-amber-100 rounded-lg px-4 py-3 my-4">{step.warning}</p>
+                      )}
+
+                      {/* Internal CTA to Anonymous Ask (after step 2) */}
+                      {index === 1 && (
+                        <div className="my-8 bg-pg-cream border border-pg-gray-100 p-6 rounded-xl flex flex-col sm:flex-row items-center gap-6 justify-between shadow-sm">
+                          <div className="flex items-start gap-3">
+                            <Lock className="text-pg-rose shrink-0 mt-1" />
+                            <p className="text-sm font-medium text-pg-gray-700">
+                              Have a specific question you can't ask anyone? Ask it anonymously — no name needed.
+                            </p>
+                          </div>
+                          <Link href="/ask" className="shrink-0 bg-pg-white border-2 border-pg-rose text-pg-rose hover:bg-pg-rose hover:text-white px-6 py-2 rounded-lg font-bold transition-colors text-sm">
+                            Ask Here →
+                          </Link>
+                        </div>
+                      )}
+
+                      {index === 2 && <ProductRecommendation category={article.category} lang={lang} />}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* 7. Expert Tip */}

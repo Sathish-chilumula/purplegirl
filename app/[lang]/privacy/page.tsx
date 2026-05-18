@@ -26,7 +26,7 @@ export default function PrivacyPage() {
         
         <h1 className="text-4xl font-display font-bold text-pg-gray-900 mb-2">Privacy Policy</h1>
         <p className="text-sm text-pg-gray-500 mb-8 border-b border-pg-gray-100 pb-8">
-          Last Updated: {new Date().toLocaleDateString()}
+          Last Updated: <strong>May 18, 2026</strong>
         </p>
 
         <div className="prose prose-sm md:prose-base text-pg-gray-700 space-y-8 max-w-none">
@@ -83,11 +83,28 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-pg-rose mb-3">6. Contact Us</h2>
+            <h2 className="text-xl font-bold text-pg-rose mb-3">6. Affiliate Links Disclosure</h2>
+            <p>
+              Some articles on PurpleGirl.in may contain affiliate links. This means if you click a link and purchase a product, PurpleGirl may earn a small commission at no extra cost to you. We use CueLinks, an affiliate marketing platform, which automatically converts relevant product mentions into trackable links. This helps us keep the platform free. Our editorial opinions are never influenced by affiliate partnerships.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-bold text-pg-rose mb-3">7. India DPDP Act 2023 Compliance</h2>
+            <p>
+              PurpleGirl.in complies with India's Digital Personal Data Protection (DPDP) Act, 2023. As a platform that does not collect identifiable personal data for its core service (anonymous Q&amp;A), we operate with a data-minimal approach. Where we do collect data (such as feedback ratings or newsletter sign-ups), we process it only for the stated purpose.
+            </p>
+            <p className="mt-2">
+              You have the right to know what personal data we hold about you, to correct inaccurate data, and to request erasure. To exercise any of these rights, please contact us at <a href="mailto:hello@purplegirl.in" className="text-pg-rose font-bold hover:underline">hello@purplegirl.in</a>. We will respond within 30 days.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-bold text-pg-rose mb-3">8. Contact Us</h2>
             <p>
               If you have any questions about this Privacy Policy, please contact us at{' '}
-              <a href="mailto:hello@purplegirl.in" className="text-pg-rose font-bold hover:underline">hello@purplegirl.in</a> 
-              {' '}or visit our <Link href="/contact" className="text-pg-rose font-bold hover:underline">Contact page</Link>.
+              <a href="mailto:hello@purplegirl.in" className="text-pg-rose font-bold hover:underline">hello@purplegirl.in</a>{' '}
+              or visit our <Link href="/contact" className="text-pg-rose font-bold hover:underline">Contact page</Link>.
             </p>
           </section>
 

@@ -9,209 +9,327 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-const SYSTEM_PROMPT = `You are a senior content writer for PurpleGirl.in, acting as a trusted older sister (didi) for Indian women.
-Your job is to write a highly empathetic, actionable, and SEO-optimized guide based on the provided title.
-Target Audience: Indian women, reading on their phones, often secretly.
-Tone: Warm, non-judgmental, practical. Use simple English (Class 8 level).
+// ─────────────────────────────────────────────────────────
+// 3 rotating content formats so no two articles look alike
+// ─────────────────────────────────────────────────────────
+const FORMATS = [
+  // FORMAT A — Classic How-To (numbered steps, conversational)
+  `FORMAT: Classic How-To
+Write as if explaining to a friend who just called you for help. 
+Start with a relatable 2-3 sentence opening that names the exact situation she is in.
+Then give 5 to 7 clear, numbered steps. Each step MUST be at least 120 words — give real context, 
+explain WHY it works, include a specific Indian example (city, product, food, situation).
+Each step can have an optional "tip" (max 1 per article, not every step) or a "warning" (max 1 per article).
+Do NOT add a tip or warning to every single step — it makes the article look formulaic.
+End with 5 FAQ answers that read like real Google searches Indian women type.`,
 
-CRITICAL INSTRUCTIONS:
-1. The Intro MUST start by acknowledging their exact pain/fear (The "Mirror Moment"). Let them know they aren't alone.
-2. Provide exactly 3 to 5 practical, numbered steps.
-3. Include an "expert_tip" (a short, powerful quote of advice).
-4. Provide a list of "things_needed" (can be mental things like 'patience' or physical things).
-5. Provide 2-3 "faqs" that women actually Google about this topic.
+  // FORMAT B — Story-First (personal narrative, then advice)
+  `FORMAT: Story-First
+Open with a short 3-4 sentence story — a real scenario an Indian woman might recognize 
+(e.g., "Meera had been trying to talk to her husband about this for months..."). 
+Then transition naturally into practical advice broken into 5 to 6 clear steps.
+Each step MUST be at least 130 words with specific Indian context.
+Include personal-feel language — "You might find..." "A lot of women in India..." "If your situation is..."
+Use 1 optional tip somewhere in the MIDDLE of the article, not at every step.
+End with 5 FAQs written like real questions women search on Google.`,
 
-You MUST return the output ONLY as a valid JSON object with the following schema:
+  // FORMAT C — Listicle-Hybrid (bold insight, numbered reasons with depth)
+  `FORMAT: Listicle-Hybrid
+Open with a direct, confident statement that surprises the reader or challenges a common myth.
+Then explain 5 to 7 key points or reasons, each with a clear bold heading and 120+ word explanation.
+Use conversational transitions between points ("Here's something most people miss..." "The tricky part is...")
+Include at least 2 India-specific statistics or cultural references (in-laws, joint family, festivals, government schemes).
+Do NOT use "Tip:" or "Warning:" labels — instead, weave practical advice naturally into the body text.
+End with 4 to 5 FAQs in the format real Indian women would search on Google.`
+];
+
+function getSystemPrompt(formatIndex) {
+  return `You are a content writer for PurpleGirl.in — India's how-to guide site for women.
+Write in natural, conversational English — like one person talking to another.
+NOT like AI content. NOT like a corporate blog.
+
+Target reader: Indian woman, age 18–42, reading on her phone.
+Voice: Direct, warm, practical. Like a knowledgeable friend.
+DO NOT use "didi". DO NOT use: "In conclusion", "In summary", "It is important to note".
+Write in flowing paragraphs. Vary sentence length naturally.
+Use contractions: "you'll", "it's", "here's", "don't".
+
+${FORMATS[formatIndex % FORMATS.length]}
+
+━━━ KEYWORD SEO RULES ━━━
+- Primary keyword from the title MUST appear in: intro paragraph 1, at least 2 step headlines or bodies, and FAQs
+- Use natural variations of the keyword (e.g. "PCOS in Indian women", "PCOS symptoms", "polycystic ovary")
+- LSI keywords: include 3-4 related terms naturally woven into the content
+- Reading level: Class 8 — short sentences, no unexplained jargon
+
+━━━ META DESCRIPTION ━━━
+Use one of these 4 formulas (rotate):
+A) "Feeling [emotion]? Here's exactly what to do when [problem]. [Specific promise]. For Indian women."
+B) "[Keyword] can be managed at home. [X] simple steps — Indian-specific remedies. No judgment."  
+C) "If [common Indian situation], you're not alone. Our honest guide helps you [outcome] without [fear]. 100% private."
+D) "Before you [common action], read this. [Topic] is more common than you think. Here's what actually works."
+Max 155 characters. Do NOT start with the site name or article title.
+
+━━━ INTERNAL LINKS ━━━
+In step bodies, naturally link to related PurpleGirl content using this format:
+[anchor text](/how-to/related-slug)
+Rules:
+- Include 2-3 internal links total (NOT on every step, spread naturally)
+- Anchor text MUST be the target keyword, never "click here" or "this article"
+- Only link to plausibly related topics (e.g. a PCOS article links to [thyroid symptoms](/how-to/thyroid-symptoms-in-women-india) or [irregular periods](/how-to/irregular-periods-home-remedies-india))
+- Include 1 link to a quiz or tool where relevant: [check your symptoms](/quiz/pcos-quiz) or [use the period calculator](/tools/period-calculator)
+
+━━━ WORD COUNT (NON-NEGOTIABLE) ━━━
+- Total: 1200+ words (intro + all steps + FAQs)
+- Each step body: 120+ words
+- Intro: 120-180 words
+- Each FAQ answer: 70-120 words — no one-liners
+
+━━━ INDIA-SPECIFIC REQUIREMENT ━━━
+Every article MUST mention at least one: Indian city, Indian brand, Indian food, Indian law/scheme, or Indian family/cultural situation. Real and specific, not generic.
+
+━━━ OUTPUT FORMAT ━━━
+Return ONLY a valid JSON object. No markdown fences. No text outside JSON.
+
 {
-  "meta_description": "A 150-char SEO description",
-  "intro": "The mirror moment intro paragraph...",
-  "expert_tip": "One powerful sentence of advice.",
+  "meta_description": "140-155 chars following one of the 4 formulas above",
+  "intro": "120-180 word opening. Primary keyword in first 100 words. No bullet points.",
+  "expert_tip": "One genuinely useful sentence — specific and actionable, not generic",
   "content_json": {
-    "things_needed": ["Item 1", "Item 2"],
+    "things_needed": ["3-5 items — emotional or physical, India-specific"],
     "steps": [
       {
         "step_number": 1,
-        "headline": "Step headline",
-        "body": "Detailed paragraph.",
-        "tip": "Optional quick tip",
-        "warning": "Optional warning"
+        "headline": "Specific action-oriented heading with keyword if natural",
+        "body": "120+ words. Full explanation. WHY it works. India-specific example. Include internal link naturally if relevant using [anchor](/how-to/slug) format. Flowing prose.",
+        "tip": null,
+        "warning": null
       }
     ],
     "faqs": [
-      { "q": "Question?", "a": "Answer paragraph." }
+      {
+        "q": "Exact Google search query an Indian woman would type (People Also Ask style)",
+        "a": "70-120 word direct, honest answer. Primary keyword variation in answer."
+      }
     ]
   }
 }
-Do not include markdown blocks like \`\`\`json. Return strictly the raw JSON.`;
+
+REMINDER: tip/warning should be null for most steps. Max 1 tip and 1 warning per article.`;
+}
 
 function isTooSimilar(newTitle, existingTitle) {
-  const a = newTitle.toLowerCase().replace(/[^a-z0-9 ]/g, '').split(' ')
-  const b = existingTitle.toLowerCase().replace(/[^a-z0-9 ]/g, '').split(' ')
-  const common = a.filter(word => b.includes(word) && word.length > 3)
-  return common.length / Math.max(a.length, b.length) > 0.8
+  const a = newTitle.toLowerCase().replace(/[^a-z0-9 ]/g, '').split(' ');
+  const b = existingTitle.toLowerCase().replace(/[^a-z0-9 ]/g, '').split(' ');
+  const common = a.filter(word => b.includes(word) && word.length > 3);
+  return common.length / Math.max(a.length, b.length) > 0.8;
+}
+
+function countWords(parsedContent) {
+  const text = [
+    parsedContent.intro || '',
+    parsedContent.expert_tip || '',
+    ...(parsedContent.content_json?.steps || []).map(s => (s.headline || '') + ' ' + (s.body || '') + ' ' + (s.tip || '') + ' ' + (s.warning || '')),
+    ...(parsedContent.content_json?.faqs || []).map(f => (f.q || '') + ' ' + (f.a || '')),
+  ].join(' ');
+  return text.trim().split(/\s+/).length;
+}
+
+// ─────────────────────────────────────────────────────────
+// AI call chain: Groq → Gemini → OpenAI
+// ─────────────────────────────────────────────────────────
+async function callGroq(systemPrompt, userMessage) {
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userMessage }],
+      temperature: 0.75,
+      max_tokens: 4096,
+    })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(`Groq ${res.status}: ${err?.error?.message || res.statusText}`);
+  }
+  const data = await res.json();
+  return data.choices[0].message.content;
+}
+
+async function callGemini(systemPrompt, userMessage) {
+  const GEMINI_MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash'];
+  for (const model of GEMINI_MODELS) {
+    console.log(`  Trying Gemini model: ${model}`);
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: systemPrompt }] },
+          contents: [{ role: 'user', parts: [{ text: userMessage }] }],
+          generationConfig: { temperature: 0.75, maxOutputTokens: 4096 }
+        })
+      }
+    );
+    if (res.ok) {
+      const data = await res.json();
+      console.log(`  ✅ Gemini ${model} success`);
+      return data.candidates[0].content.parts[0].text;
+    }
+    const err = await res.json().catch(() => ({}));
+    console.warn(`  ❌ Gemini ${model} failed (${res.status}): ${(err?.error?.message || '').substring(0, 80)}`);
+    if (res.status === 429) throw new Error('Gemini quota exhausted');
+  }
+  throw new Error('All Gemini models failed');
+}
+
+async function callOpenAI(systemPrompt, userMessage) {
+  if (!process.env.OPENAI_API_KEY) throw new Error('OPENAI_API_KEY not set');
+  console.log('  Trying OpenAI GPT-4o-mini...');
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}` },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userMessage }],
+      temperature: 0.75,
+      max_tokens: 4096,
+      response_format: { type: 'json_object' },
+    })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(`OpenAI ${res.status}: ${err?.error?.message || res.statusText}`);
+  }
+  const data = await res.json();
+  console.log('  ✅ OpenAI GPT-4o-mini success');
+  return data.choices[0].message.content;
+}
+
+async function callAI(systemPrompt, userMessage) {
+  // Tier 1: Groq (fast, free)
+  try {
+    return { text: await callGroq(systemPrompt, userMessage), source: 'groq' };
+  } catch (e) {
+    console.warn(`Groq failed: ${e.message}`);
+  }
+
+  // Tier 2: Gemini (free with limits)
+  if (process.env.GEMINI_API_KEY) {
+    try {
+      return { text: await callGemini(systemPrompt, userMessage), source: 'gemini' };
+    } catch (e) {
+      console.warn(`Gemini failed: ${e.message}`);
+    }
+  }
+
+  // Tier 3: OpenAI GPT-4o-mini (paid, most reliable for long content)
+  if (process.env.OPENAI_API_KEY) {
+    try {
+      return { text: await callOpenAI(systemPrompt, userMessage), source: 'openai' };
+    } catch (e) {
+      console.warn(`OpenAI failed: ${e.message}`);
+    }
+  }
+
+  return null; // All APIs failed
 }
 
 async function generateArticle() {
-  console.log('--- PurpleGirl Article Generator Started ---');
+  console.log('--- PurpleGirl Article Generator v2 Started ---');
   const isDryRun = process.argv.includes('--dry-run');
-  if (isDryRun) {
-    console.log('DRY RUN MODE ENABLED: No data will be inserted into Supabase.');
-  }
-  
+  if (isDryRun) console.log('DRY RUN MODE ENABLED: No data will be saved.');
+
   // 1. Read titles bank
   const bankPath = path.join(__dirname, 'titles-bank.json');
   const bank = JSON.parse(fs.readFileSync(bankPath, 'utf8'));
-  
+
   if (bank.length === 0) {
     console.log('Title bank is empty. Exiting.');
     return;
   }
 
-  // 2. Pick up to 15 titles from the bank
-  // NOTE: Groq free tier = ~14,400 req/day (primary). Gemini fallback only.
-  // gemini-3.1-flash-lite-preview (primary fallback) supports higher RPM than old 2.5-flash-lite.
-  // Batch of 25 is safe — Groq handles all 25, Gemini only kicks in on Groq failures.
-  const BATCH_SIZE = 25;
+  const BATCH_SIZE = 15; // Reduced for quality — better to generate 15 good 1200-word articles than 25 thin ones
   const articlesToProcess = bank.splice(0, BATCH_SIZE);
   console.log(`Picked ${articlesToProcess.length} titles for this run.`);
 
-  // PRE-LOAD: fetch all existing titles to prevent semantic duplicates
+  // PRE-LOAD: fetch all existing titles to prevent duplicates
   const { data: allExisting } = await supabase.from('articles').select('title, slug');
   const existingTitles = allExisting ? allExisting.map(a => a.title) : [];
 
+  let formatIndex = 0; // Rotate format across articles in the batch
+
   for (const articleDef of articlesToProcess) {
-    console.log(`\nGenerating article: "${articleDef.title}"`);
+    console.log(`\nGenerating article [Format ${(formatIndex % 3) + 1}/3]: "${articleDef.title}"`);
 
-    // DEDUPLICATION 1: Check title similarity against all existing
-    const isDuplicateTitle = existingTitles.some(extTitle => isTooSimilar(articleDef.title, extTitle));
-    if (isDuplicateTitle) {
-      console.log(`SKIPPED DUPLICATE (Title similarity): ${articleDef.title}`);
+    // Deduplication checks
+    if (existingTitles.some(t => isTooSimilar(articleDef.title, t))) {
+      console.log(`SKIPPED DUPLICATE (title similarity): ${articleDef.title}`);
       continue;
     }
-
-    // DEDUPLICATION 2: Check for exact slug match
-    const { data: existingSlugs } = await supabase
-      .from('articles')
-      .select('slug, title')
-      .ilike('slug', `%${articleDef.slug}%`);
-    
+    const { data: existingSlugs } = await supabase.from('articles').select('slug').ilike('slug', `%${articleDef.slug?.substring(0,40) || ''}%`);
     if (existingSlugs && existingSlugs.length > 0) {
-      console.log(`SKIPPED DUPLICATE (Slug match): ${articleDef.slug}`);
+      console.log(`SKIPPED DUPLICATE (slug match): ${articleDef.slug}`);
       continue;
     }
 
-    // 3. Call Groq API (Primary) with Gemini fallback
-    let resultJsonStr = null;
-    let usedFallback = false;
-    
-    try {
-      const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
-          messages: [
-            { role: 'system', content: SYSTEM_PROMPT },
-            { role: 'user', content: `Write the guide for the title: "${articleDef.title}"` }
-          ],
-          temperature: 0.7,
-        })
-      });
+    // Select rotating format
+    const systemPrompt = getSystemPrompt(formatIndex);
+    formatIndex++;
 
-      if (!groqRes.ok) {
-        const errBody = await groqRes.json().catch(() => ({}));
-        const errMsg = errBody?.error?.message || groqRes.statusText || `HTTP ${groqRes.status}`;
-        throw new Error(`Groq ${groqRes.status}: ${errMsg}`);
-      }
-      const data = await groqRes.json();
-      resultJsonStr = data.choices[0].message.content;
-      
-    } catch (e) {
-      console.warn(`Groq failed. Attempting Gemini fallback... (${e.message})`);
-      usedFallback = true;
+    const userMessage = `Write the complete guide for this topic: "${articleDef.title}"
+Category: ${articleDef.category || 'women-health'}
+This article MUST be at least 1200 words total. Do not cut it short.`;
 
-      if (!process.env.GEMINI_API_KEY) {
-        console.error('GEMINI_API_KEY is not set. Cannot fall back. Skipping.');
-        continue;
-      }
+    const result = await callAI(systemPrompt, userMessage);
 
-      const geminiBody = JSON.stringify({
-        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-        contents: [{ role: 'user', parts: [{ text: `Write the guide for the title: "${articleDef.title}"` }] }],
-        generationConfig: { temperature: 0.7 }
-      });
-
-      // Cascade: try gemini-3.1-flash-lite-preview first (latest, higher RPM), then gemini-2.5-flash-lite
-      const GEMINI_MODELS = ['gemini-3.1-flash-lite-preview', 'gemini-2.5-flash-lite'];
-      let geminiSuccess = false;
-
-      for (const model of GEMINI_MODELS) {
-        console.log(`  Trying Gemini model: ${model}`);
-        const geminiRes = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`,
-          { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: geminiBody }
-        );
-
-        if (geminiRes.ok) {
-          const data = await geminiRes.json();
-          resultJsonStr = data.candidates[0].content.parts[0].text;
-          geminiSuccess = true;
-          console.log(`  ✅ Gemini success with ${model}`);
-          break;
-        }
-
-        const geminiErr = await geminiRes.json().catch(() => ({}));
-        const geminiMsg = geminiErr?.error?.message || `HTTP ${geminiRes.status}`;
-        console.warn(`  ❌ ${model} failed (${geminiRes.status}): ${geminiMsg.substring(0, 100)}`);
-
-        if (geminiRes.status === 429) {
-          console.error('Gemini daily quota exhausted. Stopping batch early.');
-          break; // exit the for-loop; outer loop will see geminiSuccess=false
-        }
-        // 503 = overloaded preview model, fall through to next model in cascade
-      }
-
-      if (!geminiSuccess) {
-        console.error('All Gemini models failed. Skipping this article.');
-        continue;
-      }
+    if (!result) {
+      console.error(`All AI APIs failed for: ${articleDef.title}. Skipping.`);
+      continue;
     }
 
-    // 4. Parse and Validate
+    // Parse and validate
     let parsedContent;
     try {
-      resultJsonStr = resultJsonStr.replace(/^```json\n?|```$/gm, '').trim();
-      parsedContent = JSON.parse(resultJsonStr);
+      const cleaned = result.text.replace(/^```json\n?|```$/gm, '').trim();
+      parsedContent = JSON.parse(cleaned);
     } catch (e) {
-      console.error('Failed to parse AI output as JSON. Skipping.', resultJsonStr);
+      console.error(`JSON parse failed for ${articleDef.title}. Skipping.`);
       continue;
     }
 
-    // 5. Insert into Supabase (Skip if dry-run)
+    // ── WORD COUNT GATE ──────────────────────────────
+    const wordCount = countWords(parsedContent);
+    console.log(`  Word count: ${wordCount} (via ${result.source})`);
+    if (wordCount < 700) {
+      console.error(`  ❌ REJECTED — too short (${wordCount} words, need 700+). Skipping.`);
+      continue;
+    }
+    if (wordCount < 900) {
+      console.warn(`  ⚠️  Short article (${wordCount} words). Publishing anyway but monitor quality.`);
+    }
+    // ────────────────────────────────────────────────
+
+    // Build slug
+    const cleanSlug = articleDef.slug && !articleDef.slug.endsWith('-')
+      ? articleDef.slug
+      : articleDef.title
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, '')
+          .trim()
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .substring(0, 100)
+          .replace(/-$/, '');
+
+    // Calculate reading time
+    const readingTimeMins = Math.max(3, Math.ceil(wordCount / 200));
+
     if (isDryRun) {
-      console.log(`[DRY RUN] Would insert article: ${articleDef.slug}`);
-      console.log(JSON.stringify(parsedContent, null, 2));
+      console.log(`[DRY RUN] Would insert: ${cleanSlug} | ${wordCount} words | ${readingTimeMins} min read`);
     } else {
-      // Generate a clean full-length slug from the title (max 100 chars)
-      const cleanSlug = articleDef.slug && !articleDef.slug.endsWith('-')
-        ? articleDef.slug
-        : articleDef.title
-            .toLowerCase()
-            .replace(/[^a-z0-9\s-]/g, '')
-            .trim()
-            .replace(/\s+/g, '-')
-            .replace(/-+/g, '-')
-            .substring(0, 100)
-            .replace(/-$/, '');
-
-      // Calculate reading time based on total word count (approx 200 words per minute)
-      const contentText = JSON.stringify(parsedContent.content_json) + ' ' + (parsedContent.intro || '') + ' ' + (parsedContent.expert_tip || '');
-      const wordCount = contentText.split(/\s+/).length;
-      const readingTimeMins = Math.max(1, Math.ceil(wordCount / 200));
-
       const { error } = await supabase.from('articles').insert([{
         slug: cleanSlug,
         title: articleDef.title,
@@ -221,51 +339,37 @@ async function generateArticle() {
         expert_tip: parsedContent.expert_tip,
         content_json: parsedContent.content_json,
         reading_time_mins: readingTimeMins,
-        is_published: true, // Auto-publish for now
+        is_published: true,
         language: 'en',
         published_at: new Date().toISOString()
       }]);
 
       if (error) {
-        console.error(`Supabase Insert Error for ${cleanSlug}:`, error);
+        console.error(`DB Insert Error for ${cleanSlug}:`, error);
       } else {
-        console.log(`✅ Successfully published: ${cleanSlug}`);
+        console.log(`✅ Published: ${cleanSlug} | ${wordCount} words | via ${result.source}`);
       }
     }
 
-    // Delay between API calls to avoid rate limits
+    // Delay: Groq = 2s gap, others = 5s
     if (!isDryRun) {
-      // Groq: 2s delay. Gemini fallback: 15s (gemini-3.1-flash-lite-preview supports ~4 rpm free tier)
-      const delay = usedFallback ? 15000 : 2000;
-      if (usedFallback) console.log(`Using Gemini fallback — waiting ${delay/1000}s between requests...`);
+      const delay = result.source === 'groq' ? 2000 : 5000;
       await new Promise(r => setTimeout(r, delay));
     }
   }
 
-  // 6. Update titles-bank file (saving state)
+  // Save updated bank
   if (!isDryRun) {
     fs.writeFileSync(bankPath, JSON.stringify(bank, null, 2));
-    
+    console.log(`\nBank updated. ${bank.length} titles remaining.`);
+
     if (process.env.CLOUDFLARE_DEPLOY_HOOK_URL) {
       console.log('Triggering Cloudflare Deploy Hook...');
       await fetch(process.env.CLOUDFLARE_DEPLOY_HOOK_URL, { method: 'POST' });
     }
   }
+
+  console.log('--- Generator Complete ---');
 }
 
 generateArticle();
-
-/*
--- Find and review duplicate articles in Supabase:
--- SELECT title, slug, COUNT(*) 
--- FROM articles 
--- GROUP BY title, slug 
--- HAVING COUNT(*) > 1
--- ORDER BY COUNT(*) DESC;
-
--- Delete older duplicates keeping highest view_count:
--- DELETE FROM articles a USING articles b
--- WHERE a.title = b.title 
--- AND a.view_count < b.view_count 
--- AND a.id != b.id;
-*/

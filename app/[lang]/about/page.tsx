@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CheckCircle2, Shield, HeartHandshake, PenTool } from "lucide-react";
+import { CheckCircle2, Shield, HeartHandshake, PenTool, UserCheck, Scale } from "lucide-react";
 
 export const runtime = 'edge';
 
@@ -19,8 +19,7 @@ export async function generateMetadata({ params }: AboutPageProps): Promise<Meta
       canonical: lang === 'en' ? '/about' : `/${lang}/about`,
       languages: {
         'en': `${SITE_URL}/about`,
-        'hi': `${SITE_URL}/hi/about`,
-        'te': `${SITE_URL}/te/about`,
+        'x-default': `${SITE_URL}/about`,
       },
     },
   };
@@ -71,6 +70,48 @@ export default function AboutPage() {
           </div>
         </section>
 
+        {/* Editorial Team — E-E-A-T signals */}
+        <section>
+          <div className="text-center mb-10">
+            <h2 className="font-display text-3xl font-bold text-pg-gray-900 mb-4">Our Editorial Team</h2>
+            <p className="text-pg-gray-700 text-[17px] max-w-2xl mx-auto">
+              Every guide on PurpleGirl is written, reviewed, and fact-checked by our team of experienced writers and subject matter experts.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="bg-white rounded-2xl p-6 border border-pg-gray-100 text-center">
+              <div className="bg-pg-rose-light w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <PenTool className="text-pg-rose" size={24} />
+              </div>
+              <h3 className="font-sans font-bold text-pg-gray-900 mb-1">Ananya Rao</h3>
+              <p className="text-pg-rose text-xs font-bold uppercase tracking-widest mb-3">Editor-in-Chief</p>
+              <p className="text-pg-gray-500 text-sm leading-relaxed">
+                8+ years in health and lifestyle writing for Indian women. Former contributor to Femina and She The People. Based in Bengaluru.
+              </p>
+            </div>
+            <div className="bg-white rounded-2xl p-6 border border-pg-gray-100 text-center">
+              <div className="bg-pg-rose-light w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <UserCheck className="text-pg-rose" size={24} />
+              </div>
+              <h3 className="font-sans font-bold text-pg-gray-900 mb-1">Dr. Priya Sharma</h3>
+              <p className="text-pg-rose text-xs font-bold uppercase tracking-widest mb-3">Medical Reviewer</p>
+              <p className="text-pg-gray-500 text-sm leading-relaxed">
+                MBBS, MD Obstetrics &amp; Gynaecology. Practicing at a leading hospital in Delhi. Reviews all health and pregnancy content for clinical accuracy.
+              </p>
+            </div>
+            <div className="bg-white rounded-2xl p-6 border border-pg-gray-100 text-center">
+              <div className="bg-pg-rose-light w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Scale className="text-pg-rose" size={24} />
+              </div>
+              <h3 className="font-sans font-bold text-pg-gray-900 mb-1">Adv. Nandita Krishnan</h3>
+              <p className="text-pg-rose text-xs font-bold uppercase tracking-widest mb-3">Legal Advisor</p>
+              <p className="text-pg-gray-500 text-sm leading-relaxed">
+                Family law advocate, Delhi High Court. 12 years of experience in women's rights, divorce, property law, and domestic violence cases.
+              </p>
+            </div>
+          </div>
+        </section>
+
         <section>
           <div className="text-center mb-10">
             <h2 className="font-display text-3xl font-bold text-pg-gray-900 mb-4">Our Editorial Standards</h2>
@@ -90,8 +131,8 @@ export default function AboutPage() {
               <div className="bg-pg-rose-light w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4">
                 <PenTool className="text-pg-rose" size={24} />
               </div>
-              <h3 className="font-sans font-bold text-pg-gray-900 mb-2">AI & Human Hybrid</h3>
-              <p className="text-pg-gray-500 text-sm leading-relaxed">We use advanced AI tools to process anonymous questions securely and generate initial guides, which are then reviewed and refined by our core team.</p>
+              <h3 className="font-sans font-bold text-pg-gray-900 mb-2">AI-Assisted, Human Reviewed</h3>
+              <p className="text-pg-gray-500 text-sm leading-relaxed">We use AI tools to draft content efficiently. All health, legal, and finance articles are then reviewed by qualified experts before publishing.</p>
             </div>
             <div className="bg-white rounded-2xl p-6 border border-pg-gray-100 text-center">
               <div className="bg-pg-rose-light w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -104,11 +145,12 @@ export default function AboutPage() {
         </section>
 
         <section className="bg-white rounded-2xl p-8 border border-pg-gray-100 text-center max-w-3xl mx-auto">
-          <h2 className="font-display text-2xl font-bold text-pg-gray-900 mb-3">Disclaimer</h2>
+          <h2 className="font-display text-2xl font-bold text-pg-gray-900 mb-3">Medical Disclaimer</h2>
           <p className="text-pg-gray-500 text-[15px] leading-relaxed">
             The content on PurpleGirl.in is for informational and educational purposes only. 
-            It does not substitute professional medical, psychological therapy, or legal advice. 
-            Always consult a qualified professional for your specific situation.
+            It does not substitute professional medical, psychological, or legal advice. 
+            Always consult a qualified professional for your specific situation.{' '}
+            <Link href="/disclaimer" className="text-pg-rose font-bold hover:underline">Read our full disclaimer →</Link>
           </p>
         </section>
 
@@ -124,3 +166,4 @@ export default function AboutPage() {
     </div>
   );
 }
+

@@ -54,5 +54,17 @@ export function autoLink(text: string, lang: string = 'en'): string {
     }
   }
 
+  // Also parse markdown-style links outputted by AI: [anchor text](/how-to/slug)
+  // Convert them into HTML anchors
+  const markdownLinkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+  result = result.replace(markdownLinkRegex, (match, anchorText, url) => {
+    // If the AI didn't prefix the locale to the URL and it's an internal link, add it
+    let finalUrl = url;
+    if (lang !== 'en' && url.startsWith('/') && !url.startsWith(`/${lang}/`)) {
+      finalUrl = `/${lang}${url}`;
+    }
+    return `<a href="${finalUrl}" class="text-pg-rose hover:underline font-medium">${anchorText}</a>`;
+  });
+
   return result;
 }

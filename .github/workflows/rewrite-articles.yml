@@ -1,0 +1,46 @@
+name: Rewrite Thin Articles (Every 4 Hours)
+
+on:
+  schedule:
+    # Every 4 hours: 1 AM, 5 AM, 9 AM, 1 PM, 5 PM, 9 PM UTC
+    # = 6:30 AM, 10:30 AM, 2:30 PM, 6:30 PM, 10:30 PM, 2:30 AM IST
+    - cron: '0 1,5,9,13,17,21 * * *'
+  workflow_dispatch:
+    inputs:
+      min_mins:
+        description: 'Max reading_time_mins to rewrite (default: 3)'
+        required: false
+        default: '3'
+
+permissions:
+  contents: write
+
+jobs:
+  rewrite-thin-articles:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Rewrite thin English articles
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          CLOUDFLARE_DEPLOY_HOOK_URL: ${{ secrets.CLOUDFLARE_DEPLOY_HOOK_URL }}
+        run: |
+          MINS="${{ github.event.inputs.min_mins || '3' }}"
+          node scripts/rewrite-thin-articles.js --min-mins=$MINS
