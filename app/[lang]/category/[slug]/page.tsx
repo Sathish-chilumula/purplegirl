@@ -26,7 +26,7 @@ async function getCategoryArticles(categorySlug: string, lang: string) {
     .eq('category', categorySlug)
     .eq('language', lang)
     .eq('is_published', true)
-    .order('view_count', { ascending: false });
+    .order('published_at', { ascending: false });
   return data || [];
 }
 

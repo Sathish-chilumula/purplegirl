@@ -62,7 +62,7 @@ async function getHomeData(lang: string) {
       .select('slug, title, intro, reading_time_mins, category')
       .eq('language', lang)
       .eq('is_published', true)
-      .order('view_count', { ascending: false })
+      .order('published_at', { ascending: false })
       .limit(6),
     supabaseAdmin
       .from('quizzes')
