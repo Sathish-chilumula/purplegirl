@@ -89,13 +89,13 @@ function buildPrompt(lang) {
     '- Example searches: ' + lang.exampleSearch + '\n' +
     '- Tone: ' + lang.tone + '\n\n' +
     'CRITICAL RULES FOR NATIVE SCRIPT:\n' +
-    '1. ALL text MUST be written in the native ' + lang.script + '. Do NOT write the article in English letters (Latin/Roman script).\n' +
-    '2. You can use English words (like PCOS, IVF) but write the rest of the sentence in ' + lang.script + '.\n' +
-    '3. Keep brand names in English (Amazon, Flipkart) or transcribe them into the native script.\n' +
-    '4. Adapt food/city/cultural references to ' + lang.region + ' specifically\n' +
-    '5. Each step body: 120+ words minimum\n' +
-    '6. Total adapted content: 1000+ words\n' +
-    '7. tip and warning should be null for most steps — only use when genuinely needed\n\n' +
+    '1. ALL normal text MUST be written in the native ' + lang.script + ' (e.g. Hindi should be in Devanagari, Telugu in Telugu Lipi, etc.). Do NOT write the main sentence in English letters.\n' +
+    '2. HOWEVER: ALL Medical terms (PCOS, Thyroid, IVF), technical terms, and Brand names MUST be written in ENGLISH LETTERS (A-Z). DO NOT transliterate them into ' + lang.script + '.\n' +
+    '3. For example, write "PCOS के लक्षण" instead of "पीसीओएस के लक्षण". This makes it easier to read.\n' +
+    '4. Adapt food/city/cultural references to ' + lang.region + ' specifically.\n' +
+    '5. Each step body: 120+ words minimum.\n' +
+    '6. Total adapted content: 1000+ words.\n' +
+    '7. tip and warning should be null for most steps — only use when genuinely needed.\n\n' +
     'SLUG RULE: ' + lang.slug_style + '. Max 80 chars, lowercase, hyphens only.\n\n' +
     'OUTPUT: Return ONLY a valid JSON object. No markdown. No explanation outside JSON.\n\n' +
     '{\n' +

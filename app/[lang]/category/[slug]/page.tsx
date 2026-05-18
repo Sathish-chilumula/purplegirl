@@ -124,7 +124,7 @@ export default async function CategoryPage(props: CategoryPageProps) {
           {/* 3. Article Grid */}
           <div className="grid md:grid-cols-2 gap-6">
             {articles.length > 0 ? articles.map((article) => (
-              <Link key={article.slug} href={`/how-to/${article.slug}`}>
+              <Link key={article.slug} href={lang === 'en' ? `/how-to/${article.slug}` : `/${lang}/how-to/${article.slug}`}>
                 <Card className="h-full hover:border-pg-rose transition-colors flex flex-col p-6">
                   <h3 className="font-display text-[20px] font-bold text-pg-gray-900 mb-3 leading-snug group-hover:text-pg-rose">
                     {article.title}

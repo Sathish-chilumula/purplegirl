@@ -227,14 +227,14 @@ export default async function Home({ params }: HomePageProps) {
           <h2 className="font-sans text-[20px] md:text-[22px] font-bold text-pg-gray-900">
             Popular How-To Guides
           </h2>
-          <Link href="/how-to" className="text-pg-rose text-sm font-bold hover:underline">
+          <Link href={lang === 'en' ? '/how-to' : `/${lang}/how-to`} className="text-pg-rose text-sm font-bold hover:underline">
             View all →
           </Link>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
           {featuredArticles.length > 0 ? featuredArticles.map((article) => (
-            <Link key={article.slug} href={`/how-to/${article.slug}`}>
+            <Link key={article.slug} href={lang === 'en' ? `/how-to/${article.slug}` : `/${lang}/how-to/${article.slug}`}>
               <Card className="h-full hover:border-pg-rose hover:-translate-y-1 hover:shadow-lg hover:shadow-pg-rose/10 transition-all duration-300 flex flex-col p-3 md:p-6 cursor-pointer">
                 <div className="mb-2 md:mb-4">
                   <Badge className="text-[9px] md:text-[10px]">{article.category.replace(/-/g, ' ')}</Badge>
