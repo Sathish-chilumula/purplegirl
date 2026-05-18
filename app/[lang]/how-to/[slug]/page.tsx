@@ -15,10 +15,8 @@ import { Card } from '@/components/ui/Card';
 import { OtherWomenAsked } from '@/components/articles/OtherWomenAsked';
 import { LeadCaptureWidget } from '@/components/articles/LeadCaptureWidget';
 
-// Restored edge runtime for Cloudflare Pages dynamic rendering compatibility
 export const runtime = 'edge';
-export const dynamicParams = true;
-export const revalidate = 3600;
+export const revalidate = 3600; // 1 hour Edge ISR caching
 
 async function getArticleData(slug: string, lang: string) {
   // Try to find exact slug match first (e.g., if they navigated to 'my-guide-hi' directly)
@@ -136,32 +134,6 @@ interface ArticlePageProps {
 }
 
 // ─── generateStaticParams: Pre-builds ALL published articles as static HTML ─────
-// At build time, Cloudflare Pages calls this, fetches every slug from Supabase,
-// and renders each article page as a pure static HTML file.
-// Google Googlebot gets served this static HTML directly from Cloudflare CDN — 
-// no server round-trip, fastest possible TTFB, ideal for indexing speed.
-export async function generateStaticParams() {
-  try {
-    // Fetch all published article slugs + languages in one call
-    const { data } = await supabaseAdmin
-      .from('articles')
-      .select('slug, language')
-      .eq('is_published', true)
-      .order('published_at', { ascending: false })
-      .limit(5000); // Cap to avoid build timeouts on huge datasets
-
-    if (!data) return [];
-
-    return data.map((article) => ({
-      lang: article.language === 'en' ? 'en' : article.language,
-      slug: article.slug,
-    }));
-  } catch (e) {
-    console.warn('generateStaticParams: Could not fetch articles, falling back to empty.', e);
-    return [];
-  }
-}
-
 import { redirect, notFound } from 'next/navigation';
 import { autoLink } from '@/lib/auto-link';
 
