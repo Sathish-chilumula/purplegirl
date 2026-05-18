@@ -220,9 +220,10 @@ async function rewriteThinArticles() {
   // Parse --min-mins arg (default 3 = rewrite articles <=3 min read)
   const minMinsArg = process.argv.find(function(a) { return a.startsWith('--min-mins='); });
   const maxMins = minMinsArg ? parseInt(minMinsArg.split('=')[1]) : 3;
-  const BATCH = 10; // Rewrite 10 per run (quality focus)
+  // BATCH size increased to 50 per user request for fast manual runs
+  const BATCH = 50; 
 
-  console.log('Targeting English articles with reading_time_mins <=', maxMins);
+  console.log('Targeting English articles where is_seo_optimized is not true...');
 
   // --- Show Overall Status ---
   const { count: pendingCount } = await supabase
@@ -230,27 +231,26 @@ async function rewriteThinArticles() {
     .select('*', { count: 'exact', head: true })
     .eq('is_published', true)
     .eq('language', 'en')
-    .lte('reading_time_mins', maxMins);
+    .neq('is_seo_optimized', true); // Anything null or false needs rewriting
     
   const { count: completedCount } = await supabase
     .from('articles')
     .select('*', { count: 'exact', head: true })
     .eq('is_published', true)
     .eq('language', 'en')
-    .gt('reading_time_mins', maxMins);
+    .eq('is_seo_optimized', true);
 
   console.log('\n📊 STATUS REPORT:');
-  console.log(`✅ Completed (1200+ words): ${completedCount || 0} articles`);
-  console.log(`⏳ Pending (Short/Thin):    ${pendingCount || 0} articles\n`);
+  console.log(`✅ SEO Optimized: ${completedCount || 0} articles`);
+  console.log(`⏳ Pending:       ${pendingCount || 0} articles\n`);
 
-  // Fetch thin articles, oldest first (they're the most outdated)
+  // Fetch articles that are NOT yet SEO optimized
   const { data: articles, error } = await supabase
     .from('articles')
     .select('id, slug, title, category')
     .eq('is_published', true)
     .eq('language', 'en')
-    .lte('reading_time_mins', maxMins)
-    .order('reading_time_mins', { ascending: true })
+    .neq('is_seo_optimized', true)
     .order('published_at', { ascending: true })
     .limit(BATCH);
 
@@ -312,6 +312,7 @@ async function rewriteThinArticles() {
           expert_tip: parsed.expert_tip,
           content_json: parsed.content_json,
           reading_time_mins: readingTimeMins,
+          is_seo_optimized: true, // Mark as fully optimized so it's never touched again
           published_at: new Date().toISOString(), // Refresh date — signals to Google it's updated
         })
         .eq('id', article.id);
