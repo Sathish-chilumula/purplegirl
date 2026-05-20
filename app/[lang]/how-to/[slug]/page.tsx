@@ -105,26 +105,34 @@ async function getRelatedQuiz(category: string) {
   return data || { slug, title: 'Take a Quiz', category, thumbnail_emoji: '✨' };
 }
 
-async function getRelatedArticles(article: any) {
-  // Try related_article_slugs first
-  if (article.related_article_slugs && article.related_article_slugs.length > 0) {
-    const { data } = await supabaseAdmin
-      .from('articles')
-      .select('slug, title')
-      .in('slug', article.related_article_slugs.slice(0, 4))
-      .eq('is_published', true);
-    if (data && data.length > 0) return data;
-  }
-  // Fallback: same category, excluding current article
+async function getRelatedArticles(article: any, lang: string = 'en') {
+  // Try to find articles in the SAME language with the SAME category
   const { data } = await supabaseAdmin
     .from('articles')
-    .select('slug, title')
+    .select('slug, title, language')
     .eq('category', article.category)
+    .eq('language', lang)
     .eq('is_published', true)
     .neq('slug', article.slug)
     .order('view_count', { ascending: false })
     .limit(4);
-  return data || [];
+
+  if (data && data.length > 0) return data;
+
+  // Fallback to English articles if no translations exist yet in this category
+  if (lang !== 'en') {
+    const { data: fallbackData } = await supabaseAdmin
+      .from('articles')
+      .select('slug, title, language')
+      .eq('category', article.category)
+      .eq('language', 'en')
+      .eq('is_published', true)
+      .order('view_count', { ascending: false })
+      .limit(4);
+    return fallbackData || [];
+  }
+
+  return [];
 }
 
 const SITE_URL = 'https://purplegirl.in';
@@ -194,7 +202,7 @@ export default async function HowToArticlePage({ params }: ArticlePageProps) {
 
   // Fetch related articles, matching quiz, translations, and increment views in parallel
   const [relatedArticles, relatedQuiz, availableTranslations] = await Promise.all([
-    getRelatedArticles(article),
+    getRelatedArticles(article, lang),
     getRelatedQuiz(article.category),
     getAvailableTranslations(article.slug),
     supabaseAdmin.rpc('increment_view_count', { article_id: article.id }).then(),
@@ -416,7 +424,7 @@ export default async function HowToArticlePage({ params }: ArticlePageProps) {
                 </h2>
                 <div className="grid md:grid-cols-2 gap-6">
                   {relatedArticles.map((rel: any) => (
-                    <Link key={rel.slug} href={`/how-to/${rel.slug}`}>
+                    <Link key={rel.slug} href={(!rel.language || rel.language === 'en') ? `/how-to/${rel.slug}` : `/${rel.language}/how-to/${rel.slug}`}>
                       <Card className="p-6 hover:border-pg-rose transition-colors h-full flex flex-col">
                         <h3 className="font-sans font-bold text-pg-gray-900 mb-2 leading-tight">
                           {rel.title}
