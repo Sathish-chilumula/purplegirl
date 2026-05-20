@@ -30,7 +30,9 @@ export default function Footer({ dict, lang }: FooterProps) {
   const currentPath = pathname.replace(/^\/(hi|te|bn|mr|ta|gu)/, '') || '/';
   
   const getLangLink = (newLang: string) => {
-    return newLang === 'en' ? currentPath : `/${newLang}${currentPath}`;
+    // We route directly to the language home page rather than preserving the current path.
+    // This prevents 404s if the current specific article hasn't been translated yet.
+    return newLang === 'en' ? '/' : `/${newLang}`;
   };
   
   const handleLanguageClick = (newLang: string) => {
