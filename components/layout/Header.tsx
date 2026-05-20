@@ -216,8 +216,7 @@ export default function Header({ dict, lang }: HeaderProps) {
 
   const changeLanguage = (newLang: string) => {
     document.cookie = `NEXT_LOCALE=${newLang}; path=/; max-age=31536000`;
-    const currentPath = pathname.replace(/^\/(hi|te|en)/, '') || '/';
-    router.push(newLang === 'en' ? currentPath : `/${newLang}${currentPath}`);
+    router.push(newLang === 'en' ? '/' : `/${newLang}`);
     setLangOpen(false);
   };
 
