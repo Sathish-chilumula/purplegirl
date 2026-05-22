@@ -167,11 +167,14 @@ async function postArticleToFacebook(article) {
   // Programmatically trigger Facebook Scrape first so the preview card fetches our fb_image_url!
   await triggerFacebookScrape(articleUrl);
 
+  // Add the link to the caption since it's a photo post
+  const fullMessage = `${captionText}\n\nRead the full guide here:\n${articleUrl}`;
+
   try {
-    console.log(`Posting Link Post to Facebook for: ${article.title}`);
-    const response = await axios.post(`https://graph.facebook.com/v20.0/${facebookPageId}/feed`, {
-      message: captionText,
-      link: articleUrl,
+    console.log(`Posting Photo Post to Facebook for: ${article.title}`);
+    const response = await axios.post(`https://graph.facebook.com/v20.0/${facebookPageId}/photos`, {
+      message: fullMessage,
+      url: article.fb_image_url,
     }, {
       headers: {
         'Authorization': `Bearer ${facebookAccessToken}`,

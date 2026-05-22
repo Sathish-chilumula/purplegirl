@@ -129,7 +129,7 @@ async function generatePin(article, format = 'landscape') {
       }
       
       .card {
-        width: 90%; max-width: 950px;
+        width: 85%; max-width: 880px;
         background: rgba(255, 255, 255, 0.75);
         backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px);
         border: 1.5px solid rgba(255, 255, 255, 0.8);
