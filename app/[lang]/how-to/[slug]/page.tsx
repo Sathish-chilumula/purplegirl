@@ -174,21 +174,17 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
       description: article.meta_description || article.intro,
       type: 'article',
       url: lang === 'en' ? `${SITE_URL}/how-to/${slug}` : `${SITE_URL}/${lang}/how-to/${slug}`,
-      images: article.fb_image_url
-        ? [{ url: article.fb_image_url, width: 1200, height: 630 }]
-        : article.pin_image_url
-          ? [{ url: article.pin_image_url, width: 1000, height: 1500 }]
-          : undefined,
+      images: (article.fb_image_url || article.pin_image_url)
+        ? [{ url: article.fb_image_url || article.pin_image_url, width: 1200, height: 630 }]
+        : undefined,
     },
     twitter: {
       card: 'summary_large_image',
       title: article.title,
       description: article.meta_description || article.intro,
-      images: article.fb_image_url
-        ? [article.fb_image_url]
-        : article.pin_image_url
-          ? [article.pin_image_url]
-          : undefined,
+      images: (article.fb_image_url || article.pin_image_url)
+        ? [article.fb_image_url || article.pin_image_url]
+        : undefined,
     },
   };
 }

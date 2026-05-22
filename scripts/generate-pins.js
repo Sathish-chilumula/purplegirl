@@ -31,87 +31,91 @@ const bgPath = path.join(__dirname, 'images', 'background.png');
 const bgData = fs.readFileSync(bgPath);
 const bgBase64 = `data:image/jpeg;base64,${bgData.toString('base64')}`;
 
-async function generatePin(article, format = 'portrait') {
-  const isLandscape = format === 'landscape';
-  const realWidth = isLandscape ? 1200 : 1000;
-  const realHeight = isLandscape ? 630 : 1500;
+async function generatePin(article, format = 'landscape') {
+  // We strictly enforce landscape format (1200x630) to prevent cropping on Facebook
+  const isLandscape = true;
+  const realWidth = 1200;
+  const realHeight = 630;
 
-  console.log(`Generating Premium Dynamic Card (${format}) for: ${article.title}`);
+  console.log(`Generating Premium Dynamic Card (landscape) for: ${article.title}`);
 
-  // 🎨 Premium Category-Specific Gradient Palettes Setup (Primary, Secondary, Ambient Tint)
-  const categoryPalettes = {
-    'relationships-marriage': { primary: '#db2777', secondary: '#f43f5e', tint: 'rgba(219, 39, 119, 0.03)' }, // Pink to Rose
-    'womens-health': { primary: '#059669', secondary: '#10b981', tint: 'rgba(5, 150, 105, 0.03)' }, // Emerald to Green
-    'mental-health-emotions': { primary: '#0891b2', secondary: '#06b6d4', tint: 'rgba(8, 145, 178, 0.03)' }, // Cyan to Sky
-    'skin-beauty': { primary: '#d97706', secondary: '#f59e0b', tint: 'rgba(217, 119, 6, 0.03)' }, // Amber to Yellow
-    'family-parenting': { primary: '#7c3aed', secondary: '#a855f7', tint: 'rgba(124, 58, 237, 0.03)' }, // Violet to Purple
-    'self-growth': { primary: '#4f46e5', secondary: '#6366f1', tint: 'rgba(79, 70, 229, 0.03)' }, // Indigo to Violet
-    'self-growth-confidence': { primary: '#4f46e5', secondary: '#6366f1', tint: 'rgba(79, 70, 229, 0.03)' },
-    'career-workplace': { primary: '#2563eb', secondary: '#3b82f6', tint: 'rgba(37, 99, 235, 0.03)' }, // Blue to Light Blue
-    'baby-care-motherhood': { primary: '#ec4899', secondary: '#f472b6', tint: 'rgba(236, 72, 153, 0.03)' }, // Pink to Soft Pink
-    'food-indian-cooking': { primary: '#ea580c', secondary: '#f97316', tint: 'rgba(234, 88, 12, 0.03)' }, // Orange to Light Orange
-    'sex-intimacy': { primary: '#dc2626', secondary: '#ef4444', tint: 'rgba(220, 38, 38, 0.03)' }, // Red to Light Red
-    'finance-money': { primary: '#0d9488', secondary: '#14b8a6', tint: 'rgba(13, 148, 136, 0.03)' }, // Teal to Mint
-    'weight-fitness': { primary: '#16a34a', secondary: '#22c55e', tint: 'rgba(22, 163, 74, 0.03)' }, // Green to Light Green
-    'pregnancy-fertility': { primary: '#f43f5e', secondary: '#fda4af', tint: 'rgba(244, 63, 94, 0.03)' }, // Rose to soft rose
-    'legal-rights': { primary: '#4b5563', secondary: '#6b7280', tint: 'rgba(75, 85, 99, 0.03)' }, // Gray
-    'hair-care': { primary: '#b45309', secondary: '#d97706', tint: 'rgba(180, 83, 9, 0.03)' }, // Amber-700 to Amber-600
-    'fashion-style': { primary: '#be185d', secondary: '#db2777', tint: 'rgba(190, 24, 93, 0.03)' }, // Pink-700 to Pink-600
-    'home-household': { primary: '#854d0e', secondary: '#a16207', tint: 'rgba(133, 77, 14, 0.03)' }, // Yellow-800 to Yellow-700
-    'festivals-traditions': { primary: '#c026d3', secondary: '#d946ef', tint: 'rgba(192, 38, 211, 0.03)' }, // Fuchsia to Magenta
-  };
-
-  const palette = categoryPalettes[article.category] || { primary: '#8b5cf6', secondary: '#ec4899', tint: 'rgba(139, 92, 246, 0.03)' };
-  const primaryColor = palette.primary;
-  const secondaryColor = palette.secondary;
-  const tintColor = palette.tint;
-
-  // 🎲 Deterministic design choice based on title hash so different articles have unique visual flows
+  // 🎲 Deterministic title hash so different articles have unique visual flows and colors
   const titleHash = (article.slug || article.title).split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+
+  // 🎨 Premium Catalog of Vibrant Colors for Truly Dynamic Multi-Color Gradients
+  const vibrantColors = [
+    '#db2777', // Pink
+    '#f43f5e', // Rose
+    '#7c3aed', // Violet
+    '#4f46e5', // Indigo
+    '#2563eb', // Blue
+    '#0891b2', // Cyan
+    '#0d9488', // Teal
+    '#059669', // Emerald
+    '#d97706', // Amber
+    '#ea580c', // Orange
+    '#dc2626', // Red
+    '#c026d3', // Fuchsia
+  ];
+
+  // Dynamic 3-Color Gradient Engine based on titleHash for rich multi-color variety
+  const baseLen = vibrantColors.length;
+  const c1Index = titleHash % baseLen;
+  const primaryColor = vibrantColors[c1Index];
+
+  const c2Offset = 1 + (titleHash % (baseLen - 1));
+  const secondaryColor = vibrantColors[(c1Index + c2Offset) % baseLen];
+
+  const c3Offset = 1 + ((titleHash >> 2) % (baseLen - 2));
+  const remainingColors = vibrantColors.filter(c => c !== primaryColor && c !== secondaryColor);
+  const tertiaryColor = remainingColors[c3Offset % remainingColors.length];
+
+  const tintColor = `${primaryColor}05`; // Ultra-soft ambient primary overlay
+
   const designPreset = titleHash % 4; // 4 distinct layouts now!
 
   // 🌌 Deterministic dynamic decorative elements for premium visual variety
-  const bubble1X = isLandscape ? ((titleHash % 500) - 200) : ((titleHash % 400) - 150);
-  const bubble1Y = isLandscape ? (((titleHash >> 2) % 250) - 100) : (((titleHash >> 2) % 500) - 150);
-  const bubble1Size = isLandscape ? (((titleHash >> 4) % 200) + 300) : (((titleHash >> 4) % 300) + 450);
+  const bubble1X = ((titleHash % 500) - 200);
+  const bubble1Y = (((titleHash >> 2) % 250) - 100);
+  const bubble1Size = (((titleHash >> 4) % 200) + 300);
 
-  const bubble2X = realWidth - (isLandscape ? (((titleHash >> 6) % 500) + 200) : (((titleHash >> 6) % 400) + 350));
-  const bubble2Y = realHeight - (isLandscape ? (((titleHash >> 8) % 250) + 200) : (((titleHash >> 8) % 500) + 350));
-  const bubble2Size = isLandscape ? (((titleHash >> 10) % 200) + 300) : (((titleHash >> 10) % 300) + 450);
+  const bubble2X = realWidth - (((titleHash >> 6) % 500) + 200);
+  const bubble2Y = realHeight - (((titleHash >> 8) % 250) + 200);
+  const bubble2Size = (((titleHash >> 10) % 200) + 300);
+
+  // Third bubble for extra depth in our multi-color atmosphere
+  const bubble3X = (((titleHash >> 12) % 400) + 400);
+  const bubble3Y = (((titleHash >> 14) % 200) + 200);
+  const bubble3Size = (((titleHash >> 16) % 150) + 250);
 
   // Soft dual-tone glowing background blends
-  const bubbleColor1 = `${primaryColor}26`; // 15% opacity primary
-  const bubbleColor2 = `${secondaryColor}22`; // 13% opacity secondary
+  const bubbleColor1 = `${primaryColor}33`; // 20% opacity primary
+  const bubbleColor2 = `${secondaryColor}26`; // 15% opacity secondary
+  const bubbleColor3 = `${tertiaryColor}1E`; // 12% opacity tertiary
 
   // Dynamic values inside layouts based on hash
   const dynamicBorderRadius = (titleHash % 2 === 0) ? '32px' : '20px';
   const dynamicCardShadow = (titleHash % 2 === 0) 
     ? '0 25px 50px -12px rgba(0,0,0,0.08)' 
     : '0 20px 40px -8px rgba(0,0,0,0.06)';
-  const dynamicStripeWidth = isLandscape 
-    ? ((titleHash % 2 === 0) ? '18px' : '12px')
-    : ((titleHash % 2 === 0) ? '28px' : '20px');
+  const dynamicStripeWidth = ((titleHash % 2 === 0) ? '18px' : '12px');
   const dynamicPillRadius = (titleHash % 2 === 0) ? '100px' : '12px';
-  const dynamicUnderlineWidth1 = isLandscape
-    ? ((titleHash % 2 === 0) ? '120px' : '100px')
-    : ((titleHash % 2 === 0) ? '180px' : '140px');
-  const dynamicUnderlineWidth2 = isLandscape
-    ? ((titleHash % 2 === 0) ? '60px' : '50px')
-    : ((titleHash % 2 === 0) ? '90px' : '70px');
+  const dynamicUnderlineWidth1 = ((titleHash % 2 === 0) ? '120px' : '100px');
+  const dynamicUnderlineWidth2 = ((titleHash % 2 === 0) ? '60px' : '50px');
 
   // Format-specific sizing & spacing rules
-  const categoryFontSize = isLandscape ? '18px' : '28px';
-  const categoryLetterSpacing = isLandscape ? '3px' : '4px';
-  const categoryMarginBottom = isLandscape ? '12px' : '30px';
+  const categoryFontSize = '18px';
+  const categoryLetterSpacing = '3px';
+  const categoryMarginBottom = '12px';
 
-  const titleFontSizeEn = isLandscape ? '44px' : '82px';
-  const titleFontSizeTe = isLandscape ? '34px' : '62px';
+  const titleFontSizeEn = '44px';
+  const titleFontSizeTe = '34px';
   const titleFontSize = article.language === 'te' ? titleFontSizeTe : titleFontSizeEn;
   const titleLineHeight = article.language === 'te' ? '1.3' : '1.1';
-  const titleMarginBottom = isLandscape ? '18px' : '40px';
+  const titleMarginBottom = '18px';
 
-  const btnPadding = isLandscape ? '12px 36px' : '20px 50px';
-  const btnFontSize = isLandscape ? '20px' : '32px';
+  const btnPadding = '12px 36px';
+  const btnFontSize = '20px';
 
   let mainCardMarkup;
 
@@ -137,7 +141,7 @@ async function generatePin(article, format = 'portrait') {
             props: {
               style: {
                 width: dynamicStripeWidth,
-                background: `linear-gradient(to bottom, ${primaryColor}, ${secondaryColor})`,
+                background: `linear-gradient(to bottom, ${primaryColor}, ${secondaryColor}, ${tertiaryColor})`,
               },
             },
           },
@@ -186,7 +190,7 @@ async function generatePin(article, format = 'portrait') {
                   type: 'div',
                   props: {
                     style: {
-                      background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`,
+                      background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor}, ${tertiaryColor})`,
                       color: 'white',
                       padding: btnPadding,
                       borderRadius: '12px',
@@ -227,7 +231,7 @@ async function generatePin(article, format = 'portrait') {
             type: 'div',
             props: {
               style: {
-                background: `linear-gradient(to right, ${primaryColor}1A, ${secondaryColor}1A)`,
+                background: `linear-gradient(to right, ${primaryColor}1A, ${secondaryColor}1A, ${tertiaryColor}1A)`,
                 border: `1.5px solid ${primaryColor}40`,
                 color: primaryColor,
                 padding: isLandscape ? '8px 24px' : '12px 32px',
@@ -272,7 +276,7 @@ async function generatePin(article, format = 'portrait') {
                     style: {
                       width: dynamicUnderlineWidth1,
                       height: isLandscape ? '3px' : '5px',
-                      background: `linear-gradient(to right, ${primaryColor}, ${secondaryColor})`,
+                      background: `linear-gradient(to right, ${primaryColor}, ${secondaryColor}, ${tertiaryColor})`,
                       marginBottom: isLandscape ? '4px' : '6px',
                       borderRadius: '2px',
                     },
@@ -284,7 +288,7 @@ async function generatePin(article, format = 'portrait') {
                     style: {
                       width: dynamicUnderlineWidth2,
                       height: isLandscape ? '1px' : '2px',
-                      backgroundColor: `${secondaryColor}80`,
+                      backgroundColor: `${tertiaryColor}80`,
                       borderRadius: '1px',
                     },
                   },
@@ -296,7 +300,7 @@ async function generatePin(article, format = 'portrait') {
             type: 'div',
             props: {
               style: {
-                background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`,
+                background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor}, ${tertiaryColor})`,
                 color: 'white',
                 padding: btnPadding,
                 borderRadius: '50px',
@@ -343,7 +347,7 @@ async function generatePin(article, format = 'portrait') {
                 left: 0,
                 right: 0,
                 height: isLandscape ? '6px' : '10px',
-                background: `linear-gradient(to right, ${primaryColor}, ${secondaryColor})`,
+                background: `linear-gradient(to right, ${primaryColor}, ${secondaryColor}, ${tertiaryColor})`,
               },
             },
           },
@@ -425,7 +429,7 @@ async function generatePin(article, format = 'portrait') {
                       width: isLandscape ? '8px' : '12px',
                       height: isLandscape ? '8px' : '12px',
                       borderRadius: '50%',
-                      background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`,
+                      background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor}, ${tertiaryColor})`,
                       marginLeft: '8px',
                       marginRight: '8px',
                     },
@@ -513,7 +517,7 @@ async function generatePin(article, format = 'portrait') {
               style: {
                 width: isLandscape ? '80px' : '120px',
                 height: '3px',
-                background: `linear-gradient(to right, ${primaryColor}, ${secondaryColor})`,
+                background: `linear-gradient(to right, ${primaryColor}, ${secondaryColor}, ${tertiaryColor})`,
                 marginBottom: isLandscape ? '20px' : '40px',
                 borderRadius: '2px',
               },
@@ -523,7 +527,7 @@ async function generatePin(article, format = 'portrait') {
             type: 'div',
             props: {
               style: {
-                background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`,
+                background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor}, ${tertiaryColor})`,
                 color: 'white',
                 padding: btnPadding,
                 borderRadius: '50px',
@@ -609,6 +613,21 @@ async function generatePin(article, format = 'portrait') {
               height: `${bubble2Size}px`,
               borderRadius: '50%',
               background: `radial-gradient(circle, ${bubbleColor2} 0%, rgba(255,255,255,0) 70%)`,
+            },
+          },
+        },
+        // 🌌 Dynamic Glowing Atmosphere Bubble 3
+        {
+          type: 'div',
+          props: {
+            style: {
+              position: 'absolute',
+              top: `${bubble3Y}px`,
+              left: `${bubble3X}px`,
+              width: `${bubble3Size}px`,
+              height: `${bubble3Size}px`,
+              borderRadius: '50%',
+              background: `radial-gradient(circle, ${bubbleColor3} 0%, rgba(255,255,255,0) 70%)`,
             },
           },
         },
@@ -739,25 +758,13 @@ async function main() {
   console.log(`Found ${articles.length} articles that need social cards.`);
 
   for (const article of articles) {
-    const titleHash = (article.slug || article.title).split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const chosenFormat = (titleHash % 2 === 0) ? 'landscape' : 'portrait';
-    
-    console.log(`Selected format ${chosenFormat} for: ${article.title}`);
-    const publicUrl = await generatePin(article, chosenFormat);
+    const publicUrl = await generatePin(article, 'landscape');
     if (publicUrl) {
-      if (chosenFormat === 'landscape') {
-        await supabase
-          .from('articles')
-          .update({ fb_image_url: publicUrl, pin_image_url: null })
-          .eq('id', article.id);
-        console.log(`✅ Saved landscape card to fb_image_url: ${publicUrl}`);
-      } else {
-        await supabase
-          .from('articles')
-          .update({ pin_image_url: publicUrl, fb_image_url: null })
-          .eq('id', article.id);
-        console.log(`✅ Saved portrait pin to pin_image_url: ${publicUrl}`);
-      }
+      await supabase
+        .from('articles')
+        .update({ fb_image_url: publicUrl, pin_image_url: publicUrl })
+        .eq('id', article.id);
+      console.log(`✅ Saved landscape card to both fb_image_url and pin_image_url: ${publicUrl}`);
     }
   }
 }

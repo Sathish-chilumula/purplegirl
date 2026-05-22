@@ -143,43 +143,25 @@ async function postArticleToFacebook(article) {
   // Clean description WITHOUT raw URLs (Facebook clickable card handles redirects)
   const captionText = `${emoji} ${article.title}\n\n${article.meta_description || 'Read the full guide on PurpleGirl!'}\n\n${hashtags}`;
 
-  // Check if we already have an image generated for this article (either landscape or portrait)
-  const hasImage = article.fb_image_url || article.pin_image_url;
-  
-  if (!hasImage) {
-    const titleHash = (article.slug || article.title).split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const chosenFormat = (titleHash % 2 === 0) ? 'landscape' : 'portrait';
-    console.log(`Generating a single rich card (format: ${chosenFormat}) on-the-fly for: ${article.title}`);
-    
+  // For Facebook link posts, we strictly require a premium landscape card (1200x630) to prevent awkward cropping.
+  if (!article.fb_image_url) {
+    console.log(`Generating a premium landscape card on-the-fly for Facebook link preview: ${article.title}`);
     try {
-      const publicUrl = await generatePin(article, chosenFormat);
+      const publicUrl = await generatePin(article, 'landscape');
       if (publicUrl) {
-        if (chosenFormat === 'landscape') {
-          article.fb_image_url = publicUrl;
-          article.pin_image_url = null;
-          // Persist in Supabase, making sure pin_image_url is explicitly null
-          await supabase
-            .from('articles')
-            .update({ fb_image_url: publicUrl, pin_image_url: null })
-            .eq('id', article.id);
-          console.log(`✅ Successfully generated & persisted Facebook landscape card: ${publicUrl}`);
-        } else {
-          article.pin_image_url = publicUrl;
-          article.fb_image_url = null;
-          // Persist in Supabase, making sure fb_image_url is explicitly null
-          await supabase
-            .from('articles')
-            .update({ pin_image_url: publicUrl, fb_image_url: null })
-            .eq('id', article.id);
-          console.log(`✅ Successfully generated & persisted Pinterest portrait pin: ${publicUrl}`);
-        }
+        article.fb_image_url = publicUrl;
+        // Persist the landscape card in Supabase to both fb_image_url and pin_image_url
+        await supabase
+          .from('articles')
+          .update({ fb_image_url: publicUrl, pin_image_url: publicUrl })
+          .eq('id', article.id);
+        console.log(`✅ Successfully generated & persisted Facebook landscape card to both fields: ${publicUrl}`);
       }
     } catch (genError) {
       console.error(`Error generating card dynamically for ${article.slug}:`, genError);
     }
   } else {
-    const existingFormat = article.fb_image_url ? 'landscape' : 'portrait';
-    console.log(`Using existing ${existingFormat} card: ${article.fb_image_url || article.pin_image_url}`);
+    console.log(`Using existing landscape card: ${article.fb_image_url}`);
   }
 
   // Programmatically trigger Facebook Scrape first so the preview card fetches our fb_image_url!
@@ -207,28 +189,90 @@ async function postArticleToFacebook(article) {
 }
 
 async function main() {
-  // Fetch articles that are published but haven't been posted to Facebook yet (English and Telugu only)
-  const { data: articles, error } = await supabase
+  // 1. Fetch unpublished/unposted Telugu articles (up to 3 in case of backfill)
+  const { data: teArticles, error: teError } = await supabase
     .from('articles')
-    .select('id, title, slug, category, language, meta_description, pin_image_url, fb_image_url')
+    .select('id, title, slug, category, language, meta_description, pin_image_url, fb_image_url, published_at')
     .eq('is_published', true)
-    .in('language', ['en', 'te'])
+    .eq('language', 'te')
     .is('facebook_id', null)
-    .limit(3); // Process exactly 3 articles per run
+    .order('published_at', { ascending: false })
+    .limit(3);
 
-  if (error) {
-    console.error('Error fetching articles from Supabase:', error);
+  if (teError) {
+    console.error('Error fetching Telugu articles from Supabase:', teError);
     return;
   }
 
-  if (!articles || articles.length === 0) {
+  // 2. Fetch unpublished/unposted English articles (up to 3 in case of backfill)
+  const { data: enArticles, error: enError } = await supabase
+    .from('articles')
+    .select('id, title, slug, category, language, meta_description, pin_image_url, fb_image_url, published_at')
+    .eq('is_published', true)
+    .eq('language', 'en')
+    .is('facebook_id', null)
+    .order('published_at', { ascending: false })
+    .limit(3);
+
+  if (enError) {
+    console.error('Error fetching English articles from Supabase:', enError);
+    return;
+  }
+
+  const teList = teArticles || [];
+  const enList = enArticles || [];
+
+  console.log(`Found ${teList.length} Telugu articles and ${enList.length} English articles ready for Facebook posting.`);
+
+  const selectedArticles = [];
+
+  // Goal: Exactly 3 posts. Standard mix is 2 Telugu and 1 English.
+  // We'll take up to 2 Telugu first, then up to 1 English.
+  // Then we backfill if we didn't reach 3.
+
+  // 1. Take up to 2 Telugu
+  const teToTake = Math.min(teList.length, 2);
+  for (let i = 0; i < teToTake; i++) {
+    selectedArticles.push(teList[i]);
+  }
+
+  // 2. Take up to 1 English
+  const enToTake = Math.min(enList.length, 1);
+  for (let i = 0; i < enToTake; i++) {
+    selectedArticles.push(enList[i]);
+  }
+
+  // 3. Backfill with Telugu if we still need more to reach 3, and we have leftover Telugu
+  if (selectedArticles.length < 3 && teList.length > teToTake) {
+    const leftoverTe = teList.slice(teToTake);
+    const need = 3 - selectedArticles.length;
+    const toTake = Math.min(leftoverTe.length, need);
+    for (let i = 0; i < toTake; i++) {
+      selectedArticles.push(leftoverTe[i]);
+    }
+  }
+
+  // 4. Backfill with English if we still need more to reach 3, and we have leftover English
+  if (selectedArticles.length < 3 && enList.length > enToTake) {
+    const leftoverEn = enList.slice(enToTake);
+    const need = 3 - selectedArticles.length;
+    const toTake = Math.min(leftoverEn.length, need);
+    for (let i = 0; i < toTake; i++) {
+      selectedArticles.push(leftoverEn[i]);
+    }
+  }
+
+  if (selectedArticles.length === 0) {
     console.log('No new articles found to post to Facebook.');
     return;
   }
 
-  console.log(`Found ${articles.length} article(s) ready to post to Facebook.`);
+  console.log(`Selected ${selectedArticles.length} article(s) to post to Facebook.`);
+  for (const article of selectedArticles) {
+    console.log(`- [${article.language.toUpperCase()}] ${article.title} (${article.slug})`);
+  }
 
-  for (const article of articles) {
+  for (const article of selectedArticles) {
     const facebookPostId = await postArticleToFacebook(article);
     if (facebookPostId) {
       const { error: updateError } = await supabase
