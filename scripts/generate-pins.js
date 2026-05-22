@@ -21,10 +21,15 @@ const fontSansPath = path.join(__dirname, 'fonts', 'NotoSans-Bold.ttf');
 const fontSerifData = fs.readFileSync(fontSerifPath);
 const fontSansData = fs.readFileSync(fontSansPath);
 
+const fontSerifTeluguPath = path.join(__dirname, 'fonts', 'NotoSerifTelugu-Bold.ttf');
+const fontSansTeluguPath = path.join(__dirname, 'fonts', 'NotoSansTelugu-Bold.ttf');
+const fontSerifTeluguData = fs.readFileSync(fontSerifTeluguPath);
+const fontSansTeluguData = fs.readFileSync(fontSansTeluguPath);
+
 // Load Background Image and convert to Base64
 const bgPath = path.join(__dirname, 'images', 'background.png');
 const bgData = fs.readFileSync(bgPath);
-const bgBase64 = `data:image/png;base64,${bgData.toString('base64')}`;
+const bgBase64 = `data:image/jpeg;base64,${bgData.toString('base64')}`;
 
 async function generatePin(article) {
   console.log(`Generating Premium Pin for: ${article.title}`);
@@ -37,13 +42,26 @@ async function generatePin(article) {
         flexDirection: 'column',
         width: '1000px',
         height: '1500px',
-        backgroundImage: `url(${bgBase64})`,
-        backgroundSize: '100% 100%',
+        backgroundColor: '#f5f3ff',
         padding: '60px',
         alignItems: 'center',
         justifyContent: 'center',
       },
       children: [
+        // Background Image
+        {
+          type: 'img',
+          props: {
+            src: bgBase64,
+            style: {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '1000px',
+              height: '1500px',
+            },
+          },
+        },
         // Decorative Border
         {
           type: 'div',
@@ -94,9 +112,9 @@ async function generatePin(article) {
                 type: 'h1',
                 props: {
                   style: {
-                    fontSize: '84px',
-                    fontFamily: 'NotoSerif',
-                    lineHeight: '1.1',
+                    fontSize: article.language === 'te' ? '64px' : '84px',
+                    fontFamily: article.language === 'te' ? 'NotoSerifTelugu' : 'NotoSerif',
+                    lineHeight: article.language === 'te' ? '1.2' : '1.1',
                     color: '#111827',
                     marginBottom: '40px',
                   },
@@ -180,6 +198,18 @@ async function generatePin(article) {
         weight: 700,
         style: 'normal',
       },
+      {
+        name: 'NotoSerifTelugu',
+        data: fontSerifTeluguData,
+        weight: 700,
+        style: 'normal',
+      },
+      {
+        name: 'NotoSansTelugu',
+        data: fontSansTeluguData,
+        weight: 700,
+        style: 'normal',
+      },
     ],
   });
 
@@ -210,6 +240,7 @@ async function main() {
     .from('articles')
     .select('id, title, slug, category, language')
     .is('pin_image_url', null) // Only process articles that don't have a pin yet
+    .in('language', ['en', 'te']) // Only generate for English and Telugu
     .order('published_at', { ascending: false })
     .limit(50); // Process 50 per run
 
@@ -224,5 +255,8 @@ async function main() {
     }
   }
 }
+if (require.main === module) {
+  main();
+}
 
-main();
+module.exports = { generatePin };
