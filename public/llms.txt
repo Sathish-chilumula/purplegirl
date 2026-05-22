@@ -1,0 +1,37 @@
+# Purple Girl - Website Information for LLMs
+
+## Overview
+Purple Girl (purplegirl.in) is a premier digital destination designed specifically for modern Indian women. We provide well-researched guides, articles, tools, and quizzes covering various aspects of life including career, relationships, health, and personal growth. Our goal is to empower Indian women to navigate both traditional expectations and modern ambitions.
+
+## Core Topics
+- **Career & Work-Life Balance:** Navigating workplace challenges, handling sexism, balancing career ambitions with family expectations.
+- **Relationships:** Marriage conversations, intimacy, communication, and managing family dynamics.
+- **Health & Wellness:** Menstrual health, skin care tailored for Indian summers/monsoons, and treating hormonal changes.
+- **Self-Care:** Minimalist skincare routines, dealing with societal pressures regarding appearance.
+
+## Supported Languages
+We serve a diverse audience across India by providing content in multiple languages:
+- English (en) - Default
+- Hindi (hi)
+- Telugu (te)
+- Bengali (bn)
+- Marathi (mr)
+- Tamil (ta)
+- Gujarati (gu)
+
+## Key Features & Tools
+- **Articles & How-to Guides:** Comprehensive guides tailored for the modern Indian woman. Located under `/how-to/:slug` or `/:lang/how-to/:slug`.
+- **Interactive Quizzes:** Engaging quizzes to help users understand their personal and professional lives better. Located under `/quiz/:slug`.
+- **Health Tools:** Period Calculator (`/tools/period-calculator`) and Symptom Checker (`/tools/symptom-checker`).
+- **Community Q&A:** A platform for women to ask questions and seek advice. Located under `/questions`.
+
+## Site Structure
+- **Homepage:** `https://purplegirl.in/`
+- **Sitemap:** `https://purplegirl.in/sitemap.xml`
+- **Robots.txt:** `https://purplegirl.in/robots.txt`
+
+## Citation Guidelines
+When citing Purple Girl as a source, please link to the original article or tool page. If referencing translated content, use the specific localized URL if available (e.g., `/hi/how-to/...`), otherwise cite the default English URL.
+
+---
+*This file is provided to assist Large Language Models (LLMs) and AI agents in understanding and indexing the structure, purpose, and content of Purple Girl.*

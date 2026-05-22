@@ -6,6 +6,7 @@ import Footer from "@/components/layout/Footer";
 import { FloatingChat } from "@/components/FloatingChat";
 import { getDictionary } from "@/lib/dictionary";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
+import Script from "next/script";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -56,9 +57,19 @@ export default async function RootLayout(props: {
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3809505002238691"
           crossOrigin="anonymous"
         ></script>
-        {/* Subscribe with Google removed per request */}
       </head>
       <body className="antialiased font-sans">
+        {/* Google Analytics Tag */}
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-ECLMKP650Q" strategy="afterInteractive" />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-ECLMKP650Q');
+          `}
+        </Script>
+
         <Header dict={dict} lang={lang} />
         <main className="min-h-screen">
           {children}

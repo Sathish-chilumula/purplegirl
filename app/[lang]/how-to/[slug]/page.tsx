@@ -51,11 +51,9 @@ async function getArticleData(slug: string, lang: string) {
   }
 
   // For English routes, return exact match (even if null → triggers notFound())
-  // For non-English routes with no translation found above: return null → clean 404.
-  // NOTE: Once a translation IS inserted to DB with language='hi'/'te' etc.,
-  // it will be caught at line 30 above and served correctly. The 404 only fires
-  // when NO translation exists yet — eliminating the duplicate content problem.
-  if (lang === 'en') {
+  // For non-English routes with no translation found above: return exactMatch fallback.
+  // This prevents 404s when a user with a regional locale visits an untranslated article.
+  if (lang === 'en' || exactMatch) {
     return { article: exactMatch, redirectSlug: null };
   }
   return { article: null, redirectSlug: null };
@@ -156,20 +154,19 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
   if (!article) return { title: 'Not Found' };
   
   return {
-    // Let the layout template append " | PurpleGirl" — don't add it here to avoid double-branding
     title: article.title,
     description: article.meta_description || article.intro,
     alternates: {
-      canonical: lang === 'en' ? `/how-to/${slug}` : `/${lang}/how-to/${slug}`,
+      canonical: article.language === 'en' ? `/how-to/${article.slug}` : `/${article.language}/how-to/${article.slug}`,
       languages: {
-        'en': `${SITE_URL}/how-to/${slug}`,
-        'hi': `${SITE_URL}/hi/how-to/${slug}`,
-        'te': `${SITE_URL}/te/how-to/${slug}`,
-        'bn': `${SITE_URL}/bn/how-to/${slug}`,
-        'mr': `${SITE_URL}/mr/how-to/${slug}`,
-        'ta': `${SITE_URL}/ta/how-to/${slug}`,
-        'gu': `${SITE_URL}/gu/how-to/${slug}`,
-        'x-default': `${SITE_URL}/how-to/${slug}`,
+        'en': `${SITE_URL}/how-to/${article.slug}`,
+        'hi': `${SITE_URL}/hi/how-to/${article.slug}`,
+        'te': `${SITE_URL}/te/how-to/${article.slug}`,
+        'bn': `${SITE_URL}/bn/how-to/${article.slug}`,
+        'mr': `${SITE_URL}/mr/how-to/${article.slug}`,
+        'ta': `${SITE_URL}/ta/how-to/${article.slug}`,
+        'gu': `${SITE_URL}/gu/how-to/${article.slug}`,
+        'x-default': `${SITE_URL}/how-to/${article.slug}`,
       }
     },
     openGraph: {
