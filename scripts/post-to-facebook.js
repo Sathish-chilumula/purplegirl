@@ -214,7 +214,7 @@ async function main() {
     .eq('is_published', true)
     .in('language', ['en', 'te'])
     .is('facebook_id', null)
-    .limit(1); // Process exactly 1 article per run to test E2E and prevent rate limiting
+    .limit(3); // Process exactly 3 articles per run
 
   if (error) {
     console.error('Error fetching articles from Supabase:', error);
