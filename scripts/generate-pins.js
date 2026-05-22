@@ -66,11 +66,6 @@ async function generatePin(article, format = 'landscape') {
   const fontSerifBase64 = fs.readFileSync(fontSerifPath).toString('base64');
   const fontSansBase64 = fs.readFileSync(fontSansPath).toString('base64');
   const fontSerifTeluguBase64 = fs.readFileSync(fontSerifTeluguPath).toString('base64');
-  
-  let logoBase64 = '';
-  if (fs.existsSync(logoPath)) {
-    logoBase64 = `data:image/png;base64,${fs.readFileSync(logoPath).toString('base64')}`;
-  }
 
   // Determine Emoji
   const lowerCategory = (article.category || '').toLowerCase();
@@ -176,7 +171,6 @@ async function generatePin(article, format = 'landscape') {
     <div class="bg-emoji">${emoji}</div>
     
     <div class="card">
-      ${logoBase64 ? '<img src="' + logoBase64 + '" class="logo-img" />' : ''}
       <div class="badge"><span>${emoji}</span> ${article.category.replace(/-/g, ' ')}</div>
       <h1>${article.title}</h1>
       <div class="cta">Read Guide →</div>
@@ -222,9 +216,11 @@ async function main() {
   const { data: articles, error } = await supabase
     .from('articles')
     .select('id, title, slug, category, language')
+    .is('pin_image_url', null)
+    .is('fb_image_url', null)
     .in('language', ['en', 'te'])
     .order('published_at', { ascending: false })
-    .limit(3); // Temporarily test on the 3 most recent articles
+    .limit(5);
 
   if (!articles || articles.length === 0) return;
 
