@@ -724,7 +724,7 @@ async function main() {
     .is('fb_image_url', null)
     .in('language', ['en', 'te']) // Only English and Telugu
     .order('published_at', { ascending: false })
-    .limit(50);
+    .limit(5);
 
   if (error) {
     console.error('Error fetching articles for pin/card generation:', error);
