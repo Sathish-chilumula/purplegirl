@@ -193,7 +193,7 @@ async function main() {
     .eq('language', 'te')
     .is('threads_id', null)
     .order('published_at', { ascending: false })
-    .limit(3);
+    .limit(5);
 
   const { data: enArticles, error: enError } = await supabase
     .from('articles')
@@ -202,7 +202,7 @@ async function main() {
     .eq('language', 'en')
     .is('threads_id', null)
     .order('published_at', { ascending: false })
-    .limit(3);
+    .limit(5);
 
   const teList = teArticles || [];
   const enList = enArticles || [];
@@ -211,28 +211,28 @@ async function main() {
 
   const selectedArticles = [];
   
-  // Standard mix: up to 2 Telugu, 1 English
-  const teToTake = Math.min(teList.length, 2);
+  // Standard mix: up to 3 Telugu, 2 English
+  const teToTake = Math.min(teList.length, 3);
   for (let i = 0; i < teToTake; i++) {
     selectedArticles.push(teList[i]);
   }
-  const enToTake = Math.min(enList.length, 1);
+  const enToTake = Math.min(enList.length, 2);
   for (let i = 0; i < enToTake; i++) {
     selectedArticles.push(enList[i]);
   }
 
   // Backfill if needed
-  if (selectedArticles.length < 3 && teList.length > teToTake) {
+  if (selectedArticles.length < 5 && teList.length > teToTake) {
     const leftoverTe = teList.slice(teToTake);
-    const need = 3 - selectedArticles.length;
+    const need = 5 - selectedArticles.length;
     const toTake = Math.min(leftoverTe.length, need);
     for (let i = 0; i < toTake; i++) {
       selectedArticles.push(leftoverTe[i]);
     }
   }
-  if (selectedArticles.length < 3 && enList.length > enToTake) {
+  if (selectedArticles.length < 5 && enList.length > enToTake) {
     const leftoverEn = enList.slice(enToTake);
-    const need = 3 - selectedArticles.length;
+    const need = 5 - selectedArticles.length;
     const toTake = Math.min(leftoverEn.length, need);
     for (let i = 0; i < toTake; i++) {
       selectedArticles.push(leftoverEn[i]);

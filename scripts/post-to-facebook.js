@@ -201,7 +201,7 @@ async function main() {
     .eq('language', 'te')
     .is('facebook_id', null)
     .order('published_at', { ascending: false })
-    .limit(3);
+    .limit(5);
 
   if (teError) {
     console.error('Error fetching Telugu articles from Supabase:', teError);
@@ -216,7 +216,7 @@ async function main() {
     .eq('language', 'en')
     .is('facebook_id', null)
     .order('published_at', { ascending: false })
-    .limit(3);
+    .limit(5);
 
   if (enError) {
     console.error('Error fetching English articles from Supabase:', enError);
@@ -230,36 +230,36 @@ async function main() {
 
   const selectedArticles = [];
 
-  // Goal: Exactly 3 posts. Standard mix is 2 Telugu and 1 English.
-  // We'll take up to 2 Telugu first, then up to 1 English.
-  // Then we backfill if we didn't reach 3.
+  // Goal: Exactly 5 posts. Standard mix is 3 Telugu and 2 English.
+  // We'll take up to 3 Telugu first, then up to 2 English.
+  // Then we backfill if we didn't reach 5.
 
-  // 1. Take up to 2 Telugu
-  const teToTake = Math.min(teList.length, 2);
+  // 1. Take up to 3 Telugu
+  const teToTake = Math.min(teList.length, 3);
   for (let i = 0; i < teToTake; i++) {
     selectedArticles.push(teList[i]);
   }
 
-  // 2. Take up to 1 English
-  const enToTake = Math.min(enList.length, 1);
+  // 2. Take up to 2 English
+  const enToTake = Math.min(enList.length, 2);
   for (let i = 0; i < enToTake; i++) {
     selectedArticles.push(enList[i]);
   }
 
-  // 3. Backfill with Telugu if we still need more to reach 3, and we have leftover Telugu
-  if (selectedArticles.length < 3 && teList.length > teToTake) {
+  // 3. Backfill with Telugu if we still need more to reach 5, and we have leftover Telugu
+  if (selectedArticles.length < 5 && teList.length > teToTake) {
     const leftoverTe = teList.slice(teToTake);
-    const need = 3 - selectedArticles.length;
+    const need = 5 - selectedArticles.length;
     const toTake = Math.min(leftoverTe.length, need);
     for (let i = 0; i < toTake; i++) {
       selectedArticles.push(leftoverTe[i]);
     }
   }
 
-  // 4. Backfill with English if we still need more to reach 3, and we have leftover English
-  if (selectedArticles.length < 3 && enList.length > enToTake) {
+  // 4. Backfill with English if we still need more to reach 5, and we have leftover English
+  if (selectedArticles.length < 5 && enList.length > enToTake) {
     const leftoverEn = enList.slice(enToTake);
-    const need = 3 - selectedArticles.length;
+    const need = 5 - selectedArticles.length;
     const toTake = Math.min(leftoverEn.length, need);
     for (let i = 0; i < toTake; i++) {
       selectedArticles.push(leftoverEn[i]);
