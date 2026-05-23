@@ -164,29 +164,30 @@ async function postArticleToFacebook(article) {
     console.log(`Using existing landscape card: ${article.fb_image_url}`);
   }
 
-  // Programmatically trigger Facebook Scrape first so the preview card fetches our fb_image_url!
-  await triggerFacebookScrape(articleUrl);
-
-  // Add the link to the caption since it's a photo post
-  const fullMessage = `${captionText}\n\nRead the full guide here:\n${articleUrl}`;
-
   try {
-    console.log(`Posting Photo Post to Facebook for: ${article.title}`);
-    const response = await axios.post(`https://graph.facebook.com/v20.0/${facebookPageId}/photos`, {
-      message: fullMessage,
-      url: article.fb_image_url,
-    }, {
-      headers: {
-        'Authorization': `Bearer ${facebookAccessToken}`,
-        'Content-Type': 'application/json'
-      }
-    });
+    console.log(`Sending Photo Post data to Make.com Webhook for: ${article.title}`);
+    const MAKE_WEBHOOK_URL = 'https://hook.us2.make.com/w84joit4qmhto0k2sx27lqoluq8y3cg6';
+    
+    const fullMessage = `${captionText}\n\nRead the full guide here:\n${articleUrl}`;
 
-    console.log(`✅ Successfully posted! Facebook ID: ${response.data.id}`);
-    return response.data.id;
+    const payload = {
+      title: article.title,
+      message: fullMessage,
+      image_url: article.fb_image_url,
+      article_url: articleUrl,
+      language: article.language,
+      category: article.category
+    };
+
+    const response = await axios.post(MAKE_WEBHOOK_URL, payload);
+
+    // Make.com generally returns "Accepted" if successful. 
+    // We will generate a unique timestamp-based ID to track it in our DB since Make handles the actual FB posting.
+    console.log(`✅ Successfully sent to Make.com! Make Response: ${response.data}`);
+    return `make_${Date.now()}`;
 
   } catch (error) {
-    console.error(`❌ Error posting ${article.slug} to Facebook:`, error.response ? error.response.data : error.message);
+    console.error(`❌ Error sending ${article.slug} to Make.com Webhook:`, error.message);
     return null;
   }
 }
