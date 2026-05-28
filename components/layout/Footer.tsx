@@ -58,15 +58,15 @@ export default function Footer({ dict, lang }: FooterProps) {
               {dict.footer_tagline}
             </p>
             <div className="flex items-center gap-4 mb-6">
-              <a href="https://www.instagram.com/purplegirl.in/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-pg-rose hover:text-white transition-colors" aria-label="Instagram">
+              <button onClick={() => window.open("https://www.instagram.com/purplegirl.in/", "_blank", "noopener,noreferrer")} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-pg-rose hover:text-white transition-colors cursor-pointer" aria-label="Instagram">
                 <Instagram size={16} />
-              </a>
-              <a href="https://www.facebook.com/thepurplegirls" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-pg-rose hover:text-white transition-colors" aria-label="Facebook">
+              </button>
+              <button onClick={() => window.open("https://www.facebook.com/thepurplegirls", "_blank", "noopener,noreferrer")} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-pg-rose hover:text-white transition-colors cursor-pointer" aria-label="Facebook">
                 <Facebook size={16} />
-              </a>
-              <a href="https://x.com/purplegirl_in" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-pg-rose hover:text-white transition-colors" aria-label="Twitter">
+              </button>
+              <button onClick={() => window.open("https://x.com/purplegirl_in", "_blank", "noopener,noreferrer")} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-pg-rose hover:text-white transition-colors cursor-pointer" aria-label="Twitter">
                 <Twitter size={16} />
-              </a>
+              </button>
             </div>
             <div className="p-4 bg-white/5 rounded-xl border border-white/10 text-xs leading-relaxed text-white/50">
               <strong className="text-white/80 block mb-1">Disclaimer:</strong>
