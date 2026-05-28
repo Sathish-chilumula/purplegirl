@@ -13,32 +13,42 @@ const SITE_URL = 'https://purplegirl.in';
 const locales = ['en', 'hi', 'te', 'bn', 'mr', 'ta', 'gu'];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const { data: articles, error: articlesError } = await supabaseAdmin
-    .from('articles')
-    .select('slug, language, published_at, created_at')
-    .eq('is_published', true);
+  // Helper to fetch all records bypassing the 1000 limit
+  async function fetchAllRecords(table: string, columns: string, isPublishedOnly: boolean, notNullColumn?: string) {
+    let allData: any[] = [];
+    let page = 0;
+    const PAGE_SIZE = 1000;
+    let hasMore = true;
 
-  if (articlesError) {
-    console.error('Sitemap: Error fetching articles:', articlesError);
+    while (hasMore) {
+      let query = supabaseAdmin
+        .from(table)
+        .select(columns)
+        .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+        
+      if (isPublishedOnly) query = query.eq('is_published', true);
+      if (notNullColumn) query = query.not(notNullColumn, 'is', null);
+
+      const { data, error } = await query;
+      if (error) {
+        console.error(`Sitemap: Error fetching ${table}:`, error);
+        break;
+      }
+      if (data && data.length > 0) {
+        allData = allData.concat(data);
+        page++;
+        if (data.length < PAGE_SIZE) hasMore = false;
+      } else {
+        hasMore = false;
+      }
+    }
+    return allData;
   }
 
-  // 2. Fetch all categories
-  const { data: categories } = await supabaseAdmin
-    .from('categories')
-    .select('slug');
-
-  // 3. Fetch published quizzes
-  const { data: quizzes } = await supabaseAdmin
-    .from('quizzes')
-    .select('slug, created_at')
-    .eq('is_published', true);
-
-  // 4. Fetch published questions (Q&A feed)
-  const { data: questions } = await supabaseAdmin
-    .from('questions')
-    .select('slug, created_at')
-    .eq('is_published', true)
-    .not('slug', 'is', null);
+  const articles = await fetchAllRecords('articles', 'slug, language, published_at, created_at', true);
+  const categories = await fetchAllRecords('categories', 'slug', false);
+  const quizzes = await fetchAllRecords('quizzes', 'slug, created_at', true);
+  const questions = await fetchAllRecords('questions', 'slug, created_at', true, 'slug');
 
   const sitemapEntries: MetadataRoute.Sitemap = [];
 
