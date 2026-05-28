@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   if (!category) return { title: 'Category Not Found' };
   
   return {
-    title: `${category.name} Problems & Advice for Indian Women | PurpleGirl`,
+    title: `${category.name} Problems & Advice for Indian Women`,
     description: `How-to guides for Indian women facing ${category.name.toLowerCase()} problems. Honest, anonymous advice.`,
     alternates: {
       canonical: lang === 'en' ? `/category/${slug}` : `/${lang}/category/${slug}`,

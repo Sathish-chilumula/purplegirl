@@ -84,6 +84,8 @@ async function getHomeData(lang: string) {
       .from('questions')
       .select('slug, question_text, category')
       .eq('is_published', true)
+      .not('question_text', 'ilike', '%Explain and%')
+      .not('question_text', 'ilike', '%explain me%')
       .order('created_at', { ascending: false })
       .limit(6),
   ]);

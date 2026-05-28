@@ -225,9 +225,9 @@ export default async function HowToArticlePage({ params }: ArticlePageProps) {
             
             {/* 1. Breadcrumb */}
             <nav className="flex items-center text-xs font-bold text-pg-gray-400 uppercase tracking-widest mb-8" aria-label="breadcrumb">
-              <Link href="/" className="hover:text-pg-rose">Home</Link>
+              <Link href={lang === 'en' ? '/' : `/${lang}`} className="hover:text-pg-rose">Home</Link>
               <ChevronRight size={14} className="mx-2" />
-              <Link href={`/category/${article.category}`} className="hover:text-pg-rose">
+              <Link href={lang === 'en' ? `/category/${article.category}` : `/${lang}/category/${article.category}`} className="hover:text-pg-rose">
                 {article.category.replace(/-/g, ' ')}
               </Link>
               <ChevronRight size={14} className="mx-2" />

@@ -29,10 +29,7 @@ export function LeadCaptureWidget({ category, articleTitle }: LeadCaptureProps) 
 
   const message = category ? (CATEGORY_MESSAGES[category] || DEFAULT_MESSAGE) : DEFAULT_MESSAGE;
 
-  const whatsappText = encodeURIComponent(
-    `Hi! I just read "${articleTitle || 'a guide'}" on PurpleGirl.in and I'd love to receive weekly guides. Please add me.`
-  );
-  const whatsappUrl = `https://wa.me/919999999999?text=${whatsappText}`;
+  const whatsappUrl = 'https://whatsapp.com/channel/0029VbCdecs2f3ESzKq8bY3N';
 
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();

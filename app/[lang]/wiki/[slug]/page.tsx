@@ -100,9 +100,9 @@ export default async function WikiPage({ params }: WikiPageProps) {
 
             {/* Breadcrumb */}
             <nav className="flex items-center text-xs font-bold text-pg-gray-400 uppercase tracking-widest mb-8 flex-wrap gap-1" aria-label="breadcrumb">
-              <Link href="/" className="hover:text-pg-rose">Home</Link>
+              <Link href={lang === 'en' ? '/' : `/${lang}`} className="hover:text-pg-rose">Home</Link>
               <ChevronRight size={14} />
-              <Link href={`/category/${term.categorySlug}`} className="hover:text-pg-rose capitalize">
+              <Link href={lang === 'en' ? `/category/${term.categorySlug}` : `/${lang}/category/${term.categorySlug}`} className="hover:text-pg-rose capitalize">
                 {term.category}
               </Link>
               <ChevronRight size={14} />
