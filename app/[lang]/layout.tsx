@@ -52,11 +52,12 @@ export default async function RootLayout(props: {
         <link rel="apple-touch-icon" href="/icons/pwa-512.png" />
         <meta name="theme-color" content="#581C87" />
         {/* Google AdSense */}
-        <script 
-          async 
+        <Script 
+          id="google-adsense"
+          strategy="afterInteractive"
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3809505002238691"
           crossOrigin="anonymous"
-        ></script>
+        />
       </head>
       <body className="antialiased font-sans">
         {/* Google Analytics Tag */}
@@ -78,8 +79,8 @@ export default async function RootLayout(props: {
         <FloatingChat />
         <PWAInstallPrompt />
         {/* CueLinks JS (Invisible Affiliate Link Converter) */}
-        <script dangerouslySetInnerHTML={{
-          __html: `
+        <Script id="cuelinks" strategy="lazyOnload">
+          {`
             var cId = "283648";
             (function(d, t) {
               var s = document.createElement("script");
@@ -88,8 +89,8 @@ export default async function RootLayout(props: {
               s.src = (document.location.protocol == "https:" ? "https://cdn0.cuelinks.com/js/" : "http://cdn0.cuelinks.com/js/")  + "cuelinksv2.js";
               document.getElementsByTagName("body")[0].appendChild(s);
             }());
-          `
-        }} />
+          `}
+        </Script>
       </body>
     </html>
   );

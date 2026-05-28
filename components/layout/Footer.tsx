@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Heart, ShieldCheck, Globe } from 'lucide-react';
+import { Heart, ShieldCheck, Globe, Instagram, Facebook, Twitter } from 'lucide-react';
 import { InstallFooterButton } from '@/components/PWAInstallPrompt';
 
 interface FooterProps {
@@ -57,6 +57,17 @@ export default function Footer({ dict, lang }: FooterProps) {
             <p className="text-sm leading-relaxed mb-6 text-white/60">
               {dict.footer_tagline}
             </p>
+            <div className="flex items-center gap-4 mb-6">
+              <a href="https://www.instagram.com/purplegirl.in/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-pg-rose hover:text-white transition-colors" aria-label="Instagram">
+                <Instagram size={16} />
+              </a>
+              <a href="https://www.facebook.com/thepurplegirls" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-pg-rose hover:text-white transition-colors" aria-label="Facebook">
+                <Facebook size={16} />
+              </a>
+              <a href="https://x.com/purplegirl_in" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-pg-rose hover:text-white transition-colors" aria-label="Twitter">
+                <Twitter size={16} />
+              </a>
+            </div>
             <div className="p-4 bg-white/5 rounded-xl border border-white/10 text-xs leading-relaxed text-white/50">
               <strong className="text-white/80 block mb-1">Disclaimer:</strong>
               The content on PurpleGirl.in is for informational and educational purposes only. 
