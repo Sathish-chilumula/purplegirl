@@ -46,13 +46,18 @@ export const ArticleSchemas = ({ article }: { article: any }) => {
       "name": "PurpleGirl Editorial Team",
       "url": baseUrl
     },
+    "reviewedBy": {
+      "@type": "Organization",
+      "name": "PurpleGirl Medical & Wellness Review Board",
+      "url": `${baseUrl}/experts`
+    },
     "publisher": {
       "@type": "Organization",
       "name": "PurpleGirl",
       "url": baseUrl,
       "logo": {
         "@type": "ImageObject",
-        "url": `${baseUrl}/logo.png`
+        "url": `${baseUrl}/icons/pwa-512.png`
       }
     },
     "mainEntityOfPage": {
