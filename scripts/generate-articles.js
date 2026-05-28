@@ -322,7 +322,7 @@ This article MUST be at least 1200 words total. Do not cut it short.`;
           .replace(/\s+/g, '-')
           .replace(/-+/g, '-')
           .substring(0, 100)
-          .replace(/-$/, '');
+          .replace(/-[^-]*$/, ''); // Removes the last partial word if truncated mid-word
 
     // Calculate reading time
     const readingTimeMins = Math.max(3, Math.ceil(wordCount / 200));
