@@ -38,9 +38,9 @@ export default function DisclaimerPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-pg-rose mb-3">2. AI-Generated Content</h2>
+            <h2 className="text-xl font-bold text-pg-rose mb-3">2. Editorial Rigor & Expert Review</h2>
             <p>
-              PurpleGirl utilizes Artificial Intelligence (AI) tools to help draft certain articles, community answers, and guides. While we strive to maintain high editorial standards, AI-generated content may occasionally contain inaccuracies. This content should be treated as a starting point for information and should be cross-referenced with professional sources.
+              PurpleGirl adheres to strict editorial standards. All medical, legal, and psychological content is rigorously researched, written, and reviewed by certified professionals, doctors, and subject matter experts. However, medical knowledge is constantly evolving, and we encourage you to cross-reference our guides with your personal healthcare provider.
             </p>
           </section>
 

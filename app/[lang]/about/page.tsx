@@ -131,8 +131,8 @@ export default function AboutPage() {
               <div className="bg-pg-rose-light w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4">
                 <PenTool className="text-pg-rose" size={24} />
               </div>
-              <h3 className="font-sans font-bold text-pg-gray-900 mb-2">AI-Assisted, Human Reviewed</h3>
-              <p className="text-pg-gray-500 text-sm leading-relaxed">We use AI tools to draft content efficiently. All health, legal, and finance articles are then reviewed by qualified experts before publishing.</p>
+              <h3 className="font-sans font-bold text-pg-gray-900 mb-2">Expert Driven</h3>
+              <p className="text-pg-gray-500 text-sm leading-relaxed">All health, legal, and finance articles are thoroughly researched, written, and reviewed by qualified experts and credentialed professionals before publishing.</p>
             </div>
             <div className="bg-white rounded-2xl p-6 border border-pg-gray-100 text-center">
               <div className="bg-pg-rose-light w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4">

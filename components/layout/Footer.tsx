@@ -18,6 +18,7 @@ const getSupport = (dict: any) => [
   { href: '/privacy', label: 'Privacy Policy' },
   { href: '/terms', label: 'Terms of Service' },
   { href: '/disclaimer', label: 'Disclaimer' },
+  { href: '/editorial', label: 'Editorial Policy' },
   { href: '/contact', label: 'Contact Us' },
   { href: '/about', label: 'About PurpleGirl' },
 ];
@@ -128,9 +129,14 @@ export default function Footer({ dict, lang }: FooterProps) {
 
         {/* Bottom Bar */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-xs text-white/40">
-            © {new Date().getFullYear()} PurpleGirl.in — {dict.footer_rights}
-          </p>
+          <div className="flex flex-col items-center md:items-start gap-1">
+            <p className="text-xs text-white/40">
+              © {new Date().getFullYear()} PurpleGirl Media Pvt. Ltd. — {dict.footer_rights}
+            </p>
+            <p className="text-[10px] text-white/30">
+              Registered Office: Indiranagar, Bangalore, Karnataka, India
+            </p>
+          </div>
           <div className="flex items-center gap-2 text-xs text-white/50">
             <ShieldCheck size={14} className="text-green-400" />
             100% Anonymous & Secure

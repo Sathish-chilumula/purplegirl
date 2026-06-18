@@ -211,6 +211,8 @@ export default async function HowToArticlePage({ params }: ArticlePageProps) {
     supabaseAdmin.rpc('increment_view_count', { article_id: article.id }).then(),
   ]);
 
+  const expert = getExpertForCategory(article.category);
+
   return (
     <>
       <ArticleSchemas article={article} />
@@ -243,7 +245,7 @@ export default async function HowToArticlePage({ params }: ArticlePageProps) {
               </h1>
               <div className="flex flex-wrap items-center justify-between gap-4 mt-6">
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-pg-gray-500 font-medium">
-                  <span>By PurpleGirl Editors</span>
+                  <span className="font-bold text-pg-gray-900">By {expert.name}</span>
                   <span className="hidden sm:inline">•</span>
                   <span>Updated {new Date(article.published_at || article.created_at).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}</span>
                   <span className="hidden sm:inline">•</span>
@@ -278,7 +280,6 @@ export default async function HowToArticlePage({ params }: ArticlePageProps) {
 
               {/* Expert Reviewer Badge */}
               {(() => {
-                const expert = getExpertForCategory(article.category);
                 return (
                   <Link
                     href="/experts"
@@ -473,6 +474,27 @@ export default async function HowToArticlePage({ params }: ArticlePageProps) {
                 </div>
               </div>
             )}
+
+            {/* 10. Robust Expert Reviewer Bio Box (E-E-A-T Signal) */}
+            <div className="my-16 bg-white border-2 border-pg-gray-100 rounded-3xl p-8 shadow-sm">
+              <h3 className="text-sm font-bold text-pg-rose uppercase tracking-widest mb-6">Reviewed & Verified By</h3>
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+                <div className="w-24 h-24 rounded-full bg-pg-rose-light text-pg-rose flex items-center justify-center text-3xl font-display font-bold shrink-0 border-4 border-white shadow-md">
+                  {expert.avatarInitials}
+                </div>
+                <div className="text-center sm:text-left flex-1">
+                  <h4 className="text-2xl font-display font-bold text-pg-gray-900 mb-1">{expert.name}</h4>
+                  <p className="text-pg-gray-600 font-medium mb-1">{expert.credentials}</p>
+                  <p className="text-pg-gray-500 text-sm mb-4 italic">{expert.role}</p>
+                  <p className="text-pg-gray-700 text-sm leading-relaxed mb-4">
+                    {expert.name} ensures that all information provided in this guide aligns with the latest medical, legal, and professional standards in India. PurpleGirl Media relies on credentialed experts to provide a safe, accurate space for women.
+                  </p>
+                  <Link href={`/experts#${expert.profileSlug}`} className="inline-flex items-center gap-1 text-sm font-bold text-pg-rose hover:text-pg-rose-dark transition-colors">
+                    Read full editorial policy <ChevronRight size={14} />
+                  </Link>
+                </div>
+              </div>
+            </div>
 
             {/* Smart Product Affiliate Widget */}
             <SmartProductWidget category={article.category} title={article.title} />

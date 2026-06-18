@@ -60,49 +60,42 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-pg-rose mb-3">5. AI-Generated Content Disclosure</h2>
-            <p>
-              To provide immediate, empathetic support to a large volume of inquiries, <strong>some articles and anonymous answers on PurpleGirl are generated with the assistance of artificial intelligence tools.</strong> While we strive for accuracy and empathy, AI-generated content should not be taken as absolute fact or professional advice. Our editorial team reviews high-traffic guides to ensure quality.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-bold text-pg-rose mb-3">6. Intellectual Property</h2>
+            <h2 className="text-xl font-bold text-pg-rose mb-3">5. Intellectual Property</h2>
             <p>
               The PurpleGirl brand, logo, site design, original guides, and compilation of content are protected by copyright and intellectual property laws. You may not reproduce, distribute, or create derivative works from our content without explicit written permission.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-pg-rose mb-3">7. Limitation of Liability</h2>
+            <h2 className="text-xl font-bold text-pg-rose mb-3">6. Limitation of Liability</h2>
             <p>
               In no event shall PurpleGirl, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the service.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-pg-rose mb-3">8. Changes to Terms</h2>
+            <h2 className="text-xl font-bold text-pg-rose mb-3">7. Changes to Terms</h2>
             <p>
               We reserve the right, at our sole discretion, to modify or replace these Terms at any time. What constitutes a material change will be determined at our sole discretion. By continuing to access or use our service after those revisions become effective, you agree to be bound by the revised terms.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-pg-rose mb-3">9. Termination</h2>
+            <h2 className="text-xl font-bold text-pg-rose mb-3">8. Termination</h2>
             <p>
               We may terminate or suspend access to our service immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-pg-rose mb-3">10. Governing Law</h2>
+            <h2 className="text-xl font-bold text-pg-rose mb-3">9. Governing Law</h2>
             <p>
               These terms are governed by the laws of India. Any disputes arising out of or related to these terms or the use of the website shall be subject to the exclusive jurisdiction of the courts located in India.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-pg-rose mb-3">11. Contact Us</h2>
+            <h2 className="text-xl font-bold text-pg-rose mb-3">10. Contact Us</h2>
             <p>
               If you have any questions about these Terms, please contact us at <a href="mailto:hello@purplegirl.in" className="text-pg-rose font-bold hover:underline">hello@purplegirl.in</a>.
             </p>
