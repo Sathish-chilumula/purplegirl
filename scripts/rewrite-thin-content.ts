@@ -62,10 +62,10 @@ async function processArticles() {
     return;
   }
 
-  console.log("\n🚀 Starting rewrite process (processing first 5 as a test run)...");
+  console.log("\n🚀 Starting rewrite process (processing batch of 50 articles)...");
   
-  // Test run: Only process the first 5 to avoid burning API limits accidentally
-  const articlesToProcess = thinArticles.slice(0, 5);
+  // Process 50 articles per run to stay within API limits and avoid long CI timeouts
+  const articlesToProcess = thinArticles.slice(0, 50);
 
   for (const article of articlesToProcess) {
     console.log(`\n⏳ Processing: "${article.title}" (Current words: ${getWordCount(article)})`);
@@ -138,7 +138,7 @@ Output ONLY valid JSON matching this exact structure:
     }
   }
   
-  console.log("\n🎉 Test run complete. To process all articles, remove the \`.slice(0, 5)\` in the script.");
+  console.log("\n🎉 Batch run complete.");
 }
 
 processArticles();
