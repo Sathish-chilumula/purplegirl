@@ -186,6 +186,10 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
         ? [article.fb_image_url || article.pin_image_url]
         : undefined,
     },
+    ...(lang !== 'en' && (() => {
+      const words = (article.intro + ' ' + (article.content_json?.steps?.map((s: any) => s.headline + ' ' + s.body).join(' ') || '')).split(/\s+/).length;
+      return words < 400;
+    })() ? { robots: { index: false, follow: true } } : {}),
   };
 }
 
@@ -304,13 +308,15 @@ export default async function HowToArticlePage({ params }: ArticlePageProps) {
               {article.intro}
             </p>
 
-            {/* 4. YMYL Medical Disclaimer */}
-            <div className="bg-amber-50 border border-amber-200 text-amber-800 p-5 rounded-2xl text-[14px] leading-relaxed mb-12 flex items-start gap-3">
-              <AlertTriangle className="text-amber-500 shrink-0 mt-0.5" size={18} />
-              <div>
-                <strong>Community Advice Disclaimer:</strong> This guide is based on community experiences and lifestyle advice. It is <strong>not</strong> a substitute for professional medical, psychological, or legal advice. Always consult a qualified healthcare provider for personal diagnoses or treatments.
+            {/* 4. YMYL Medical Disclaimer - Only for non-expert reviewed */}
+            {expert.name === 'PurpleGirl Editorial Team' && (
+              <div className="bg-amber-50 border border-amber-200 text-amber-800 p-5 rounded-2xl text-[14px] leading-relaxed mb-12 flex items-start gap-3">
+                <AlertTriangle className="text-amber-500 shrink-0 mt-0.5" size={18} />
+                <div>
+                  <strong>Community Advice Disclaimer:</strong> This guide is based on community experiences and lifestyle advice. It is <strong>not</strong> a substitute for professional medical, psychological, or legal advice. Always consult a qualified healthcare provider for personal diagnoses or treatments.
+                </div>
               </div>
-            </div>
+            )}
 
             {/* 8. Things You'll Need (Moved up for WikiHow style if exists) */}
             {article.content_json?.things_needed && article.content_json.things_needed.length > 0 && (

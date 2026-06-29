@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: AboutPageProps): Promise<Meta
     title: "About PurpleGirl | Anonymous Advice for Indian Women",
     description: "PurpleGirl is India's trusted anonymous platform for women — honest how-to guides on relationships, health, career, and more. No login, no judgment.",
     alternates: {
-      canonical: lang === 'en' ? '/about' : `/${lang}/about`,
+      canonical: lang === 'en' ? `${SITE_URL}/about` : `${SITE_URL}/${lang}/about`,
       languages: {
         'en': `${SITE_URL}/about`,
         'x-default': `${SITE_URL}/about`,

@@ -35,9 +35,9 @@ export default function ContactPage() {
             <p className="text-lg font-medium text-pg-gray-800 mb-2">
               Email us directly at:
             </p>
-            <a href="mailto:hello@purplegirl.in" className="text-2xl font-bold text-pg-rose hover:underline">
-              hello@purplegirl.in
-            </a>
+            <p className="text-2xl font-bold text-pg-rose">
+              hello [at] purplegirl [dot] in
+            </p>
           </div>
 
           <div className="relative flex items-center py-5">

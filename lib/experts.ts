@@ -70,6 +70,20 @@ const EXPERTS: Record<string, Expert> = {
     avatarInitials: 'SJ',
     profileSlug: 'ca-sunita-joshi',
   },
+  'skin-beauty': {
+    name: 'Dr. Anjali Desai',
+    credentials: 'MD (Dermatology)',
+    role: 'Consultant Dermatologist',
+    avatarInitials: 'AD',
+    profileSlug: 'dr-anjali-desai',
+  },
+  'hair-care': {
+    name: 'Dr. Anjali Desai',
+    credentials: 'MD (Dermatology)',
+    role: 'Consultant Dermatologist',
+    avatarInitials: 'AD',
+    profileSlug: 'dr-anjali-desai',
+  },
 };
 
 const DEFAULT_EXPERT: Expert = {
@@ -89,4 +103,5 @@ export const ALL_EXPERTS: Expert[] = [
   EXPERTS['mental-health-emotions'],
   EXPERTS['legal-rights'],
   EXPERTS['finance-money'],
+  EXPERTS['skin-beauty'],
 ];

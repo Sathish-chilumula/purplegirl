@@ -87,19 +87,24 @@ async function getHomeData(lang: string) {
       .not('question_text', 'ilike', '%Explain and%')
       .not('question_text', 'ilike', '%explain me%')
       .order('created_at', { ascending: false })
-      .limit(6),
+      .limit(20),
   ]);
+
+  const trendingFiltered = (questionsRes.data || [])
+    .filter((q: any) => q.question_text && q.question_text.length >= 20)
+    .slice(0, 6)
+    .map((q: any) => ({
+      question: q.question_text,
+      category: q.category || 'general',
+      slug: q.slug,
+    }));
 
   return {
     categories: categoriesRes.data || [],
     featuredArticles: articlesRes.data || [],
     latestQuizzes: quizzesRes.data || [],
     featuredGuide: featuredRes.data || null,
-    trendingQuestions: (questionsRes.data || []).map((q: any) => ({
-      question: q.question_text,
-      category: q.category || 'general',
-      slug: q.slug,
-    })),
+    trendingQuestions: trendingFiltered,
   };
 }
 
@@ -190,7 +195,6 @@ export default async function Home({ params }: HomePageProps) {
       <section className="bg-white border-y border-pg-gray-100 py-4 px-6">
         <div className="max-w-content mx-auto flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-center">
           {[
-            { value: '1,20,000+', label: 'Women Helped' },
             { value: '245+', label: 'How-To Guides' },
             { value: '100%', label: 'Anonymous' },
             { value: '18', label: 'Categories' },

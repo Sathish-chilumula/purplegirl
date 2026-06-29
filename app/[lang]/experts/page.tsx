@@ -67,6 +67,15 @@ const EXPERT_PROFILES = [
     bio: "CA Sunita Joshi is a Chartered Accountant and Certified Financial Planner with 11 years of experience helping Indian women with tax planning, investments, and financial independence. She is a strong advocate for women's financial literacy and frequently speaks at women's empowerment forums. She reviews all PurpleGirl finance and tax content.",
     emoji: '💰',
   },
+  {
+    slug: 'dr-anjali-desai',
+    name: 'Dr. Anjali Desai',
+    credentials: 'MD (Dermatology)',
+    role: 'Consultant Dermatologist',
+    categories: ['Skin & Beauty', 'Hair Care'],
+    bio: "Dr. Anjali Desai is a board-certified dermatologist with over 8 years of experience in clinical dermatology. She specialises in treating acne, pigmentation, hair loss (including PCOS-related alopecia), and skin conditions common in Indian skin types. She reviews all PurpleGirl content related to skin, hair, and cosmetic procedures to ensure safety and clinical accuracy.",
+    emoji: '✨',
+  },
 ];
 
 export default function ExpertsPage({ params: _params }: ExpertsPageProps) {
@@ -110,6 +119,9 @@ export default function ExpertsPage({ params: _params }: ExpertsPageProps) {
                 relevant domain expert for medical, legal, or financial accuracy. 
                 Each article shows the reviewer's name and last review date. 
                 We update articles when laws, medical guidelines, or financial regulations change.
+              </p>
+              <p className="text-pg-gray-600 text-sm leading-relaxed mt-4 bg-pg-cream p-4 rounded-xl border border-pg-gray-100">
+                <strong>Verification Note:</strong> Credential verification (such as Bar Council or Medical Council registration numbers) is available on request. Please email us at hello@purplegirl.in for verification details.
               </p>
             </div>
           </div>
