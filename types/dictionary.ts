@@ -32,4 +32,9 @@ export interface Dictionary {
   calculator_ovulation: string;
   calculator_fertile_window: string;
   calculator_calculate: string;
+  hero_title?: string;
+  hero_subtitle?: string;
+  hero_desc?: string;
+  search_placeholder?: string;
+  search_button?: string;
 }

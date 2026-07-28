@@ -140,25 +140,25 @@ export default async function Home({ params }: HomePageProps) {
 
             {/* Visual headline — honest, direct, human */}
             <p className="font-display text-[28px] md:text-[44px] font-bold text-pg-gray-900 leading-tight mb-4">
-              Questions you can't ask anyone.
-              <span className="text-pg-rose block">Answers you actually need.</span>
+              {dict.hero_title || "Questions you can't ask anyone."}
+              <span className="text-pg-rose block">{dict.hero_subtitle || "Answers you actually need."}</span>
             </p>
             <p className="font-sans text-[16px] md:text-[18px] text-pg-gray-700 mb-8 max-w-lg mx-auto md:mx-0">
-              Honest guides on relationships, health, money, and rights — for Indian women. No login, no tracking, completely private.
+              {dict.hero_desc || "Honest guides on relationships, health, money, and rights — for Indian women. No login, no tracking, completely private."}
             </p>
 
             <form action="/search" className="relative w-full max-w-xl mx-auto md:mx-0 mb-6">
               <input
                 type="text"
                 name="q"
-                placeholder="Search... 'mother-in-law' or 'PCOS diet'"
+                placeholder={dict.search_placeholder || "Search... 'mother-in-law' or 'PCOS diet'"}
                 className="w-full h-[54px] pl-6 pr-32 rounded-[24px] border-2 border-white focus:border-pg-rose outline-none text-[16px] shadow-sm"
               />
               <button
                 type="submit"
                 className="absolute right-2 top-2 bottom-2 bg-pg-rose text-white px-6 rounded-full font-bold hover:bg-pg-rose-dark transition-colors"
               >
-                Search
+                {dict.search_button || "Search"}
               </button>
             </form>
 

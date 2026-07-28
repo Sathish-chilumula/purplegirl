@@ -60,6 +60,36 @@ const QUESTIONS_BY_CATEGORY: Record<string, Question[]> = {
     { question: 'How do I negotiate salary without seeming aggressive?', category: 'career-workplace' },
     { question: 'Is it worth quitting a toxic job with no next job lined up?', category: 'career-workplace' },
   ],
+  'skin-beauty': [
+    { question: 'How do I get rid of stubborn dark spots after pimples?', category: 'skin-beauty' },
+    { question: 'What is a simple morning skincare routine for Indian weather?', category: 'skin-beauty' },
+    { question: 'Is sunscreen really necessary if I stay indoors all day?', category: 'skin-beauty' },
+    { question: 'How do I manage oily skin during humid summers?', category: 'skin-beauty' },
+  ],
+  'hair-care': [
+    { question: 'How can I stop hair fall caused by hard water in my city?', category: 'hair-care' },
+    { question: 'What are natural homemade hair masks for frizzy hair?', category: 'hair-care' },
+    { question: 'How often should I oil my hair to avoid scalp buildup?', category: 'hair-care' },
+    { question: 'Can stress cause sudden heavy hair thinning?', category: 'hair-care' },
+  ],
+  'self-growth-confidence': [
+    { question: 'How do I stop feeling guilty for putting myself first?', category: 'self-growth-confidence' },
+    { question: 'How do I rebuild self-confidence after a bad breakup?', category: 'self-growth-confidence' },
+    { question: 'How do I overcome constant self-doubt at work and home?', category: 'self-growth-confidence' },
+    { question: 'What daily habits help build emotional resilience?', category: 'self-growth-confidence' },
+  ],
+  'home-household': [
+    { question: 'What are easy life hacks to keep a small apartment organized?', category: 'home-household' },
+    { question: 'How do I share household responsibilities fairly with family?', category: 'home-household' },
+    { question: 'What are simple natural ways to keep kitchen cabinets pest-free?', category: 'home-household' },
+    { question: 'How do I organize monsoon clothing to prevent mildew?', category: 'home-household' },
+  ],
+  'festivals-traditions': [
+    { question: 'How do I balance festive cooking and family hosting without burnout?', category: 'festivals-traditions' },
+    { question: 'What are easy traditional home decoration ideas on a budget?', category: 'festivals-traditions' },
+    { question: 'How do I handle family pressure during festival gatherings?', category: 'festivals-traditions' },
+    { question: 'What are simple skin prep routines before festive events?', category: 'festivals-traditions' },
+  ],
 };
 
 const DEFAULT_QUESTIONS: Question[] = [

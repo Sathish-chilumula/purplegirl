@@ -333,33 +333,23 @@ export default async function HowToArticlePage({ params }: ArticlePageProps) {
               </div>
             )}
 
-            {/* 5. Steps Section — Dynamic rendering, each step has a varied visual style */}
+            {/* 5. Steps Section — Consistent, clean numbered steps */}
             <div className="space-y-14">
               {article.content_json?.steps?.map((step: any, index: number) => {
-                // Rotate through different visual treatments so no two articles look identical
+                const stepNum = index + 1;
                 const stepStyle = index % 4;
                 return (
                   <div key={index} className="relative">
-                    {/* Step header — alternates between numbered circle and text badge */}
-                    {stepStyle !== 3 ? (
-                      <div className="flex items-start gap-4 mb-5">
-                        <div className={`w-10 h-10 rounded-full text-white flex items-center justify-center font-bold text-xl shrink-0 mt-1 ${
-                          stepStyle === 0 ? 'bg-pg-rose' : stepStyle === 1 ? 'bg-pg-plum' : 'bg-pg-gray-800'
-                        }`}>
-                          {step.step_number || index + 1}
-                        </div>
-                        <h2 className="font-sans text-2xl font-bold text-pg-gray-900 leading-tight pt-1">
-                          {step.headline}
-                        </h2>
+                    <div className="flex items-start gap-4 mb-5">
+                      <div className="w-10 h-10 rounded-full bg-pg-rose text-white flex items-center justify-center font-bold text-xl shrink-0 mt-1">
+                        {stepNum}
                       </div>
-                    ) : (
-                      <div className="mb-5">
-                        <span className="inline-block bg-pg-rose/10 text-pg-rose text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-2">Step {step.step_number || index + 1}</span>
-                        <h2 className="font-sans text-2xl font-bold text-pg-gray-900 leading-tight">{step.headline}</h2>
-                      </div>
-                    )}
+                      <h2 className="font-sans text-2xl font-bold text-pg-gray-900 leading-tight pt-1">
+                        {step.headline}
+                      </h2>
+                    </div>
 
-                    <div className={stepStyle !== 3 ? 'pl-14' : ''}>
+                    <div className="pl-14">
                       <p
                         className="text-[16px] leading-[1.8] text-pg-gray-700 mb-5"
                         dangerouslySetInnerHTML={{ __html: autoLink(step.body, lang) }}
@@ -395,21 +385,6 @@ export default async function HowToArticlePage({ params }: ArticlePageProps) {
                       )}
                       {step.warning && stepStyle % 2 === 1 && (
                         <p className="text-sm text-pg-gray-600 bg-amber-50 border border-amber-100 rounded-lg px-4 py-3 my-4">{step.warning}</p>
-                      )}
-
-                      {/* Internal CTA to Anonymous Ask (after step 2) */}
-                      {index === 1 && (
-                        <div className="my-8 bg-pg-cream border border-pg-gray-100 p-6 rounded-xl flex flex-col sm:flex-row items-center gap-6 justify-between shadow-sm">
-                          <div className="flex items-start gap-3">
-                            <Lock className="text-pg-rose shrink-0 mt-1" />
-                            <p className="text-sm font-medium text-pg-gray-700">
-                              Have a specific question you can't ask anyone? Ask it anonymously — no name needed.
-                            </p>
-                          </div>
-                          <Link href="/ask" className="shrink-0 bg-pg-white border-2 border-pg-rose text-pg-rose hover:bg-pg-rose hover:text-white px-6 py-2 rounded-lg font-bold transition-colors text-sm">
-                            Ask Here →
-                          </Link>
-                        </div>
                       )}
 
                       {index === 2 && <ProductRecommendation category={article.category} lang={lang} />}

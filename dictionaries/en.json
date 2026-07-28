@@ -32,5 +32,10 @@
   "calculator_next_period": "Next Period",
   "calculator_ovulation": "Ovulation Day",
   "calculator_fertile_window": "Fertile Window",
-  "calculator_calculate": "Calculate My Cycle"
+  "calculator_calculate": "Calculate My Cycle",
+  "hero_title": "Questions you can't ask anyone.",
+  "hero_subtitle": "Answers you actually need.",
+  "hero_desc": "Honest guides on relationships, communication, confidence, skincare, and daily life — for Indian women. No login, no tracking, completely private.",
+  "search_placeholder": "Search... 'communication' or 'skincare routine'",
+  "search_button": "Search"
 }

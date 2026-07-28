@@ -85,8 +85,8 @@ Rules:
 - Intro: 120-180 words
 - Each FAQ answer: 70-120 words — no one-liners
 
-━━━ INDIA-SPECIFIC REQUIREMENT ━━━
-Every article MUST mention at least one: Indian city, Indian brand, Indian food, Indian law/scheme, or Indian family/cultural situation. Real and specific, not generic.
+━━━ WRITING STYLE & NATURAL TONE ━━━
+Do NOT inject artificial city names like "in cities like Mumbai or Delhi" into steps. Write naturally, directly addressing the reader's question with practical, realistic advice.
 
 ━━━ OUTPUT FORMAT ━━━
 Return ONLY a valid JSON object. No markdown fences. No text outside JSON.

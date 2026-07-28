@@ -13,14 +13,12 @@ export interface WikiTerm {
   terms: string[]; // All surface forms to match (case-insensitive first match)
 }
 
-// Master list of wiki terms and their slugs
+// Master list of internal terms and their target category hub links
 export const WIKI_TERMS: WikiTerm[] = [
-  { slug: 'pcos', terms: ['PCOS', 'polycystic ovary', 'polycystic ovarian'] },
-  { slug: 'gaslighting', terms: ['gaslighting', 'gaslit', 'gaslighted'] },
-  { slug: 'itr', terms: ['ITR', 'income tax return'] },
-  { slug: 'ivf', terms: ['IVF', 'in vitro fertilisation', 'in vitro fertilization'] },
-  { slug: 'section-498a', terms: ['Section 498A', '498A', 'section 498a'] },
-  { slug: 'dowry-prohibition-act', terms: ['Dowry Prohibition Act', 'dowry law'] },
+  { slug: '../category/relationships-marriage', terms: ['relationship', 'communication'] },
+  { slug: '../category/skin-beauty', terms: ['skincare', 'skin routine'] },
+  { slug: '../category/career-workplace', terms: ['career', 'workplace'] },
+  { slug: '../category/self-growth-confidence', terms: ['confidence', 'mindfulness'] },
 ];
 
 /**

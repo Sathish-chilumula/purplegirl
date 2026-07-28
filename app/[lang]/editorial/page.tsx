@@ -9,11 +9,31 @@ interface EditorialPageProps {
 
 export async function generateMetadata({ params }: EditorialPageProps): Promise<Metadata> {
   const { lang } = await params;
-  const canonical = lang === 'en' ? '/editorial' : `/${lang}/editorial`;
+  const canonical = lang === 'en' ? `${SITE_URL}/editorial` : `${SITE_URL}/${lang}/editorial`;
+  const title = 'Editorial Policy & Standards | PurpleGirl';
+  const description = 'Learn about PurpleGirl\'s strict editorial standards, peer research process, and commitment to providing accurate, empathetic lifestyle guides for Indian women.';
+  
   return {
-    title: 'Editorial Policy & Standards | PurpleGirl',
-    description: 'Learn about PurpleGirl Media\'s strict editorial standards, medical review processes, and commitment to providing accurate, empathetic information for Indian women.',
-    alternates: { canonical, languages: { 'en': `${SITE_URL}/editorial`, 'x-default': `${SITE_URL}/editorial` } },
+    title,
+    description,
+    alternates: {
+      canonical,
+      languages: {
+        'en': `${SITE_URL}/editorial`,
+        'x-default': `${SITE_URL}/editorial`,
+      },
+    },
+    openGraph: {
+      title,
+      description,
+      type: 'article',
+      url: canonical,
+    },
+    twitter: {
+      card: 'summary',
+      title,
+      description,
+    },
   };
 }
 
