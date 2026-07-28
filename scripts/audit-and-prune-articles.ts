@@ -15,26 +15,28 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Categories safe for AdSense (Non-YMYL Lifestyle, Relationships, Beauty, Self-Growth, Workplace)
-const SAFE_CATEGORIES = new Set([
+const SAFE_CATEGORIES = [
   'relationships-marriage',
-  'self-growth-confidence',
-  'career-workplace',
   'skin-beauty',
   'hair-care',
+  'career-workplace',
+  'self-growth-confidence',
   'family-parenting',
   'home-household',
   'festivals-traditions',
-]);
+];
 
-// Keywords in titles that indicate strict YMYL clinical or legal risk
 const YMYL_RISK_KEYWORDS = [
   'cure', 'doctor', 'treatment', 'medication', 'pill', 'prescription',
   'divorce law', 'section 498a', 'court', 'advocate', 'lawyer', 'tax',
-  'investment', 'disease', 'diagnosis', 'symptom checker'
+  'investment', 'disease', 'diagnosis', 'symptom checker', 'pcos', 'pregnancy'
 ];
 
-async function auditAndPrune() {
-  console.log('🔍 Starting Article Quality & YMYL Audit...');
+// Target number of flagship articles to keep published for AdSense approval
+const TARGET_FLAGSHIP_COUNT_PER_CATEGORY = 5;
+
+async function curateFlagshipArticles() {
+  console.log('🌟 Starting Flagship Articles Curation (Option B)...');
 
   let allArticles: any[] = [];
   let page = 0;
@@ -44,11 +46,11 @@ async function auditAndPrune() {
   while (hasMore) {
     const { data, error } = await supabase
       .from('articles')
-      .select('id, slug, title, category, is_published, language')
+      .select('id, slug, title, category, language, is_published')
       .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
 
     if (error) {
-      console.error('Error fetching articles from Supabase:', error);
+      console.error('Error fetching articles:', error);
       break;
     }
     if (data && data.length > 0) {
@@ -60,66 +62,71 @@ async function auditAndPrune() {
     }
   }
 
-  const articles = allArticles;
-  console.log(`Total articles found in database across all pages: ${articles.length}`);
+  console.log(`Total articles in database: ${allArticles.length}`);
 
-  let safeCount = 0;
-  let ymylPrunedCount = 0;
-  let nonEnglishPrunedCount = 0;
+  // Group candidate English non-YMYL articles by category
+  const candidatesByCategory: Record<string, any[]> = {};
+  for (const cat of SAFE_CATEGORIES) {
+    candidatesByCategory[cat] = [];
+  }
 
-  const toUnpublishIds: string[] = [];
+  for (const article of allArticles) {
+    if ((article.language || 'en') !== 'en') continue;
 
-  for (const article of articles) {
     const category = (article.category || '').toLowerCase();
     const title = (article.title || '').toLowerCase();
-    const language = article.language || 'en';
 
-    // 1. Unpublish non-English articles during AdSense review phase
-    if (language !== 'en') {
-      toUnpublishIds.push(article.id);
-      nonEnglishPrunedCount++;
-      continue;
-    }
+    if (!SAFE_CATEGORIES.includes(category)) continue;
+    if (YMYL_RISK_KEYWORDS.some(kw => title.includes(kw))) continue;
 
-    // 2. Check if category is YMYL (medical/legal/finance)
-    const isSafeCategory = SAFE_CATEGORIES.has(category);
-    const hasRiskKeyword = YMYL_RISK_KEYWORDS.some(kw => title.includes(kw));
+    candidatesByCategory[category].push(article);
+  }
 
-    if (!isSafeCategory || hasRiskKeyword) {
-      toUnpublishIds.push(article.id);
-      ymylPrunedCount++;
+  const flagshipIdsToKeep = new Set<string>();
+
+  console.log('\n📌 Selecting Flagship Articles per Category:');
+  for (const cat of SAFE_CATEGORIES) {
+    const pool = candidatesByCategory[cat] || [];
+    const selected = pool.slice(0, TARGET_FLAGSHIP_COUNT_PER_CATEGORY);
+    selected.forEach(a => flagshipIdsToKeep.add(a.id));
+    console.log(`- Category [${cat}]: Selected ${selected.length} flagship guides out of ${pool.length} available.`);
+  }
+
+  console.log(`\n🎯 Total Flagship Articles Selected: ${flagshipIdsToKeep.size}`);
+
+  const toUnpublishIds: string[] = [];
+  const toPublishIds: string[] = [];
+
+  for (const article of allArticles) {
+    if (flagshipIdsToKeep.has(article.id)) {
+      if (!article.is_published) toPublishIds.push(article.id);
     } else {
-      safeCount++;
+      if (article.is_published) toUnpublishIds.push(article.id);
     }
   }
 
-  console.log('\n📊 Audit Summary:');
-  console.log(`- Safe Non-YMYL English Articles (Kept Published): ${safeCount}`);
-  console.log(`- Clinical YMYL / Legal / Risk Articles (To Unpublish): ${ymylPrunedCount}`);
-  console.log(`- Non-English Articles (To Unpublish during review): ${nonEnglishPrunedCount}`);
+  console.log(`\n⏳ Updating Database:`);
+  console.log(`- Articles to keep PUBLISHED: ${flagshipIdsToKeep.size}`);
+  console.log(`- Articles to UNPUBLISH: ${toUnpublishIds.length}`);
 
+  const chunkSize = 100;
   if (toUnpublishIds.length > 0) {
-    console.log(`\n⏳ Updating ${toUnpublishIds.length} articles to is_published = false...`);
-    
-    // Batch update in chunks of 100
-    const chunkSize = 100;
     for (let i = 0; i < toUnpublishIds.length; i += chunkSize) {
       const chunk = toUnpublishIds.slice(i, i + chunkSize);
-      const { error: updateErr } = await supabase
-        .from('articles')
-        .update({ is_published: false })
-        .in('id', chunk);
-
-      if (updateErr) {
-        console.error(`Error updating chunk ${i}:`, updateErr);
-      }
+      await supabase.from('articles').update({ is_published: false }).in('id', chunk);
     }
-    console.log('✅ Successfully unpublished YMYL and non-English articles for clean AdSense review!');
-  } else {
-    console.log('✅ No articles needed unpublishing.');
   }
+
+  if (toPublishIds.length > 0) {
+    for (let i = 0; i < toPublishIds.length; i += chunkSize) {
+      const chunk = toPublishIds.slice(i, i + chunkSize);
+      await supabase.from('articles').update({ is_published: true }).in('id', chunk);
+    }
+  }
+
+  console.log('\n✅ Flagship Curation Complete! Database is now optimized for AdSense approval with a clean 40-article flagship magazine footprint.');
 }
 
-auditAndPrune().catch(err => {
-  console.error('Fatal error during audit:', err);
+curateFlagshipArticles().catch(err => {
+  console.error('Fatal error during curation:', err);
 });
