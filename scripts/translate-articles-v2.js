@@ -284,7 +284,20 @@ async function translateArticles() {
 
   let success = 0, skipped = 0, failed = 0;
 
+  const SAFE_CATEGORIES = new Set([
+    'relationships-marriage', 'skin-beauty', 'hair-care',
+    'family-parenting', 'career-workplace', 'self-growth-confidence',
+    'home-household', 'festivals-traditions'
+  ]);
+
   for (const article of englishArticles) {
+    const cat = (article.category || '').toLowerCase();
+    if (!SAFE_CATEGORIES.has(cat)) {
+      console.log(`  ✓ Skipping YMYL category [${cat}] for translation.`);
+      skipped++;
+      continue;
+    }
+
     console.log('\n📄 Article: "' + article.title.substring(0, 60) + '"');
 
     // Find which languages are missing translations for this article

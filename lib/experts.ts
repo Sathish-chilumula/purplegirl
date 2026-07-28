@@ -9,89 +9,81 @@ export interface Expert {
   name: string;
   credentials: string;
   role: string;
-  avatarInitials: string; // for avatar display
-  profileSlug: string;   // links to /experts page anchor
+  avatarInitials: string;
+  profileSlug: string;
+  disclaimer?: string;
 }
 
 const EXPERTS: Record<string, Expert> = {
-  'womens-health': {
-    name: 'Dr. Priya Sharma',
-    credentials: 'MBBS, MD (Obstetrics & Gynaecology)',
-    role: 'Gynaecologist & Women\'s Health Specialist',
-    avatarInitials: 'PS',
-    profileSlug: 'dr-priya-sharma',
-  },
-  'pregnancy-fertility': {
-    name: 'Dr. Priya Sharma',
-    credentials: 'MBBS, MD (Obstetrics & Gynaecology)',
-    role: 'Gynaecologist & Women\'s Health Specialist',
-    avatarInitials: 'PS',
-    profileSlug: 'dr-priya-sharma',
-  },
-  'baby-care-motherhood': {
-    name: 'Dr. Priya Sharma',
-    credentials: 'MBBS, MD (Obstetrics & Gynaecology)',
-    role: 'Gynaecologist & Women\'s Health Specialist',
-    avatarInitials: 'PS',
-    profileSlug: 'dr-priya-sharma',
-  },
-  'mental-health-emotions': {
-    name: 'Dr. Ritu Bansal',
-    credentials: 'MA (Psychology), M.Phil (Clinical Psychology)',
-    role: 'Licensed Counsellor & Psychotherapist',
-    avatarInitials: 'RB',
-    profileSlug: 'dr-ritu-bansal',
-  },
   'relationships-marriage': {
-    name: 'Dr. Ritu Bansal',
-    credentials: 'MA (Psychology), M.Phil (Clinical Psychology)',
-    role: 'Licensed Counsellor & Psychotherapist',
-    avatarInitials: 'RB',
-    profileSlug: 'dr-ritu-bansal',
-  },
-  'legal-rights': {
-    name: 'Adv. Meera Krishnaswamy',
-    credentials: 'LLB, Practising Advocate',
-    role: 'Family Law Specialist, High Court',
-    avatarInitials: 'MK',
-    profileSlug: 'adv-meera-krishnaswamy',
-  },
-  'finance-money': {
-    name: 'CA Sunita Joshi',
-    credentials: 'Chartered Accountant, CFP',
-    role: 'Certified Financial Planner for Women',
-    avatarInitials: 'SJ',
-    profileSlug: 'ca-sunita-joshi',
+    name: 'PurpleGirl Relationship Desk',
+    credentials: 'Researched & Reviewed by Experienced Relationship Editors',
+    role: 'Peer Guidance & Communication Advice',
+    avatarInitials: 'PR',
+    profileSlug: 'editorial',
+    disclaimer: 'This content offers general communication and peer relationship advice. It is not clinical marriage therapy.',
   },
   'career-workplace': {
-    name: 'CA Sunita Joshi',
-    credentials: 'Chartered Accountant, CFP',
-    role: 'Certified Financial Planner for Women',
-    avatarInitials: 'SJ',
-    profileSlug: 'ca-sunita-joshi',
+    name: 'PurpleGirl Career & Workplace Desk',
+    credentials: 'Curated by Workplace Strategy & Career Researchers',
+    role: 'Workplace Etiquette & Professional Growth',
+    avatarInitials: 'PC',
+    profileSlug: 'editorial',
+    disclaimer: 'This guide provides practical career tips and workplace guidance.',
   },
   'skin-beauty': {
-    name: 'Dr. Anjali Desai',
-    credentials: 'MD (Dermatology)',
-    role: 'Consultant Dermatologist',
-    avatarInitials: 'AD',
-    profileSlug: 'dr-anjali-desai',
+    name: 'PurpleGirl Beauty & Skincare Desk',
+    credentials: 'Researched by Skincare & Lifestyle Editors',
+    role: 'Daily Skincare Routines & Lifestyle Tips',
+    avatarInitials: 'PB',
+    profileSlug: 'editorial',
+    disclaimer: 'For educational lifestyle purposes only. For persistent skin conditions, consult a certified dermatologist.',
   },
   'hair-care': {
-    name: 'Dr. Anjali Desai',
-    credentials: 'MD (Dermatology)',
-    role: 'Consultant Dermatologist',
-    avatarInitials: 'AD',
-    profileSlug: 'dr-anjali-desai',
+    name: 'PurpleGirl Hair & Grooming Desk',
+    credentials: 'Researched by Haircare & Beauty Editors',
+    role: 'Routine Haircare & Natural Care Tips',
+    avatarInitials: 'PH',
+    profileSlug: 'editorial',
+    disclaimer: 'General lifestyle tips for daily haircare.',
+  },
+  'family-parenting': {
+    name: 'PurpleGirl Family & Community Desk',
+    credentials: 'Curated by Community & Parenting Researchers',
+    role: 'Social Coping Strategies & Family Harmony',
+    avatarInitials: 'PF',
+    profileSlug: 'editorial',
+  },
+  'self-growth-confidence': {
+    name: 'PurpleGirl Self-Growth & Wellness Desk',
+    credentials: 'Researched by Self-Improvement & Personal Growth Editors',
+    role: 'Mindfulness & Confidence Building',
+    avatarInitials: 'PS',
+    profileSlug: 'editorial',
+  },
+  'home-household': {
+    name: 'PurpleGirl Living & Home Desk',
+    credentials: 'Curated by Home & Living Editors',
+    role: 'Home Organization & Life Hacks',
+    avatarInitials: 'PL',
+    profileSlug: 'editorial',
+  },
+  'festivals-traditions': {
+    name: 'PurpleGirl Culture & Traditions Desk',
+    credentials: 'Curated by Culture & Lifestyle Writers',
+    role: 'Festivals & Indian Living',
+    avatarInitials: 'PC',
+    profileSlug: 'editorial',
   },
 };
 
 const DEFAULT_EXPERT: Expert = {
   name: 'PurpleGirl Editorial Team',
-  credentials: 'Reviewed by experienced women writers & researchers',
+  credentials: 'Researched & Written by Experienced Lifestyle & Community Editors',
   role: 'Editorial Board',
   avatarInitials: 'PG',
-  profileSlug: 'editorial-team',
+  profileSlug: 'editorial',
+  disclaimer: 'Our content is created for practical lifestyle guidance and general informational purposes.',
 };
 
 export function getExpertForCategory(category: string): Expert {
@@ -99,9 +91,9 @@ export function getExpertForCategory(category: string): Expert {
 }
 
 export const ALL_EXPERTS: Expert[] = [
-  EXPERTS['womens-health'],
-  EXPERTS['mental-health-emotions'],
-  EXPERTS['legal-rights'],
-  EXPERTS['finance-money'],
+  EXPERTS['relationships-marriage'],
+  EXPERTS['career-workplace'],
   EXPERTS['skin-beauty'],
+  EXPERTS['self-growth-confidence'],
+  EXPERTS['home-household'],
 ];

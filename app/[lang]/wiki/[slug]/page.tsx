@@ -24,6 +24,7 @@ export async function generateMetadata({ params }: WikiPageProps): Promise<Metad
   return {
     title: term.metaTitle,
     description: term.metaDescription,
+    robots: { index: false, follow: true },
     alternates: {
       canonical,
       languages: {

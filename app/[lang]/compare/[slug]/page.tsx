@@ -25,6 +25,7 @@ export async function generateMetadata({ params }: ComparePageProps): Promise<Me
   return {
     title: page.metaTitle,
     description: page.metaDescription,
+    robots: { index: false, follow: true },
     alternates: {
       canonical,
       languages: {

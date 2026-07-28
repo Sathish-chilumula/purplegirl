@@ -14,20 +14,16 @@ require('dotenv').config({ path: path.resolve(__dirname, '../.env.local') });
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-// ─── Category Definitions ────────────────────────────────────────────────────
+// ─── Category Definitions (Strictly Non-YMYL Lifestyle Focus) ────────────────
 const CATEGORIES = [
-  { slug: 'relationships-marriage',   label: 'Relationships & Marriage' },
-  { slug: 'womens-health',            label: "Women's Health" },
-  { slug: 'mental-health-emotions',   label: 'Mental Health & Emotions' },
-  { slug: 'skin-beauty',              label: 'Skin & Beauty' },
-  { slug: 'family-parenting',         label: 'Family & Parenting' },
-  { slug: 'career-workplace',         label: 'Career & Workplace' },
-  { slug: 'pregnancy-fertility',      label: 'Pregnancy & Fertility' },
-  { slug: 'weight-fitness',           label: 'Weight & Fitness' },
-  { slug: 'hair-care',                label: 'Hair Care' },
-  { slug: 'finance-money',            label: 'Finance & Money' },
-  { slug: 'self-growth-confidence',   label: 'Self-Growth & Confidence' },
-  { slug: 'legal-rights',             label: 'Legal Rights for Women' },
+  { slug: 'relationships-marriage', label: 'Relationships & Communication' },
+  { slug: 'skin-beauty', label: 'Skin & Skincare Routines' },
+  { slug: 'hair-care', label: 'Hair Care & Hair Habits' },
+  { slug: 'family-parenting', label: 'Family Dynamics & Social Harmony' },
+  { slug: 'career-workplace', label: 'Career Growth & Workplace Scenarios' },
+  { slug: 'self-growth-confidence', label: 'Self-Growth & Personal Confidence' },
+  { slug: 'home-household', label: 'Home Organization & Life Hacks' },
+  { slug: 'festivals-traditions', label: 'Culture, Festivals & Living' },
 ];
 
 // Pick 4 random categories per run to keep variety
@@ -107,10 +103,10 @@ Your task: Generate exactly 8 "How To" article titles for the category: "${cat.l
 
 Requirements:
 - Each title must start with "How to" or be a clear guide title (like "Signs That...", "What To Do When...", "X Ways to...")
-- Focus on REAL questions Indian women search on Google — think family pressure, health taboos, workplace issues, relationship problems, money struggles, beauty tips
+- Focus on REAL questions Indian women search on Google — relationship communication, daily self-growth, workplace etiquette, skincare habits, home organization, and social dynamics
+- DO NOT generate titles about clinical medical treatments, prescription drugs, court laws, divorce acts, or tax filing (strictly non-YMYL)
 - Titles must be specific, actionable, and emotionally resonant
-- Mix serious topics with practical day-to-day advice
-- Think like WikiHow + She The People + Sheroes combined
+- Think like WikiHow lifestyle guides + community peer advice combined
 
 Return ONLY a valid JSON array of objects with this exact format (no extra text):
 [

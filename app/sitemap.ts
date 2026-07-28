@@ -92,17 +92,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  // Articles (already have language info — only English gets bare path)
+  // Articles (English canonicals only for clean index focus during AdSense review)
   if (articles) {
     for (const article of articles) {
       const lang = article.language || 'en';
-      const prefix = lang === 'en' ? '' : `/${lang}`;
-      sitemapEntries.push({
-        url: `${SITE_URL}${prefix}/how-to/${article.slug}`,
-        lastModified: new Date(article.published_at || article.created_at),
-        changeFrequency: 'monthly',
-        priority: 0.8,
-      });
+      if (lang === 'en') {
+        sitemapEntries.push({
+          url: `${SITE_URL}/how-to/${article.slug}`,
+          lastModified: new Date(article.published_at || article.created_at),
+          changeFrequency: 'monthly',
+          priority: 0.8,
+        });
+      }
     }
   }
 
@@ -132,38 +133,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  // Wiki definition pages (English only — static content)
-  const wikiSlugs = getAllWikiSlugs();
-  for (const slug of wikiSlugs) {
-    sitemapEntries.push({
-      url: `${SITE_URL}/wiki/${slug}`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.65,
-    });
-  }
-
-  // Compare pages (English only — static content)
-  const compareSlugs = getAllCompareSlugs();
-  for (const slug of compareSlugs) {
-    sitemapEntries.push({
-      url: `${SITE_URL}/compare/${slug}`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.65,
-    });
-  }
-
-  // City-specific pages (English only)
-  const cityTopicPairs = getAllCityTopicPairs();
-  for (const { city, topic } of cityTopicPairs) {
-    sitemapEntries.push({
-      url: `${SITE_URL}/city/${city}/${topic}`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    });
-  }
+  // NOTE: Wiki, Compare, and City-specific pSEO pages are intentionally omitted from sitemap
+  // during the AdSense review phase to focus domain index authority on high-value articles.
 
   return sitemapEntries;
 }

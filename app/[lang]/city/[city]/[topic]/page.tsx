@@ -32,6 +32,7 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
   return {
     title: fillTemplate(topicData.metaTitleTemplate, cityData.name),
     description: fillTemplate(topicData.metaDescTemplate, cityData.name),
+    robots: { index: false, follow: true },
     alternates: {
       canonical,
       languages: {

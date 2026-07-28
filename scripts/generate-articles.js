@@ -261,7 +261,28 @@ async function generateArticle() {
 
   let formatIndex = 0; // Rotate format across articles in the batch
 
+  const SAFE_CATEGORIES = new Set([
+    'relationships-marriage', 'skin-beauty', 'hair-care',
+    'family-parenting', 'career-workplace', 'self-growth-confidence',
+    'home-household', 'festivals-traditions'
+  ]);
+  const YMYL_RISK_KEYWORDS = [
+    'cure', 'doctor', 'treatment', 'medication', 'pill', 'prescription',
+    'divorce law', 'section 498a', 'court', 'advocate', 'lawyer', 'tax',
+    'investment', 'disease', 'diagnosis'
+  ];
+
   for (const articleDef of articlesToProcess) {
+    const cat = (articleDef.category || '').toLowerCase();
+    const titleLower = (articleDef.title || '').toLowerCase();
+
+    // ── Non-YMYL Filter ────────────────────────────────
+    if (!SAFE_CATEGORIES.has(cat) || YMYL_RISK_KEYWORDS.some(kw => titleLower.includes(kw))) {
+      console.log(`SKIPPED YMYL/RISK CATEGORY: [${cat}] "${articleDef.title}"`);
+      continue;
+    }
+    // ────────────────────────────────────────────────────
+
     console.log(`\nGenerating article [Format ${(formatIndex % 3) + 1}/3]: "${articleDef.title}"`);
 
     // Deduplication checks

@@ -145,7 +145,7 @@ export function DecisionToolClient({ lang }: { lang: string }) {
         </div>
 
         <div className="flex gap-4">
-          <Button onClick={handleReset} variant="outline" className="flex-1">
+          <Button onClick={handleReset} variant="secondary" className="flex-1">
             Start Over
           </Button>
           <Button onClick={handleBack} className="flex-1">
